@@ -8,7 +8,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(Catch2)
 
-add_executable(tests tests.cpp)
+add_executable(tests piece_test.cpp move_test.cpp)
 target_link_libraries(tests engine)
 target_link_libraries(tests Catch2::Catch2WithMain)
 

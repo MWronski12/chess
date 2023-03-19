@@ -3,6 +3,7 @@
 
 #include <array>
 #include <memory>
+#include <optional>
 
 #include "move.hpp"
 #include "piece.hpp"
@@ -36,6 +37,7 @@ public:
   bool blackIsCheckMated;
   bool staleMate;
   int score;
+  std::array<std::unique_ptr<Piece>, 64> squares;
 
   void makeMove(Square src, Square dest, PieceType promotion);
   std::string toFEN() const;
@@ -45,11 +47,19 @@ private:
   bool _whiteHasCastled;
   bool _blackHasCastled;
   Square _enPassantSquare;
-  std::array<std::unique_ptr<Piece>, 64> _squares;
 
   // Only used by class methods
   int _fiftyMoveCounter;
   int _threefoldRepetitionCounter;
+
+  // Helper methods
+  bool enPassantIsAvailable() const;
+  void validateMove(Square src, Square dest) const;
+  void recordEnPassant(Square src, Square dest);
+  void handleEnPassant(Square src, Square dest);
+  void handleCastling(Square src, Square dest);
+  void handlePromotion(Square src, Square dest, PieceType promotion);
+  void handleNormalMove(Square src, Square dest);
 };
 
 #endif

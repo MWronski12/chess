@@ -38,8 +38,8 @@ using Square = uint8_t;
 class Piece {
 public:
   // constructors
-  // Piece() = delete;
-  Piece(){};
+  Piece() = delete;
+  Piece(Piece &&otherPiece);
   Piece(PieceColor color, PieceType type, bool hasMoved);
 
   // getters for values that never change

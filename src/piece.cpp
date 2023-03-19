@@ -6,10 +6,10 @@ Piece::Piece(PieceColor color, PieceType type, bool hasMoved)
   setPieceActionValue();
 }
 
-PieceType Piece::getType() { return _type; }
-PieceColor Piece::getColor() { return _color; }
-int Piece::getValue() { return _value; }
-int Piece::getActionValue() { return _actionValue; }
+PieceType Piece::getType() const { return _type; }
+PieceColor Piece::getColor() const { return _color; }
+int Piece::getValue() const { return _value; }
+int Piece::getActionValue() const { return _actionValue; }
 
 void Piece::setPieceValue() {
   switch (_type) {

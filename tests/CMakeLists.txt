@@ -15,3 +15,16 @@ target_link_libraries(tests Catch2::Catch2WithMain)
 include(CTest)
 include(Catch)
 catch_discover_tests(tests)
+
+add_compile_options(
+    -Wall
+    -Wextra
+    -Wpedantic
+    -Werror
+    -fsanitize=address
+    -fsanitize=undefined
+    -fsanitize=leak
+    -fsanitize=thread
+    -fsanitize=undefined
+    # -O2 # Enables compiler optimization
+)

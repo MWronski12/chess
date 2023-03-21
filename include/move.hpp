@@ -9,10 +9,10 @@
 class MoveContent {
 public:
   MoveContent();
-  MoveContent(Square src, Square dest, PieceType promotion);
+  MoveContent(SquareIndex src, SquareIndex dest, PieceType promotion);
 
-  Square src;
-  Square dest;
+  SquareIndex src;
+  SquareIndex dest;
   PieceType promotion;
   PieceType pieceMoving;
   PieceType pieceTaken;

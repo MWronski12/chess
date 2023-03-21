@@ -19,6 +19,8 @@ auto const ROOK_ACTION_VALUE = 2;
 auto const QUEEN_ACTION_VALUE = 1;
 auto const KING_ACTION_VALUE = 1;
 
+auto const NULL_SQUARE = 64;
+
 /* ---------------------------------- enums --------------------------------- */
 enum PieceColor { WHITE, BLACK };
 
@@ -32,13 +34,13 @@ enum PieceType {
   QUEEN,
 };
 
-using Square = uint8_t;
+using SquareIndex = uint8_t;
 
 /* ------------------------------- Piece class ------------------------------ */
 class Piece {
 public:
   // constructors
-  Piece() = delete;
+  Piece(Piece &piece);
   Piece(Piece &&otherPiece);
   Piece(PieceColor color, PieceType type, bool hasMoved);
 
@@ -52,7 +54,7 @@ public:
   bool hasMoved;
   int attackedValue;
   int defendedValue;
-  std::vector<Square> validMoves;
+  std::vector<SquareIndex> validMoves;
 
 private:
   PieceType _type;

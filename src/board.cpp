@@ -20,7 +20,6 @@ Board::Board()
     }
 
     PieceColor color;
-    PieceType type;
 
     if (i < 16) { // Black side squares are low indieces
       color = BLACK;
@@ -37,14 +36,14 @@ Board::Board()
 
 bool Board::whiteHasCastled() const { return _whiteHasCastled; }
 bool Board::blackHasCastled() const { return _blackHasCastled; }
-Square Board::getEnPassantSquare() const { return _enPassantSquare; }
+SquareIndex Board::getEnPassantSquare() const { return _enPassantSquare; }
 
 /* -------------------------------------------------------------------------- */
 /*                         makeMove and helper methods                        */
 /* -------------------------------------------------------------------------- */
 
 // Changes state of the board according to the move being made
-void Board::makeMove(Square src, Square dest, PieceType promotion) {
+void Board::makeMove(SquareIndex src, SquareIndex dest, PieceType promotion) {
 
   validateMove(src, dest);
 
@@ -92,15 +91,15 @@ void Board::makeMove(Square src, Square dest, PieceType promotion) {
 }
 
 bool Board::enPassantIsAvailable() const {
-  if (_enPassantSquare == -1) {
+  if (_enPassantSquare == NULL_SQUARE) {
     return false;
   }
   return true;
 }
 
-void Board::validateMove(Square src, Square dest) const {
+void Board::validateMove(SquareIndex src, SquareIndex dest) const {
   // Validate square indices
-  if (src < 0 || src > 63 || dest < 0 || dest > 63) {
+  if (src > 63 || dest > 63) {
     throw std::invalid_argument("Invalid square indices!");
   }
 
@@ -118,10 +117,10 @@ void Board::validateMove(Square src, Square dest) const {
       throw std::logic_error("Capturing allied piece is not allowed!");
     }
   }
-};
+}
 
 // Sets en passant square according to destination square
-void Board::recordEnPassant(Square src, Square dest) {
+void Board::recordEnPassant(SquareIndex src, SquareIndex dest) {
   if (squares[src]->getColor() == WHITE) {
     _enPassantSquare = dest - 8;
   } else if (squares[src]->getColor() == BLACK) {
@@ -129,7 +128,7 @@ void Board::recordEnPassant(Square src, Square dest) {
   }
 }
 
-void Board::handleEnPassant(Square src, Square dest) {
+void Board::handleEnPassant(SquareIndex src, SquareIndex dest) {
   if (squares[src]->getColor() == WHITE) {
     squares[dest + 8].reset();
   } else if (squares[src]->getColor() == BLACK) {
@@ -138,11 +137,11 @@ void Board::handleEnPassant(Square src, Square dest) {
   squares[src].swap(squares[dest]);
 }
 
-void Board::handleCastling(Square src, Square dest) {
-  // White castle king side
-  if (src == 60) {
-    // squares[src].swap(squares[])
-  };
-}
-// void Board::handlePromotion(Square src, Square dest, PieceType promotion);
-// void Board::handleNormalMove(Square src, Square dest);
+// void Board::handleCastling(SquareIndex src, SquareIndex dest) {
+//   // White castle king side
+//   if (src == 60) {
+//     // squares[src].swap(squares[])
+//   };
+// }
+// void Board::handlePromotion(SquareIndex src, SquareIndex dest, PieceType promotion);
+// void Board::handleNormalMove(SquareIndex src, SquareIndex dest);

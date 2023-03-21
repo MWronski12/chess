@@ -1,14 +1,16 @@
 #include "piece.hpp"
 
+Piece::Piece(Piece &piece) : _type(piece._type), _color(piece._color) {}
+
 Piece::Piece(Piece &&otherPiece)
-    : _type(otherPiece.getType()), _color(otherPiece.getColor()), hasMoved(otherPiece.hasMoved),
-      attackedValue(0), defendedValue(0) {
+    : hasMoved(otherPiece.hasMoved), attackedValue(0), defendedValue(0),
+      _type(otherPiece.getType()), _color(otherPiece.getColor()) {
   setPieceValue();
   setPieceActionValue();
 }
 
 Piece::Piece(PieceColor color, PieceType type, bool hasMoved)
-    : _type(type), _color(color), hasMoved(hasMoved), attackedValue(0), defendedValue(0) {
+    : hasMoved(hasMoved), attackedValue(0), defendedValue(0), _type(type), _color(color) {
   setPieceValue();
   setPieceActionValue();
 }

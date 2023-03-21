@@ -1,6 +1,6 @@
 #include "move.hpp"
 
-MoveContent::MoveContent(Square src, Square dest, PieceType promotion)
+MoveContent::MoveContent(SquareIndex src, SquareIndex dest, PieceType promotion)
     : src(src), dest(dest), promotion(promotion), pieceMoving(EMPTY), pieceTaken(EMPTY),
       isEnPassantCapture(false), score(0) {}
 
@@ -9,4 +9,4 @@ MoveContent::MoveContent()
       isEnPassantCapture(false), score(0) {}
 
 // TODO
-std::string MoveContent::toPGN() const { return "O-O-O"; };
+std::string MoveContent::toPGN() const { return "O-O-O"; }

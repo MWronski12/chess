@@ -25,8 +25,7 @@ public:
   // getters for values that are changed only by class methods
   bool whiteHasCastled() const;
   bool blackHasCastled() const;
-  Square getEnPassantSquare() const;
-  std::array<Piece, 64> getSquares() const;
+  SquareIndex getEnPassantSquare() const;
 
   // values that change
   PieceColor sideToMove;
@@ -39,14 +38,14 @@ public:
   int score;
   std::array<std::unique_ptr<Piece>, 64> squares;
 
-  void makeMove(Square src, Square dest, PieceType promotion);
+  void makeMove(SquareIndex src, SquareIndex dest, PieceType promotion);
   std::string toFEN() const;
 
 private:
   // Available by getters
   bool _whiteHasCastled;
   bool _blackHasCastled;
-  Square _enPassantSquare;
+  SquareIndex _enPassantSquare;
 
   // Only used by class methods
   int _fiftyMoveCounter;
@@ -54,12 +53,12 @@ private:
 
   // Helper methods
   bool enPassantIsAvailable() const;
-  void validateMove(Square src, Square dest) const;
-  void recordEnPassant(Square src, Square dest);
-  void handleEnPassant(Square src, Square dest);
-  void handleCastling(Square src, Square dest);
-  void handlePromotion(Square src, Square dest, PieceType promotion);
-  void handleNormalMove(Square src, Square dest);
+  void validateMove(SquareIndex src, SquareIndex dest) const;
+  void recordEnPassant(SquareIndex src, SquareIndex dest);
+  void handleEnPassant(SquareIndex src, SquareIndex dest);
+  void handleCastling(SquareIndex src, SquareIndex dest);
+  void handlePromotion(SquareIndex src, SquareIndex dest, PieceType promotion);
+  void handleNormalMove(SquareIndex src, SquareIndex dest);
 };
 
 #endif

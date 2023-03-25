@@ -19,6 +19,7 @@ const PieceType STARTING_POSITION[64] = {
 class Board {
 public:
   Board();
+  // TODO
   Board(std::string FENString);
 
   // getters for values that are changed only by class methods
@@ -54,9 +55,9 @@ private:
 
   // Helper methods
   bool enPassantIsAvailable() const;
-  void validateMove(SquareIndex src, SquareIndex dest) const;
+  void validateMove(SquareIndex src, SquareIndex dest, PieceType promotion) const;
   void recordEnPassant(SquareIndex src, SquareIndex dest);
-  void handleEnPassant(SquareIndex src, SquareIndex dest);
+  void handleEnPassant();
   void handleCastling(SquareIndex src, SquareIndex dest);
   void handlePromotion(SquareIndex src, PieceType promotion);
 };

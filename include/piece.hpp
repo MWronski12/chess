@@ -43,7 +43,6 @@ public:
   Piece(PieceColor color, PieceType type, bool hasMoved);
 
   // getters for values that never change
-  PieceType getType() const;
   PieceColor getColor() const;
   int getValue() const;
   int getActionValue() const;

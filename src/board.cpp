@@ -12,7 +12,7 @@ Board::Board()
     : sideToMove(WHITE), lastMove(MoveContent()), whiteIsChecked(false), blackIsChecked(false),
       whiteIsCheckMated(false), blackIsCheckMated(false), staleMate(false), score(0),
       squares({std::nullopt}), _whiteHasCastled(false), _blackHasCastled(false),
-      _enPassantSquare(-1), _fiftyMoveCounter(0), _threefoldRepetitionCounter(0) {
+      _enPassantSquare(NULL_SQUARE), _fiftyMoveCounter(0), _threefoldRepetitionCounter(0) {
 
   for (int i = 0; i < 64; i++) {
 
@@ -46,10 +46,16 @@ SquareIndex Board::getEnPassantSquare() const { return _enPassantSquare; }
 
 void Board::makeMove(SquareIndex src, SquareIndex dest, PieceType promotion) {
 
-  validateMove(src, dest);
+  validateMove(src, dest, promotion);
 
   PieceType pieceMoving = squares[src] ? squares[src]->type : EMPTY;
   PieceType pieceTaken = squares[dest] ? squares[dest]->type : EMPTY;
+
+  // TODO: three fold repetition rule
+  if (_fiftyMoveCounter == 50 || _threefoldRepetitionCounter == 3) {
+    staleMate = true;
+    return;
+  }
 
   // Record move details
   lastMove.src = src;
@@ -66,7 +72,7 @@ void Board::makeMove(SquareIndex src, SquareIndex dest, PieceType promotion) {
   }
   // En passant capture
   else if (enPassantIsAvailable() && pieceMoving == PAWN && dest == getEnPassantSquare()) {
-    handleEnPassant(src, dest);
+    handleEnPassant();
   }
   // Castling
   else if (pieceMoving == KING && abs(src - dest) == 2) {
@@ -78,14 +84,21 @@ void Board::makeMove(SquareIndex src, SquareIndex dest, PieceType promotion) {
   }
 
   // Handle behaviour common to every move
-  squares[dest] = std::move(squares[src]);
+  squares[dest] = squares[src];
   squares[src] = std::nullopt;
   squares[dest]->hasMoved = true;
 
-  // Switch sideToMove
+  // Update other board information
   sideToMove = sideToMove == WHITE ? BLACK : WHITE;
+  if (pieceMoving != PAWN || abs(src - dest) != 16) {
+    _enPassantSquare = NULL_SQUARE;
+  }
+  if (pieceMoving != PAWN && pieceTaken == EMPTY) {
+    _fiftyMoveCounter++;
+  }
 }
 
+// TODO: separate conversion of the move representation
 // D2D4 notation (D2D4Q for promotion)
 void Board::makeMove(std::string move) {
 
@@ -104,7 +117,6 @@ void Board::makeMove(std::string move) {
   }
   // Promotion move like d7d8q
   else if (move.size() == 5) {
-    std::cout << toupper(move[4]) << "\n\n";
     switch (toupper(move[4])) {
     case 'Q':
       promotion = QUEEN;
@@ -145,8 +157,18 @@ bool Board::enPassantIsAvailable() const {
   return true;
 }
 
-// Validates if correct pieces stand on the src and dest squares according to the side to move
-void Board::validateMove(SquareIndex src, SquareIndex dest) const {
+// Validates that:
+// - game is not over yet
+// - src and dest are valid square indices
+// - src square is occupied by the allied piece
+// - dest square is not occupied by allied piece
+// - promotion is not EMPTY only if this is a promoting move
+void Board::validateMove(SquareIndex src, SquareIndex dest, PieceType promotion) const {
+  // Check if game is over
+  if (staleMate || blackIsCheckMated || whiteIsCheckMated) {
+    throw std::logic_error("The game is already over!");
+  }
+
   // Validate square indices
   if (src > 63 || dest > 63) {
     throw std::invalid_argument("Invalid square indices!");
@@ -166,25 +188,33 @@ void Board::validateMove(SquareIndex src, SquareIndex dest) const {
       throw std::logic_error("Capturing allied piece is not allowed!");
     }
   }
+
+  // Validate promotion logic
+  if (squares[src]->type == PAWN && (dest < 8 || dest > 55)) {
+    if (promotion == EMPTY) {
+      throw std::logic_error("Promotion PieceType must be specified for promoting move!");
+    }
+  } else if (promotion != EMPTY) {
+    throw std::logic_error("Promotion PieceType must be EMPTY for non-promoting move!");
+  }
 }
 
 // Sets en passant square according to destination square
 void Board::recordEnPassant(SquareIndex src, SquareIndex dest) {
   if (squares[src]->getColor() == WHITE) {
-    _enPassantSquare = dest - 8;
-  } else if (squares[src]->getColor() == BLACK) {
     _enPassantSquare = dest + 8;
+  } else if (squares[src]->getColor() == BLACK) {
+    _enPassantSquare = dest - 8;
   }
 }
 
 // Clears enPassant square
-void Board::handleEnPassant(SquareIndex src, SquareIndex dest) {
-  if (squares[src]->getColor() == WHITE) {
-    squares[dest + 8] = std::nullopt;
-  } else if (squares[src]->getColor() == BLACK) {
-    squares[dest - 8] = std::nullopt;
-  }
-  squares[src].swap(squares[dest]);
+void Board::handleEnPassant() {
+  squares[getEnPassantSquare()] = std::nullopt;
+  lastMove.isEnPassantCapture = true;
+
+  if (squares[44].has_value())
+    throw std::domain_error("ss");
 }
 
 // Moves the rook

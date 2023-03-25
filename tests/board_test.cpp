@@ -1,4 +1,5 @@
 #include "catch2/catch_test_macros.hpp"
+#include <catch2/benchmark/catch_benchmark.hpp>
 
 #include "board.hpp"
 #include <iostream>
@@ -112,21 +113,70 @@ TEST_CASE("En passant capture is handled properly", "[Board::makeMove()]") {
   board.makeMove(52, 36, EMPTY);
   REQUIRE(board.getEnPassantSquare() == 44);
   board.makeMove(13, 44, EMPTY);
+  REQUIRE(board.squares[36] == std::nullopt);
+  REQUIRE(board.lastMove.isEnPassantCapture == true);
+  REQUIRE(board.lastMove.pieceTaken == PAWN);
+  board.makeMove(55, 47, EMPTY);
+  board.makeMove(11, 27, EMPTY);
+  board.makeMove(50, 19, EMPTY);
+  REQUIRE(board.squares[27] == std::nullopt);
+  REQUIRE(board.lastMove.isEnPassantCapture == true);
+  REQUIRE(board.lastMove.pieceTaken == PAWN);
+}
 
-  if (board.squares[44].has_value())
-    throw std::domain_error("ss");
+TEST_CASE("Castle king side is handled properly", "Board::makeMove()") {
+  Board board;
+  // move away the horses - dest square cannot be occupied by an allied piece
+  board.makeMove(62, 45, EMPTY);
+  board.makeMove(6, 21, EMPTY);
+  // white castle king side
+  board.makeMove(60, 62, EMPTY);
+  REQUIRE(board.squares[63] == std::nullopt);
+  REQUIRE(board.squares[61]->type == ROOK);
+  REQUIRE(board.squares[61]->hasMoved == true);
+  REQUIRE(board.whiteHasCastled() == true);
+  // black castle king side
+  board.makeMove(4, 6, EMPTY);
+  REQUIRE(board.squares[7] == std::nullopt);
+  REQUIRE(board.squares[5]->type == ROOK);
+  REQUIRE(board.squares[5]->hasMoved == true);
+  REQUIRE(board.blackHasCastled() == true);
+}
 
-  //   REQUIRE_FALSE(board.squares[44].has_value());
-  //   REQUIRE(board.lastMove.isEnPassantCapture == true);
+TEST_CASE("Castle queen side is handled properly", "Board::makeMove()") {
+  Board board;
+  // move away the bishops - dest square cannot be occupied by an allied piece
+  board.makeMove(58, 44, EMPTY);
+  board.makeMove(2, 20, EMPTY);
+  // white castle queen side
+  board.makeMove(60, 58, EMPTY);
+  REQUIRE(board.squares[56] == std::nullopt);
+  REQUIRE(board.squares[59]->type == ROOK);
+  REQUIRE(board.squares[59]->hasMoved == true);
+  REQUIRE(board.whiteHasCastled() == true);
+  // black castle king side
+  board.makeMove(4, 2, EMPTY);
+  REQUIRE(board.squares[0] == std::nullopt);
+  REQUIRE(board.squares[3]->type == ROOK);
+  REQUIRE(board.squares[3]->hasMoved == true);
+  REQUIRE(board.blackHasCastled() == true);
+}
 
-  //   if (board.squares[44].has_value()) {
-  //     REQUIRE(true == false);
-  //   }
+TEST_CASE("Promotion is handled correctly", "Board::makeMove()") {
+  Board board;
+  board.makeMove(55, 7, KNIGHT);
+  REQUIRE(board.squares[7]->type == KNIGHT);
+  REQUIRE(board.squares[7]->getValue() == KNIGHT_VALUE);
+  REQUIRE(board.squares[7]->getActionValue() == KNIGHT_ACTION_VALUE);
+}
 
-  //   REQUIRE_FALSE(board.squares[44].has_value());
+TEST_CASE("Pieces are moved correctly", "[Board::makeMove()]") {
+  Board board;
+  board.makeMove(53, 37, EMPTY);
+  REQUIRE(board.squares[53] == std::nullopt);
+  REQUIRE(board.squares[37]->type == PAWN);
 
-  //   REQUIRE(board.squares[36] == std::nullopt);
-  //   board.makeMove(15, 31, EMPTY);
-  //   board.makeMove(55, 23, EMPTY);
-  //   REQUIRE(board.squares[31] == std::nullopt);
+  board.makeMove(6, 21, EMPTY);
+  REQUIRE(board.squares[6] == std::nullopt);
+  REQUIRE(board.squares[21]->type == KNIGHT);
 }

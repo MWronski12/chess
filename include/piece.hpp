@@ -54,14 +54,13 @@ public:
   int defendedValue;
   std::vector<SquareIndex> validMoves;
 
+  void setPieceValue();
+  void setPieceActionValue();
+
 private:
   PieceColor _color;
   int _value;
   int _actionValue;
-
-  // only called in constructors
-  void setPieceValue();
-  void setPieceActionValue();
 };
 
 #endif

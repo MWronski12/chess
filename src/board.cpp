@@ -9,10 +9,10 @@
 
 // Creates a board with a starting position
 Board::Board()
-    : sideToMove(WHITE), lastMove(MoveContent()), whiteIsChecked(false), blackIsChecked(false),
-      whiteIsCheckMated(false), blackIsCheckMated(false), staleMate(false), score(0),
-      squares({std::nullopt}), _whiteHasCastled(false), _blackHasCastled(false),
-      _enPassantSquare(NULL_SQUARE), _fiftyMoveCounter(0), _threefoldRepetitionCounter(0) {
+    : sideToMove(WHITE), whiteIsChecked(false), blackIsChecked(false), whiteIsCheckMated(false),
+      blackIsCheckMated(false), staleMate(false), score(0), _whiteHasCastled(false),
+      _blackHasCastled(false), _enPassantSquare(NULL_SQUARE), _fiftyMoveCounter(0),
+      _threefoldRepetitionCounter(0) {
 
   for (int i = 0; i < 64; i++) {
 
@@ -84,7 +84,7 @@ void Board::makeMove(SquareIndex src, SquareIndex dest, PieceType promotion) {
   }
 
   // Handle behaviour common to every move
-  squares[dest] = squares[src];
+  squares[dest] = std::move(squares[src]);
   squares[src] = std::nullopt;
   squares[dest]->hasMoved = true;
 
@@ -210,11 +210,13 @@ void Board::recordEnPassant(SquareIndex src, SquareIndex dest) {
 
 // Clears enPassant square
 void Board::handleEnPassant() {
-  squares[getEnPassantSquare()] = std::nullopt;
+  if (sideToMove == WHITE) {
+    squares[getEnPassantSquare() + 8] = std::nullopt;
+  } else if (sideToMove == BLACK) {
+    squares[getEnPassantSquare() - 8] = std::nullopt;
+  }
   lastMove.isEnPassantCapture = true;
-
-  if (squares[44].has_value())
-    throw std::domain_error("ss");
+  lastMove.pieceTaken = PAWN;
 }
 
 // Moves the rook
@@ -253,7 +255,9 @@ void Board::handleCastling(SquareIndex src, SquareIndex dest) {
   _blackHasCastled = true;
 }
 
-// Changes type of promoted piece
+// Changes type of promoted piece, while its still on the src square
 void Board::handlePromotion(SquareIndex src, PieceType promotion) {
   squares[src]->type = promotion;
+  squares[src]->setPieceValue();
+  squares[src]->setPieceActionValue();
 }

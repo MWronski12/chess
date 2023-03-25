@@ -5,22 +5,17 @@
 using namespace std;
 
 int main() {
-  cout << "Starting new game of chess...\n\n";
+  cout << "Starting new game of chess...\n";
   ConsoleGui gui;
 
   while (true) {
-    int src;
-    int dest;
-    int promotion;
-
-    cin >> src;
-    cin >> dest;
-    cin >> promotion;
+    std::string input;
+    cin >> input;
 
     try {
-      gui.makeMove(src, dest, (PieceType)promotion);
+      gui.makeMove(input);
     } catch (exception &e) {
-      cout << "Bad move input!\n";
+      cout << e.what();
       continue;
     }
   }

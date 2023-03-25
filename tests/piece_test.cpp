@@ -5,7 +5,7 @@
 TEST_CASE("Piece constructor assigns correct values", "[Piece::Piece]") {
   Piece piece = Piece(WHITE, PAWN, false);
   REQUIRE(piece.getColor() == WHITE);
-  REQUIRE(piece.getType() == PAWN);
+  REQUIRE(piece.type == PAWN);
   REQUIRE(piece.hasMoved == false);
   REQUIRE(piece.getActionValue() == PAWN_ACTION_VALUE);
   REQUIRE(piece.getValue() == PAWN_VALUE);

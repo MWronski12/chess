@@ -5,7 +5,7 @@ MoveContent::MoveContent(SquareIndex src, SquareIndex dest, PieceType promotion)
       isEnPassantCapture(false), score(0) {}
 
 MoveContent::MoveContent()
-    : src(-1), dest(-1), promotion(EMPTY), pieceMoving(EMPTY), pieceTaken(EMPTY),
+    : src(NULL_SQUARE), dest(NULL_SQUARE), promotion(EMPTY), pieceMoving(EMPTY), pieceTaken(EMPTY),
       isEnPassantCapture(false), score(0) {}
 
 // TODO

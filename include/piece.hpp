@@ -40,8 +40,6 @@ using SquareIndex = uint8_t;
 class Piece {
 public:
   // constructors
-  Piece(Piece &piece);
-  Piece(Piece &&otherPiece);
   Piece(PieceColor color, PieceType type, bool hasMoved);
 
   // getters for values that never change
@@ -51,13 +49,13 @@ public:
   int getActionValue() const;
 
   // values that change
+  PieceType type;
   bool hasMoved;
   int attackedValue;
   int defendedValue;
   std::vector<SquareIndex> validMoves;
 
 private:
-  PieceType _type;
   PieceColor _color;
   int _value;
   int _actionValue;

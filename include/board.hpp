@@ -2,7 +2,6 @@
 #define BOARD_HPP
 
 #include <array>
-#include <memory>
 #include <optional>
 
 #include "move.hpp"
@@ -36,9 +35,11 @@ public:
   bool blackIsCheckMated;
   bool staleMate;
   int score;
-  std::array<std::unique_ptr<Piece>, 64> squares;
+  std::array<std::optional<Piece>, 64> squares;
 
   void makeMove(SquareIndex src, SquareIndex dest, PieceType promotion);
+  void makeMove(std::string move); // d2d4 notation (d7d8Q for promotion)
+
   std::string toFEN() const;
 
 private:
@@ -57,8 +58,7 @@ private:
   void recordEnPassant(SquareIndex src, SquareIndex dest);
   void handleEnPassant(SquareIndex src, SquareIndex dest);
   void handleCastling(SquareIndex src, SquareIndex dest);
-  void handlePromotion(SquareIndex src, SquareIndex dest, PieceType promotion);
-  void handleNormalMove(SquareIndex src, SquareIndex dest);
+  void handlePromotion(SquareIndex src, PieceType promotion);
 };
 
 #endif

@@ -2,7 +2,7 @@ add_library(engine Piece.cc Move.cc Board.cc Movegen.cc Evaluation.cc Search.cc 
 target_link_libraries(chess engine)
 
 add_executable(Gui
-src/Gui.cc
+Gui.cc
 )
 
 

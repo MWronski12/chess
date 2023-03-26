@@ -13,7 +13,7 @@ public:
   std::stack<MoveContent> moveHistory;
 
 private:
-  PieceMovesNestedLists movesIterator;
+  PieceMovesNestedLists &movesIterator;
   PieceValidMoves validMoves;
 };
 

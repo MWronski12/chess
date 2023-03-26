@@ -7,7 +7,13 @@
 
 #include <vector>
 
-class PieceValidMoves {};
+class PieceValidMoves {
+public:
+  PieceValidMoves() = default;
+  PieceValidMoves(PieceMovesInterface &movesIterator) : movesIterator(movesIterator) {}
+
+  PieceMovesInterface &movesIterator;
+};
 
 // Interface for PieceMoves generator
 class PieceMovesInterface {
@@ -94,7 +100,7 @@ public:
 
   // Prevent copying of the PieceMoves.
   PieceMovesNestedLists(const PieceMovesNestedLists &) = delete;
-  PieceMovesNestedLists &operator=(const PieceMovesNestedLists &) = delete;
+  PieceMovesNestedLists &operator=(const PieceMovesNestedLists &) { return *this; }
 
 private:
   std::vector<std::vector<SquareIndex>> *_currentListPointer;

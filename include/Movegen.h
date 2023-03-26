@@ -3,59 +3,39 @@
 
 #include <array>
 #include <iostream>
+#include <memory>
 #include <vector>
 
 #include "Piece.h"
 
-// Interface for PieceMoves generator
-class PieceMovesInterface {
-public:
-    virtual void start( PieceColor color, PieceType piece, SquareIndex src ) = 0;
-    virtual bool hasNextMove() = 0;
-    virtual SquareIndex getNextMove() = 0;
-    virtual void skipRay() = 0;
-};
-
 class PieceValidMoves {
 public:
-    PieceValidMoves( PieceMovesInterface &movesIterator );
-    PieceValidMoves &operator=( const PieceValidMoves & ) { return *this; }
-    PieceMovesInterface &movesIterator;
+    // PieceValidMoves( PieceMoves &movesIterator );
+    // PieceValidMoves &operator=( const PieceValidMoves & ) { return *this; }
+    // PieceMoves &movesIterator;
 };
-// Piece moves generator using nested vectors
-// It is readable, but can loose some performance
-class PieceMovesNestedLists : public PieceMovesInterface {
+
+class PieceMoves {
 public:
-    static PieceMovesNestedLists &getInstance() {
-        static PieceMovesNestedLists instance;
+    static PieceMoves &getInstance() {
+        static PieceMoves instance;
         return instance;
     }
 
-    static std::array<std::vector<std::vector<SquareIndex>>, 64> whitePawnMoves;
-    static std::array<std::vector<std::vector<SquareIndex>>, 64> blackPawnMoves;
-    static std::array<std::vector<std::vector<SquareIndex>>, 64> knightMoves;
-    static std::array<std::vector<std::vector<SquareIndex>>, 64> bishopMoves;
-    static std::array<std::vector<std::vector<SquareIndex>>, 64> rookMoves;
-    static std::array<std::vector<std::vector<SquareIndex>>, 64> queenMoves;
-    static std::array<std::vector<std::vector<SquareIndex>>, 64> kingMoves;
-
-    // Iterator interface methods
-    void start( PieceColor color, PieceType piece, SquareIndex src ) override;
-    bool hasNextMove() override;
-    SquareIndex getNextMove() override;
-    void skipRay() override;
-
-    // Prevent copying of the PieceMoves.
-    PieceMovesNestedLists( const PieceMovesNestedLists & ) = delete;
-    PieceMovesNestedLists &operator=( const PieceMovesNestedLists & ) { return *this; }
+    const std::vector<std::vector<SquareIndex>> &getMoveList( PieceColor color, PieceType piece,
+                                                              SquareIndex square ) const;
 
 private:
-    std::vector<std::vector<SquareIndex>> *_currentListPointer;
-    int _rayIndex;
-    int _moveIndex;
-
     // Private constructor to prevent creation of instances from outside the class.
-    PieceMovesNestedLists();
+    PieceMoves();
+
+    std::array<std::vector<std::vector<SquareIndex>>, 64> _whitePawnMoves;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> _blackPawnMoves;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> _knightMoves;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> _bishopMoves;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> _rookMoves;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> _queenMoves;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> _kingMoves;
 
     void generateWhitePawnMoves();
     void generateBlackPawnMoves();

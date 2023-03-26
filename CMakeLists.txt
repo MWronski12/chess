@@ -7,7 +7,7 @@ add_compile_options(
     -Wall
     -Wextra
     -Wpedantic
-    #-Werror
+    -Werror
     # -fsanitize=leak
     # -fsanitize=address
     # -fsanitize=undefined

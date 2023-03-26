@@ -1,67 +1,30 @@
 #include "Movegen.h"
 
-PieceValidMoves::PieceValidMoves( PieceMovesInterface &movesIterator ) : movesIterator( movesIterator ) {}
 static SquareIndex Position( SquareIndex col, SquareIndex row ) { return col + ( row * 8 ); }
 
-// Set correct move ray list pointer and reset indices
-void PieceMovesNestedLists::start( PieceColor color, PieceType piece, SquareIndex src ) {
+const std::vector<std::vector<SquareIndex>> &PieceMoves::getMoveList( PieceColor color, PieceType piece,
+                                                                      SquareIndex squareIndex ) const {
     switch ( piece ) {
         case PAWN:
-            _currentListPointer = color == WHITE ? &whitePawnMoves[src] : &blackPawnMoves[src];
-            break;
-
+            return color == WHITE ? _whitePawnMoves[squareIndex] : _blackPawnMoves[squareIndex];
         case KNIGHT:
-            _currentListPointer = &knightMoves[src];
-            break;
-
+            return _knightMoves[squareIndex];
         case BISHOP:
-            _currentListPointer = &bishopMoves[src];
-            break;
-
+            return _bishopMoves[squareIndex];
         case ROOK:
-            _currentListPointer = &rookMoves[src];
-            break;
-
+            return _rookMoves[squareIndex];
         case QUEEN:
-            _currentListPointer = &queenMoves[src];
-            break;
-
+            return _queenMoves[squareIndex];
         case KING:
-            _currentListPointer = &kingMoves[src];
-            break;
-
+            return _kingMoves[squareIndex];
         default:
-            throw std::logic_error( "Invalid piece requested!" );
+            throw std::logic_error( "Request for moves of incorrect piece type!" );
             break;
     }
-}
-
-// Should be called before getNextMove()
-bool PieceMovesNestedLists::hasNextMove() {
-    if ( _rayIndex >= (int)_currentListPointer->size() ) {
-        return false;
-    }
-    return true;
-}
-
-SquareIndex PieceMovesNestedLists::getNextMove() {
-    _moveIndex++;
-    if ( _moveIndex == (int)( _currentListPointer + _rayIndex )->size() ) {
-        _rayIndex++;
-        _moveIndex = 0;
-    }
-    auto rayPointer = _currentListPointer->at( _rayIndex );
-    auto move = rayPointer.at( _moveIndex );
-    return move;
-}
-
-void PieceMovesNestedLists::skipRay() {
-    _moveIndex = 0;
-    _rayIndex++;
 }
 
 // Private constructor to prevent creation of instances from outside the class.
-PieceMovesNestedLists::PieceMovesNestedLists() : _rayIndex( 0 ), _moveIndex( 0 ) {
+PieceMoves::PieceMoves() {
     generateWhitePawnMoves();
     generateBlackPawnMoves();
     generateKnightMoves();
@@ -71,7 +34,7 @@ PieceMovesNestedLists::PieceMovesNestedLists() : _rayIndex( 0 ), _moveIndex( 0 )
     generateKingMoves();
 }
 
-void PieceMovesNestedLists::generateWhitePawnMoves() {
+void PieceMoves::generateWhitePawnMoves() {
     for ( int index = 0; index <= 64; index++ ) {
         // Pawns cannot stand on 1st and 8th ranks
         if ( index < 8 || index > 55 ) {
@@ -81,25 +44,33 @@ void PieceMovesNestedLists::generateWhitePawnMoves() {
         int x = (int)( index % 8 );
         int y = (int)( ( index / 8 ) );
 
+        std::vector<SquareIndex> ray;
+
         // Diagonal kill to the left
         if ( x > 0 && y > 0 ) {
-            whitePawnMoves[index][0].push_back( index - 8 - 1 );
+            ray.push_back( index - 8 - 1 );
+            _whitePawnMoves[index].push_back( ray );
         }
-        // One Forward
-        whitePawnMoves[index][1].push_back( index - 8 );
+        ray.clear();
 
-        // Starting Position we can jump 2
+        // Forward moves
+        ray.push_back( index - 8 );  // 1 forward
         if ( y == 6 ) {
-            whitePawnMoves[index][1].push_back( index - 16 );
+            ray.push_back( index - 16 );  // 2 forward
         }
+        _whitePawnMoves[index].push_back( ray );
+        ray.clear();
+
         // Diagonal Kill to the right
         if ( x < 7 && y > 0 ) {
-            whitePawnMoves[index][1].push_back( index - 8 + 1 );
+            ray.push_back( index - 8 + 1 );
+            _whitePawnMoves[index].push_back( ray );
         }
+        ray.clear();
     }
 }
 
-void PieceMovesNestedLists::generateBlackPawnMoves() {
+void PieceMoves::generateBlackPawnMoves() {
     for ( int index = 0; index <= 64; index++ ) {
         // Pawns cannot stand on 1st and 8th ranks
         if ( index < 8 || index > 55 ) {
@@ -109,331 +80,433 @@ void PieceMovesNestedLists::generateBlackPawnMoves() {
         int x = (int)( index % 8 );
         int y = (int)( ( index / 8 ) );
 
+        std::vector<SquareIndex> ray;
+
         // Diagonal kill to the left
         if ( x > 0 && y > 0 ) {
-            blackPawnMoves[index][0].push_back( index + 8 - 1 );
+            ray.push_back( index + 8 - 1 );
+            _blackPawnMoves[index].push_back( ray );
         }
-        // One Forward
-        blackPawnMoves[index][1].push_back( index + 8 );
+        ray.clear();
 
-        // Starting Position we can jump 2
+        // Forward moves
+        ray.push_back( index + 8 );  // 1 forward
         if ( y == 6 ) {
-            blackPawnMoves[index][1].push_back( index + 16 );
+            ray.push_back( index + 16 );  // 2 forward
         }
+        _blackPawnMoves[index].push_back( ray );
+        ray.clear();
+
         // Diagonal Kill to the right
         if ( x < 7 && y > 0 ) {
-            blackPawnMoves[index][2].push_back( index + 8 + 1 );
+            ray.push_back( index + 8 + 1 );
+            _blackPawnMoves[index].push_back( ray );
         }
+        ray.clear();
     }
 }
 
-void PieceMovesNestedLists::generateKnightMoves() {
+void PieceMoves::generateKnightMoves() {
     for ( SquareIndex y = 0; y < 8; y++ ) {
         for ( SquareIndex x = 0; x < 8; x++ ) {
             SquareIndex index = ( SquareIndex )( y + ( x * 8 ) );
 
             SquareIndex move;
+            std::vector<SquareIndex> ray;
 
             if ( y < 6 && x > 0 ) {
                 move = Position( ( y + 2 ), ( x - 1 ) );
                 if ( move < 64 ) {
-                    knightMoves[index][0].push_back( move );
+                    ray.push_back( move );
+                    _knightMoves[index].push_back( ray );
+                    ray.clear();
                 }
             }
+
             if ( y > 1 && x < 7 ) {
                 move = Position( ( y - 2 ), ( x + 1 ) );
                 if ( move < 64 ) {
-                    knightMoves[index][1].push_back( move );
+                    ray.push_back( move );
+                    _knightMoves[index].push_back( ray );
+                    ray.clear();
                 }
             }
             if ( y > 1 && x > 0 ) {
                 move = Position( ( y - 2 ), ( x - 1 ) );
                 if ( move < 64 ) {
-                    knightMoves[index][2].push_back( move );
+                    ray.push_back( move );
+                    _knightMoves[index].push_back( ray );
+                    ray.clear();
                 }
             }
             if ( y < 6 && x < 7 ) {
                 move = Position( ( y + 2 ), ( x + 1 ) );
                 if ( move < 64 ) {
-                    knightMoves[index][3].push_back( move );
+                    ray.push_back( move );
+                    _knightMoves[index].push_back( ray );
+                    ray.clear();
                 }
             }
             if ( y > 0 && x < 6 ) {
                 move = Position( ( y - 1 ), ( x + 2 ) );
                 if ( move < 64 ) {
-                    knightMoves[index][4].push_back( move );
+                    ray.push_back( move );
+                    _knightMoves[index].push_back( ray );
+                    ray.clear();
                 }
             }
             if ( y < 7 && x > 1 ) {
                 move = Position( ( y + 1 ), ( x - 2 ) );
                 if ( move < 64 ) {
-                    knightMoves[index][5].push_back( move );
+                    ray.push_back( move );
+                    _knightMoves[index].push_back( ray );
+                    ray.clear();
                 }
             }
             if ( y > 0 && x > 1 ) {
                 move = Position( ( y - 1 ), ( x - 2 ) );
                 if ( move < 64 ) {
-                    knightMoves[index][6].push_back( move );
+                    ray.push_back( move );
+                    _knightMoves[index].push_back( ray );
+                    ray.clear();
                 }
             }
             if ( y < 7 && x < 6 ) {
                 move = Position( ( y + 1 ), ( x + 2 ) );
                 if ( move < 64 ) {
-                    knightMoves[index][7].push_back( move );
+                    ray.push_back( move );
+                    _knightMoves[index].push_back( ray );
+                    ray.clear();
                 }
             }
         }
     }
 }
 
-void PieceMovesNestedLists::generateBishopMoves() {
+void PieceMoves::generateBishopMoves() {
     for ( int y = 0; y < 8; y++ ) {
         for ( int x = 0; x < 8; x++ ) {
             int index = (int)( y + ( x * 8 ) );
             int move;
             int row = x;
             int col = y;
+            std::vector<SquareIndex> ray;
+
             // Bottom right diagonal ray
             while ( row < 7 && col < 7 ) {
                 row++;
                 col++;
                 move = Position( col, row );
-                bishopMoves[index][0].push_back( move );
+                ray.push_back( move );
             }
+            if ( ray.size() > 0 ) _bishopMoves[index].push_back( ray );
+            ray.clear();
             row = x;
             col = y;
+
             // Bottom left diagonal ray
             while ( row < 7 && col > 0 ) {
                 row++;
                 col--;
                 move = Position( col, row );
-                bishopMoves[index][1].push_back( move );
+                ray.push_back( move );
             }
+            if ( ray.size() > 0 ) _bishopMoves[index].push_back( ray );
+            ray.clear();
             row = x;
             col = y;
+
             // Top right diagonal ray
             while ( row > 0 && col < 7 ) {
                 row--;
                 col++;
                 move = Position( col, row );
-                bishopMoves[index][2].push_back( index );
+                ray.push_back( move );
             }
+            if ( ray.size() > 0 ) _bishopMoves[index].push_back( ray );
+            ray.clear();
             row = x;
             col = y;
+
             // Top left diagonal ray
             while ( row > 0 && col > 0 ) {
                 row--;
                 col--;
                 move = Position( col, row );
-                bishopMoves[index][3].push_back( index );
+                ray.push_back( move );
             }
+            if ( ray.size() > 0 ) _bishopMoves[index].push_back( ray );
+            ray.clear();
         }
     }
 }
 
-void PieceMovesNestedLists::generateRookMoves() {
+void PieceMoves::generateRookMoves() {
     for ( int y = 0; y < 8; y++ ) {
         for ( int x = 0; x < 8; x++ ) {
             int index = (int)( y + ( x * 8 ) );
             int move;
             int row = x;
             int col = y;
+            std::vector<SquareIndex> ray;
+
             // Bottom side ray
             while ( row < 7 ) {
                 row++;
                 move = Position( col, row );
-                rookMoves[index][0].push_back( move );
+                ray.push_back( move );
             }
+            if ( ray.size() > 0 ) _rookMoves[index].push_back( ray );
+            ray.clear();
             row = x;
             col = y;
+
             // Top side ray
             while ( row > 0 ) {
                 row--;
                 move = Position( col, row );
-                rookMoves[index][1].push_back( move );
+                ray.push_back( move );
             }
+            if ( ray.size() > 0 ) _rookMoves[index].push_back( ray );
+            ray.clear();
             row = x;
             col = y;
+
             // Left side ray
             while ( col > 0 ) {
                 col--;
                 move = Position( col, row );
-                rookMoves[index][2].push_back( move );
+                ray.push_back( move );
             }
+            if ( ray.size() > 0 ) _rookMoves[index].push_back( ray );
+            ray.clear();
             row = x;
             col = y;
+
             // Right side ray
             while ( col < 7 ) {
                 col++;
                 move = Position( col, row );
-                rookMoves[index][3].push_back( move );
+                ray.push_back( move );
             }
+            if ( ray.size() > 0 ) _rookMoves[index].push_back( ray );
+            ray.clear();
         }
     }
 }
 
-void PieceMovesNestedLists::generateQueenMoves() {
+void PieceMoves::generateQueenMoves() {
     for ( int y = 0; y < 8; y++ ) {
         for ( int x = 0; x < 8; x++ ) {
             int index = (int)( y + ( x * 8 ) );
             int move;
             int row = x;
             int col = y;
+            std::vector<SquareIndex> ray;
+
             // Bottom sie ray
             while ( row < 7 ) {
                 row++;
                 move = Position( col, row );
-                queenMoves[index][0].push_back( move );
+                ray.push_back( move );
             }
+            if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
+            ray.clear();
             row = x;
             col = y;
+
             // Top side ray
             while ( row > 0 ) {
                 row--;
                 move = Position( col, row );
-                queenMoves[index][1].push_back( move );
+                ray.push_back( move );
             }
+            if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
+            ray.clear();
             row = x;
             col = y;
+
             // Left side ray
             while ( col > 0 ) {
                 col--;
                 move = Position( col, row );
-                queenMoves[index][2].push_back( move );
+                ray.push_back( move );
             }
+            if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
+            ray.clear();
             row = x;
             col = y;
+
             // Right side ray
             while ( col < 7 ) {
                 col++;
                 move = Position( col, row );
-                queenMoves[index][3].push_back( move );
+                ray.push_back( move );
             }
+            if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
+            ray.clear();
             row = x;
             col = y;
+
             // Botton right diagonal ray
             while ( row < 7 && col < 7 ) {
                 row++;
                 col++;
                 move = Position( col, row );
-                queenMoves[index][4].push_back( move );
+                ray.push_back( move );
             }
+            if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
+            ray.clear();
             row = x;
             col = y;
+
             // Bottom left diagonal ray
             while ( row < 7 && col > 0 ) {
                 row++;
                 col--;
                 move = Position( col, row );
-                queenMoves[index][5].push_back( move );
+                ray.push_back( move );
             }
+            if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
+            ray.clear();
             row = x;
             col = y;
+
             // Top right diagonal ray
             while ( row > 0 && col < 7 ) {
                 row--;
                 col++;
                 move = Position( col, row );
-                queenMoves[index][6].push_back( move );
+                ray.push_back( move );
             }
+            if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
+            ray.clear();
             row = x;
             col = y;
+
             // Top left diagonal ray
             while ( row > 0 && col > 0 ) {
                 row--;
                 col--;
                 move = Position( col, row );
-                queenMoves[index][7].push_back( move );
+                ray.push_back( move );
             }
+            if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
+            ray.clear();
         }
     }
 }
 
-void PieceMovesNestedLists::generateKingMoves() {
+void PieceMoves::generateKingMoves() {
     for ( int y = 0; y < 8; y++ ) {
         for ( int x = 0; x < 8; x++ ) {
             int index = (int)( y + ( x * 8 ) );
             int move;
             int row = x;
             int col = y;
+            std::vector<SquareIndex> ray;
+
             // Bottom side ray
             if ( row < 7 ) {
                 row++;
                 move = Position( col, row );
-                kingMoves[index][0].push_back( move );
+                ray.push_back( move );
+                _kingMoves[index].push_back( ray );
             }
+            ray.clear();
             row = x;
             col = y;
+
             // Top side ray
             if ( row > 0 ) {
                 row--;
                 move = Position( col, row );
-                kingMoves[index][1].push_back( move );
+                ray.push_back( move );
+                _kingMoves[index].push_back( ray );
             }
+            ray.clear();
             row = x;
             col = y;
+
             // Left side ray
             if ( col > 0 ) {
                 col--;
                 move = Position( col, row );
-                kingMoves[index][2].push_back( move );
+                ray.push_back( move );
                 // Queen side castle
                 if ( index == 4 ) {
-                    kingMoves[index][2].push_back( 2 );
+                    ray.push_back( 2 );
                 } else if ( index == 60 ) {
-                    kingMoves[index][2].push_back( 58 );
+                    ray.push_back( 58 );
                 }
+                _kingMoves[index].push_back( ray );
             }
+            ray.clear();
             row = x;
             col = y;
+
             // Right side ray
             if ( col < 7 ) {
                 col++;
                 move = Position( col, row );
-                kingMoves[index][3].push_back( move );
+                ray.push_back( move );
                 // King side castle
                 if ( index == 4 ) {
-                    kingMoves[index][3].push_back( 6 );
+                    ray.push_back( 6 );
                 } else if ( index == 60 ) {
-                    kingMoves[index][3].push_back( 62 );
+                    ray.push_back( 62 );
                 }
+                _kingMoves[index].push_back( ray );
             }
+            ray.clear();
             row = x;
             col = y;
+
             // Bottom right diagonal ray
             if ( row < 7 && col < 7 ) {
                 row++;
                 col++;
                 move = Position( col, row );
-                kingMoves[index][4].push_back( move );
+                ray.push_back( move );
+                _kingMoves[index].push_back( ray );
             }
+            ray.clear();
             row = x;
             col = y;
+
             // Bottom left diagonal ray
             if ( row < 7 && col > 0 ) {
                 row++;
                 col--;
                 move = Position( col, row );
-                kingMoves[index][5].push_back( move );
+                ray.push_back( move );
+                _kingMoves[index].push_back( ray );
             }
+            ray.clear();
             row = x;
             col = y;
+
             // Top right diagonal ray
             if ( row > 0 && col < 7 ) {
                 row--;
                 col++;
                 move = Position( col, row );
-                kingMoves[index][6].push_back( move );
+                ray.push_back( move );
+                _kingMoves[index].push_back( ray );
             }
+            ray.clear();
             row = x;
             col = y;
+
             // Top left diagonal ray
             if ( row > 0 && col > 0 ) {
                 row--;
                 col--;
                 move = Position( col, row );
-                kingMoves[index][7].push_back( move );
+                ray.push_back( move );
+                _kingMoves[index].push_back( ray );
             }
+            ray.clear();
         }
     }
 }

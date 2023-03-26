@@ -4,6 +4,7 @@
 #include "Board.h"
 #include "Move.h"
 #include "Movegen.h"
+#include <stack>
 
 class Engine {
 public:
@@ -12,7 +13,7 @@ public:
   std::stack<MoveContent> moveHistory;
 
 private:
-  PieceMovesIterator movesIterator;
+  PieceMovesNestedLists movesIterator;
   PieceValidMoves validMoves;
 };
 

@@ -1,4 +1,4 @@
-#include "movegen.hpp"
+#include "Movegen.h"
 
 static SquareIndex Position(SquareIndex col, SquareIndex row) { return col + (row * 8); }
 
@@ -13,34 +13,7 @@ PieceMoves::PieceMoves() {
   generateKingMoves();
 }
 
-void PieceMoves::generateWhitePawnMoves() {
-  for (int index = 0; index <= 64; index++) {
-    // Pawns cannot stand on 1st and 8th ranks
-    if (index < 8 || index > 55) {
-      whitePawnMoves[index].push_back(NULL_SQUARE);
-      continue;
-    }
-
-    int x = (int)(index % 8);
-    int y = (int)((index / 8));
-
-    // Diagonal Kill
-    if (x < 7 && y > 0) {
-      whitePawnMoves[index].push_back(index - 8 - 1);
-    }
-    if (x > 0 && y > 0) {
-      whitePawnMoves[index].push_back(index - 8 + 1);
-    }
-
-    // One Forward
-    whitePawnMoves[index].push_back(index - 8);
-
-    //  Starting Position we can jump 2
-    if (y == 6) {
-      whitePawnMoves[index].push_back(index - 16);
-    }
-  }
-}
+void PieceMoves::generateWhitePawnMoves() {}
 
 void PieceMoves::generateBlackPawnMoves() {
   for (SquareIndex index = 0; index <= 64; index++) {

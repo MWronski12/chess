@@ -1,4 +1,4 @@
-#include "piece.hpp"
+#include "Piece.h"
 
 Piece::Piece(PieceColor color, PieceType type, bool hasMoved)
     : type(type), hasMoved(hasMoved), attackedValue(0), defendedValue(0), _color(color) {

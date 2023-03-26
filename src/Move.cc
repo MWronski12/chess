@@ -1,4 +1,4 @@
-#include "move.hpp"
+#include "Move.h"
 
 MoveContent::MoveContent(SquareIndex src, SquareIndex dest, PieceType promotion)
     : src(src), dest(dest), promotion(promotion), pieceMoving(EMPTY), pieceTaken(EMPTY),

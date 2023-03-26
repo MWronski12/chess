@@ -1,9 +1,9 @@
-#ifndef MOVE_HPP
-#define MOVE_HPP
-
-#include "piece.hpp"
+#ifndef MOVE_H
+#define MOVE_H
 
 #include <string>
+
+#include "Piece.h"
 
 /* ---------------------------- MoveContent class --------------------------- */
 class MoveContent {

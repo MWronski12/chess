@@ -1,11 +1,11 @@
-#ifndef BOARD_HPP
-#define BOARD_HPP
+#ifndef BOARD_H
+#define BOARD_H
 
 #include <array>
 #include <optional>
 
-#include "move.hpp"
-#include "piece.hpp"
+#include "Move.h"
+#include "Piece.h"
 
 /* -------------------------- starting position map ------------------------- */
 const PieceType STARTING_POSITION[64] = {

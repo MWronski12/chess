@@ -1,8 +1,7 @@
-#ifndef MOVEGEN_HPP
-#define MOVEGEN_HPP
+#ifndef MOVEGEN_H
+#define MOVEGEN_H
 
-#include "piece.hpp"
-
+#include "Piece.h
 #include <array>
 #include <vector>
 
@@ -50,7 +49,7 @@
 
 class PieceMovesInterface {
 public:
-  virtual void start(PieceType piece, SquareIndex src) = 0;
+  virtual void start(PieceColor color, PieceType piece, SquareIndex src) = 0;
   virtual bool hasNextMove() = 0;
   virtual SquareIndex getNextMove() = 0;
   virtual void skipRay() = 0;
@@ -67,10 +66,23 @@ public:
   static std::array<std::vector<std::vector<SquareIndex>>, 64> kingMoves;
 
   // Implement iterator methods
-  void start(PieceType piece, SquareIndex src) override {}
+  void start(PieceColor color, PieceType piece, SquareIndex src) override {
+    _squareIndex = src;
+    switch (piece) {
+    case /* constant-expression */:
+      /* code */
+      break;
+
+    default:
+      break;
+    }
+  }
   bool hasNextMove() override {}
   SquareIndex getNextMove() override {}
-  void skipRay() override {}
+  void skipRay() override {
+    _rayIndex++;
+    _moveIndex = 0;
+  }
 
   // Prevent copying of the PieceMoves.
   PieceMovesNestedLists(const PieceMovesNestedLists &) = delete;
@@ -83,7 +95,7 @@ private:
   int _moveIndex;
 
   // Private constructor to prevent creation of instances from outside the class.
-  PieceMovesNestedLists() {
+  PieceMovesNestedLists() : listPointer(NULL), _squareIndex(0), _rayIndex(0), _moveIndex(0) {
     generateWhitePawnMoves();
     generateBlackPawnMoves();
     generateKnightMoves();

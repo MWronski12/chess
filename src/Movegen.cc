@@ -1,5 +1,7 @@
 #include "Movegen.h"
 
+PieceValidMoves::PieceValidMoves(PieceMovesInterface &movesIterator)
+    : movesIterator(movesIterator) {}
 static SquareIndex Position(SquareIndex col, SquareIndex row) { return col + (row * 8); }
 
 // Set correct move ray list pointer and reset indices
@@ -38,7 +40,7 @@ void PieceMovesNestedLists::start(PieceColor color, PieceType piece, SquareIndex
 
 // Should be called before getNextMove()
 bool PieceMovesNestedLists::hasNextMove() {
-  if (_rayIndex >= _currentListPointer->size()) {
+  if (_rayIndex >= (int)_currentListPointer->size()) {
     return false;
   }
   return true;
@@ -46,7 +48,7 @@ bool PieceMovesNestedLists::hasNextMove() {
 
 SquareIndex PieceMovesNestedLists::getNextMove() {
   _moveIndex++;
-  if (_moveIndex == (_currentListPointer + _rayIndex)->size()) {
+  if (_moveIndex == (int)(_currentListPointer + _rayIndex)->size()) {
     _rayIndex++;
     _moveIndex = 0;
   }

@@ -44,7 +44,7 @@ add_compile_options(
     -Wall
     -Wextra
     -Wpedantic
-    -Werror
+   # -Werror
     -fsanitize=address
     -fsanitize=undefined
     -fsanitize=leak

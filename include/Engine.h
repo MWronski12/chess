@@ -8,7 +8,7 @@
 
 class Engine {
 public:
-  Engine();
+  Engine(PieceMovesNestedLists &PieceMoves);
   Board board;
   std::stack<MoveContent> moveHistory;
 

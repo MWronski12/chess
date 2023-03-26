@@ -16,6 +16,12 @@ public:
   virtual void skipRay() = 0;
 };
 
+class PieceValidMoves {
+public:
+  PieceValidMoves(PieceMovesInterface &movesIterator);
+  PieceValidMoves &operator=(const PieceValidMoves &) { return *this; }
+  PieceMovesInterface &movesIterator;
+};
 // Piece moves generator using nested vectors
 // It is readable, but can loose some performance
 class PieceMovesNestedLists : public PieceMovesInterface {
@@ -41,7 +47,7 @@ public:
 
   // Prevent copying of the PieceMoves.
   PieceMovesNestedLists(const PieceMovesNestedLists &) = delete;
-  PieceMovesNestedLists &operator=(const PieceMovesNestedLists &) = delete;
+  PieceMovesNestedLists &operator=(const PieceMovesNestedLists &) { return *this; }
 
 private:
   std::vector<std::vector<SquareIndex>> *_currentListPointer;

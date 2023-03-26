@@ -168,12 +168,10 @@ void Board::validateMove(SquareIndex src, SquareIndex dest, PieceType promotion)
   if (staleMate || blackIsCheckMated || whiteIsCheckMated) {
     throw std::logic_error("The game is already over!");
   }
-
   // Validate square indices
   if (src > 63 || dest > 63) {
     throw std::invalid_argument("Invalid square indices!");
   }
-
   // Validate source square piece
   if (!squares[src]) {
     throw std::logic_error("Source square must be occupied by a piece!");
@@ -181,14 +179,12 @@ void Board::validateMove(SquareIndex src, SquareIndex dest, PieceType promotion)
     throw std::logic_error(
         "Source square must be occupied by a piece owned by the player whose turn it is!");
   }
-
   // Validate dest square piece
   if (squares[dest]) {
     if (sideToMove == squares[dest]->getColor()) {
       throw std::logic_error("Capturing allied piece is not allowed!");
     }
   }
-
   // Validate promotion logic
   if (squares[src]->type == PAWN && (dest < 8 || dest > 55)) {
     if (promotion == EMPTY) {
@@ -208,7 +204,7 @@ void Board::recordEnPassant(SquareIndex src, SquareIndex dest) {
   }
 }
 
-// Clears enPassant square
+// Clears enPassant square and records additional lastMove details
 void Board::handleEnPassant() {
   if (sideToMove == WHITE) {
     squares[getEnPassantSquare() + 8] = std::nullopt;

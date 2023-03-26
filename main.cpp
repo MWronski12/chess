@@ -1,24 +1,24 @@
 #include <iostream>
 
-#include "gui.hpp"
+#include "Gui.hpp"
 
 using namespace std;
 
 int main() {
-  cout << "Starting new game of chess...\n";
-  ConsoleGui gui;
+    cout << "Starting new game of chess...\n";
+    ConsoleGui gui;
 
-  while (true) {
-    std::string input;
-    cin >> input;
+    while ( true ) {
+        std::string input;
+        cin >> input;
 
-    try {
-      gui.makeMove(input);
-    } catch (exception &e) {
-      cout << e.what();
-      continue;
+        try {
+            gui.makeMove( input );
+        } catch ( exception &e ) {
+            cout << e.what();
+            continue;
+        }
     }
-  }
 
-  return 1;
+    return 1;
 }

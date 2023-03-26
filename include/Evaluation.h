@@ -2,9 +2,8 @@
 #define EVALUATION_H
 
 class Evaluation {
-
 public:
-  static int evaluateBoard(Board board);
+    static int evaluateBoard( Board board );
 
 private:
 };

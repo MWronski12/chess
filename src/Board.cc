@@ -1,3 +1,13 @@
+/*
+ * Brief:
+ * Board class representing position in the game of chess.
+ * Contains all the information necessary to continue a valid game of chess.
+ * Provides makeMove method.
+ *
+ * Author: Mikołaj Wroński
+ * Date: 24.03.2023
+ */
+
 #include <iostream>
 #include <stdexcept>
 
@@ -36,6 +46,25 @@ Board::Board()
 
         squares[i] = std::make_optional<Piece>( color, STARTING_POSITION[i], false );
     }
+}
+
+Board Board::fastCopy() {
+    Board newBoard;
+    newBoard.sideToMove = this->sideToMove;
+    newBoard.whiteIsChecked = this->whiteIsChecked;
+    newBoard.blackIsChecked = this->blackIsChecked;
+    newBoard._blackHasCastled = this->_blackHasCastled;
+    newBoard._whiteHasCastled = this->_whiteHasCastled;
+    newBoard._fiftyMoveCounter = this->_fiftyMoveCounter;
+    newBoard._threefoldRepetitionCounter = this->_fiftyMoveCounter;
+    // Copy the pieces, including only their color, type and hasMoved fields
+    for ( int i = 0; i < 64; i++ ) {
+        if ( this->squares[i] ) {
+            auto &piece = this->squares[i];
+            newBoard.squares[i] = std::make_optional<Piece>( piece->getColor(), piece->type, piece->hasMoved );
+        }
+    }
+    return newBoard;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -250,8 +279,8 @@ void Board::handleCastling( SquareIndex src, SquareIndex dest ) {
             squares[3]->hasMoved = true;
             squares[0] = std::nullopt;
         }
+        _blackHasCastled = true;
     }
-    _blackHasCastled = true;
 }
 
 // Changes type of promoted piece, while its still on the src square

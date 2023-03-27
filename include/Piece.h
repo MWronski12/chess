@@ -6,6 +6,7 @@
 #include <vector>
 
 /* -------------------------------- constants ------------------------------- */
+
 auto const PAWN_VALUE = 100;
 auto const KNIGHT_VALUE = 300;
 auto const BISHOP_VALUE = 325;
@@ -23,6 +24,7 @@ auto const KING_ACTION_VALUE = 1;
 auto const NULL_SQUARE = 64;
 
 /* ---------------------------------- enums --------------------------------- */
+
 enum PieceColor { WHITE, BLACK };
 
 enum PieceType {
@@ -38,6 +40,7 @@ enum PieceType {
 using SquareIndex = uint8_t;
 
 /* ------------------------------- Piece class ------------------------------ */
+
 class Piece {
 public:
     // constructors

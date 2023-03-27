@@ -6,6 +6,7 @@
 #include "Piece.h"
 
 /* ---------------------------- MoveContent class --------------------------- */
+
 class MoveContent {
 public:
     MoveContent();

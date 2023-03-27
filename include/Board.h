@@ -8,6 +8,7 @@
 #include "Piece.h"
 
 /* -------------------------- starting position map ------------------------- */
+
 const PieceType STARTING_POSITION[64] = {
     ROOK,  KNIGHT, BISHOP, QUEEN, KING,  BISHOP, KNIGHT, ROOK,  PAWN,  PAWN,   PAWN,   PAWN,  PAWN,
     PAWN,  PAWN,   PAWN,   EMPTY, EMPTY, EMPTY,  EMPTY,  EMPTY, EMPTY, EMPTY,  EMPTY,  EMPTY, EMPTY,
@@ -16,11 +17,13 @@ const PieceType STARTING_POSITION[64] = {
     PAWN,  PAWN,   PAWN,   PAWN,  ROOK,  KNIGHT, BISHOP, QUEEN, KING,  BISHOP, KNIGHT, ROOK };
 
 /* ------------------------------- Board class ------------------------------ */
+
 class Board {
 public:
     Board();
     // TODO
     Board( std::string FENString );
+    Board fastCopy();
 
     // getters for values that are changed only by class methods
     bool whiteHasCastled() const;

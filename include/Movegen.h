@@ -6,14 +6,8 @@
 #include <memory>
 #include <vector>
 
+#include "Board.h"
 #include "Piece.h"
-
-class PieceValidMoves {
-public:
-    // PieceValidMoves( PieceMoves &movesIterator );
-    // PieceValidMoves &operator=( const PieceValidMoves & ) { return *this; }
-    // PieceMoves &movesIterator;
-};
 
 class PieceMoves {
 public:
@@ -44,6 +38,38 @@ private:
     void generateRookMoves();
     void generateQueenMoves();
     void generateKingMoves();
+};
+
+class PieceValidMoves {
+public:
+    PieceValidMoves();
+
+    // Generate all valid moves for the given board filling Piece.validMoves vectors
+    int generateValidMoves( Board &board );
+
+private:
+    // Kings and pawns have different restrictions on moves so they are handled separately
+    int generateValidKingMoves( Board &board, SquareIndex srcSquare );
+    int generateValidPawnMoves( Board &board, SquareIndex srcSquare );
+
+    // Analyze methods will record information about the board while looking at the move
+    // They will return true if the move is valid
+    bool analyzeMove( Board &board, SquareIndex srcSquare, SquareIndex dest );
+    bool analyzePawnMove( Board &board, SquareIndex srcSquare, SquareIndex destSquare );
+    bool analyzeCastlingMove( Board &board, SquareIndex srcSquare, SquareIndex destSquare );
+
+    // Validate if the move does not leave the king in check
+    bool validateMove( Board &board, SquareIndex srcSquare, SquareIndex destSquare ) const;
+
+    // Only used for castling moves
+    std::array<bool, 64> _blackAttackBoard;
+    std::array<bool, 64> _whiteAttackBoard;
+
+    // Track the king's position to analyze at the end
+    SquareIndex _blackKingSquare;
+    SquareIndex _whiteKingSquare;
+
+    PieceMoves &_pieceMoves;
 };
 
 #endif

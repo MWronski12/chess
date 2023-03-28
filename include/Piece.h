@@ -2,6 +2,7 @@
 #define PIECE_HPP
 
 #include <inttypes.h>
+
 #include <vector>
 
 /* -------------------------------- constants ------------------------------- */
@@ -25,13 +26,13 @@ auto const NULL_SQUARE = 64;
 enum PieceColor { WHITE, BLACK };
 
 enum PieceType {
-  EMPTY,
-  ROOK,
-  KNIGHT,
-  BISHOP,
-  QUEEN,
-  KING,
-  PAWN,
+    EMPTY,
+    ROOK,
+    KNIGHT,
+    BISHOP,
+    QUEEN,
+    KING,
+    PAWN,
 };
 
 using SquareIndex = uint8_t;
@@ -39,28 +40,28 @@ using SquareIndex = uint8_t;
 /* ------------------------------- Piece class ------------------------------ */
 class Piece {
 public:
-  // constructors
-  Piece(PieceColor color, PieceType type, bool hasMoved);
+    // constructors
+    Piece( PieceColor color, PieceType type, bool hasMoved );
 
-  // getters for values that never change
-  PieceColor getColor() const;
-  int getValue() const;
-  int getActionValue() const;
+    // getters for values that never change
+    PieceColor getColor() const;
+    int getValue() const;
+    int getActionValue() const;
 
-  // values that change
-  PieceType type;
-  bool hasMoved;
-  int attackedValue;
-  int defendedValue;
-  std::vector<SquareIndex> validMoves;
+    // values that change
+    PieceType type;
+    bool hasMoved;
+    int attackedValue;
+    int defendedValue;
+    std::vector<SquareIndex> validMoves;
 
-  void setPieceValue();
-  void setPieceActionValue();
+    void setPieceValue();
+    void setPieceActionValue();
 
 private:
-  PieceColor _color;
-  int _value;
-  int _actionValue;
+    PieceColor _color;
+    int _value;
+    int _actionValue;
 };
 
 #endif

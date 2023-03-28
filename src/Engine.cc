@@ -7,7 +7,7 @@
 
 #include "Engine.h"
 
-Engine::Engine(PieceMovesNestedLists *PieceMoves) {
-  movesIterator = PieceMoves;
-  validMoves = new PieceValidMoves(movesIterator);
+Engine::Engine( PieceMovesNestedLists *PieceMoves ) {
+    movesIterator = PieceMoves;
+    validMoves = new PieceValidMoves( movesIterator );
 }

@@ -1,31 +1,23 @@
 #include <iostream>
 
-#include "Gui.h"
+#include "Movegen.h"
 
 using namespace std;
 using namespace sf;
 
 int main() {
-  cout << "Starting new game of chess...\n";
-  // ConsoleGui gui;
+    PieceMoves &pieceMoves = PieceMoves::getInstance();
+    int count = 0;
 
-  // while (true) {
-  //   std::string input;
-  //   cin >> input;
+    for ( SquareIndex square = 0; square < 64; square++ )
+        for ( auto &ray : pieceMoves.getMoveList( WHITE, PAWN, square ) ) {
+            for ( auto &_ : ray ) {
+                (void)_;
+                count++;
+            }
+        }
 
-  //   try {
-  //     gui.makeMove(input);
-  //   } catch (exception &e) {
-  //     cout << e.what();
-  //     continue;
-  //   }
-  // }
+    cout << count << endl;
 
-  // Window Gui
-  WindowGui wgui;
-  while (true) {
-    std::string input;
-    cin >> input;
-  }
-  return 1;
+    return 1;
 }

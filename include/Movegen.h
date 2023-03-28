@@ -1,76 +1,73 @@
 #ifndef MOVEGEN_HPP
 #define MOVEGEN_HPP
 
-#include "Piece.h"
 #include <array>
 #include <iostream>
-
+#include <memory>
 #include <vector>
 
-// Interface for PieceMoves generator
-class PieceMovesInterface {
+#include "Board.h"
+#include "Piece.h"
+
+class PieceMoves {
 public:
-  virtual void start(PieceColor color, PieceType piece, SquareIndex src) = 0;
-  virtual bool hasNextMove() = 0;
-  virtual SquareIndex getNextMove() = 0;
-  virtual void skipRay() = 0;
+    static PieceMoves &getInstance() {
+        static PieceMoves instance;
+        return instance;
+    }
+
+    const std::vector<std::vector<SquareIndex>> &getMoveList( PieceColor color, PieceType piece,
+                                                              SquareIndex square ) const;
+
+private:
+    // Private constructor to prevent creation of instances from outside the class.
+    PieceMoves();
+
+    std::array<std::vector<std::vector<SquareIndex>>, 64> _whitePawnMoves;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> _blackPawnMoves;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> _knightMoves;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> _bishopMoves;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> _rookMoves;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> _queenMoves;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> _kingMoves;
+
+    void generateWhitePawnMoves();
+    void generateBlackPawnMoves();
+    void generateKnightMoves();
+    void generateBishopMoves();
+    void generateRookMoves();
+    void generateQueenMoves();
+    void generateKingMoves();
 };
 
 class PieceValidMoves {
 public:
-  PieceValidMoves(PieceMovesInterface *movesIterator);
-  PieceValidMoves &operator=(const PieceValidMoves &) { return *this; }
-  PieceMovesInterface *movesIterator;
-};
-// Piece moves generator using nested vectors
-// It is readable, but can loose some performance
-class PieceMovesNestedLists : public PieceMovesInterface {
-public:
-  static PieceMovesNestedLists &getInstance() {
-    static PieceMovesNestedLists instance;
-    return instance;
-  }
+    PieceValidMoves();
 
-  std::array<std::vector<std::vector<SquareIndex>>, 64> whitePawnMoves;
-  std::array<std::vector<std::vector<SquareIndex>>, 64> blackPawnMoves;
-  std::array<std::vector<std::vector<SquareIndex>>, 64> knightMoves;
-  std::array<std::vector<std::vector<SquareIndex>>, 64> bishopMoves;
-  std::array<std::vector<std::vector<SquareIndex>>, 64> rookMoves;
-  std::array<std::vector<std::vector<SquareIndex>>, 64> queenMoves;
-  std::array<std::vector<std::vector<SquareIndex>>, 64> kingMoves;
-
-  // Iterator interface methods
-  void start(PieceColor color, PieceType piece, SquareIndex src) override;
-  bool hasNextMove() override;
-  SquareIndex getNextMove() override;
-  void skipRay() override;
-
-  // Prevent copying of the PieceMoves.
-  PieceMovesNestedLists(const PieceMovesNestedLists &) = delete;
-  PieceMovesNestedLists &operator=(const PieceMovesNestedLists &) { return *this; }
+    // Generate all valid moves for the given board filling Piece.validMoves vectors
+    int generateValidMoves( Board &board );
 
 private:
-  std::vector<std::vector<SquareIndex>> *_currentListPointer;
-  int _rayIndex;
-  int _moveIndex;
-  void generateWhitePawnMoves();
-  void generateBlackPawnMoves();
-  void generateKnightMoves();
-  void generateBishopMoves();
-  void generateRookMoves();
-  void generateQueenMoves();
-  void generateKingMoves();
+    // Kings and pawns have different restrictions on moves so they are handled separately
+    int generateValidKingMoves( Board &board, SquareIndex srcSquare );
+    int generateValidCastlingMoves( Board &board, SquareIndex srcSquare );
+    int generateValidPawnMoves( Board &board, SquareIndex srcSquare );
 
-  // Private constructor to prevent creation of instances from outside the class.
-  PieceMovesNestedLists() : _rayIndex(0), _moveIndex(0) {
-    generateWhitePawnMoves();
-    generateBlackPawnMoves();
-    generateKnightMoves();
-    generateBishopMoves();
-    generateRookMoves();
-    generateQueenMoves();
-    generateKingMoves();
-  }
+    // Analyze methods will record information about the board while looking at the move
+    // They will return true if the move is valid
+    bool analyzeMove( Board &board, SquareIndex srcSquare, SquareIndex dest );
+    bool analyzePawnMove( Board &board, SquareIndex srcSquare, SquareIndex destSquare );
+    bool analyzeCastlingMove( Board &board, SquareIndex srcSquare, SquareIndex destSquare );
+
+    // Only used for castling moves
+    std::array<bool, 64> _blackAttackBoard;
+    std::array<bool, 64> _whiteAttackBoard;
+
+    // Track the king's position to analyze at the end
+    SquareIndex _blackKingSquare;
+    SquareIndex _whiteKingSquare;
+
+    PieceMoves &_pieceMoves;
 };
 
 #endif

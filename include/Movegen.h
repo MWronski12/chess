@@ -50,6 +50,7 @@ public:
 private:
     // Kings and pawns have different restrictions on moves so they are handled separately
     int generateValidKingMoves( Board &board, SquareIndex srcSquare );
+    int generateValidCastlingMoves( Board &board, SquareIndex srcSquare );
     int generateValidPawnMoves( Board &board, SquareIndex srcSquare );
 
     // Analyze methods will record information about the board while looking at the move
@@ -57,9 +58,6 @@ private:
     bool analyzeMove( Board &board, SquareIndex srcSquare, SquareIndex dest );
     bool analyzePawnMove( Board &board, SquareIndex srcSquare, SquareIndex destSquare );
     bool analyzeCastlingMove( Board &board, SquareIndex srcSquare, SquareIndex destSquare );
-
-    // Validate if the move does not leave the king in check
-    bool validateMove( Board &board, SquareIndex srcSquare, SquareIndex destSquare ) const;
 
     // Only used for castling moves
     std::array<bool, 64> _blackAttackBoard;

@@ -1,15 +1,17 @@
 add_library(engine Piece.cc Move.cc Board.cc Movegen.cc)
-target_link_libraries(chess engine)
+include(FetchContent)
+FetchContent_Declare(SFML
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG 2.6.x)
+FetchContent_MakeAvailable(SFML)
+
+install(TARGETS chess)
+target_link_libraries(chess engine sfml-graphics sfml-window sfml-system)
 
 # add_executable(Gui
 # Gui.cc
 # )
-
-# include(FetchContent)
-# FetchContent_Declare(SFML
-#     GIT_REPOSITORY https://github.com/SFML/SFML.git
-#     GIT_TAG 2.6.x)
-# FetchContent_MakeAvailable(SFML)
+# tutaj taki jest problem że tworzym bibliotekę, która jest zależna od biblioteki?
 
 # target_link_libraries(Gui PRIVATE sfml-graphics)
 # target_link_libraries(Gui PRIVATE sfml-window)
@@ -20,19 +22,19 @@ target_link_libraries(chess engine)
 # # endif()
 # install(TARGETS Gui)
 
-# # To build static libraries?
-# # unset(BUILD_SHARED_LIBS)
-# # You CMake code isn't how you find SFML.
+# To build static libraries?
+# unset(BUILD_SHARED_LIBS)
+# You CMake code isn't how you find SFML.
 
-# # Like mentioned in this thread you really just need to have the following three statements for linking SFML statically:
+# Like mentioned in this thread you really just need to have the following three statements for linking SFML statically:
 
-# # set(SFML_STATIC_LIBRARIES TRUE)
-# # find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
-# # ...
-# # target_link_libraries(SFMLTest sfml-graphics sfml-audio)
+# set(SFML_STATIC_LIBRARIES TRUE)
+# find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
+# ...
+# target_link_libraries(SFMLTest sfml-graphics sfml-audio)
 
-# # This requires that you set SFML_DIR to the directory where the SFML config files are located (usually SFML/lib/cmake/SFML).
+# This requires that you set SFML_DIR to the directory where the SFML config files are located (usually SFML/lib/cmake/SFML).
 
-# # Note also that SFML will automatically look for its dependencies and link them, so you don't really need to search for freetype in your own CMake script.
+# Note also that SFML will automatically look for its dependencies and link them, so you don't really need to search for freetype in your own CMake script.
 
-# include_directories (/usr/include/freetype2)
+include_directories (/usr/include/freetype2)

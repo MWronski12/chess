@@ -1,6 +1,6 @@
 #include "Gui.h"
 
-WindowGui::WindowGui() : board( Board() ), window( VideoMode( 504, 504 ), "The Chess!" ), offset( 28, 28 ) {
+WindowGui::WindowGui() : Gui(), board( Board() ), window( VideoMode( 504, 504 ), "The Chess!" ), offset( 28, 28 ) {
     // RenderWindow window(VideoMode(504, 504), "The Chess!");
     // window = RenderWindow((VideoMode(504, 504), "The Chess!"));
     // ConnectToEngine("stockfish.exe");
@@ -44,6 +44,12 @@ void WindowGui::_move( std::string str ) {
     for ( int i = 0; i < 32; i++ )
         if ( f[i].getPosition() == oldPos ) f[i].setPosition( newPos );
 }
+
+void WindowGui::makeMove( std::string move ) {
+    _move( move );  // here we need also to call makeMove from board?  bcs right now it is  only GUI
+    draw();
+}
+void WindowGui::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ){};
 
 Vector2f WindowGui::toCoord( char a, char b ) {
     int x = int( a ) - 97;

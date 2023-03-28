@@ -14,9 +14,9 @@ add_compile_options(
     # -O2 # Enables compiler optimization
 )
 
-add_executable(chess main.cpp)
+add_executable(chess main.cpp src/Gui.cc)
 
-add_executable(Gui src/GuiExample.cc )
+# add_executable(Gui src/GuiExample.cc )
 
 include_directories(include)
 add_subdirectory(src)

@@ -8,13 +8,13 @@
 
 class Engine {
 public:
-  Engine(PieceMovesNestedLists &PieceMoves);
+  Engine(PieceMovesNestedLists *PieceMoves);
   Board board;
   std::stack<MoveContent> moveHistory;
 
 private:
-  PieceMovesNestedLists &movesIterator;
-  PieceValidMoves validMoves;
+  PieceMovesNestedLists *movesIterator;
+  PieceValidMoves *validMoves;
 };
 
 #endif

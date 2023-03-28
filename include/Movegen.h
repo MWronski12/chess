@@ -18,9 +18,9 @@ public:
 
 class PieceValidMoves {
 public:
-  PieceValidMoves(PieceMovesInterface &movesIterator);
+  PieceValidMoves(PieceMovesInterface *movesIterator);
   PieceValidMoves &operator=(const PieceValidMoves &) { return *this; }
-  PieceMovesInterface &movesIterator;
+  PieceMovesInterface *movesIterator;
 };
 // Piece moves generator using nested vectors
 // It is readable, but can loose some performance
@@ -31,13 +31,13 @@ public:
     return instance;
   }
 
-  static std::array<std::vector<std::vector<SquareIndex>>, 64> whitePawnMoves;
-  static std::array<std::vector<std::vector<SquareIndex>>, 64> blackPawnMoves;
-  static std::array<std::vector<std::vector<SquareIndex>>, 64> knightMoves;
-  static std::array<std::vector<std::vector<SquareIndex>>, 64> bishopMoves;
-  static std::array<std::vector<std::vector<SquareIndex>>, 64> rookMoves;
-  static std::array<std::vector<std::vector<SquareIndex>>, 64> queenMoves;
-  static std::array<std::vector<std::vector<SquareIndex>>, 64> kingMoves;
+  std::array<std::vector<std::vector<SquareIndex>>, 64> whitePawnMoves;
+  std::array<std::vector<std::vector<SquareIndex>>, 64> blackPawnMoves;
+  std::array<std::vector<std::vector<SquareIndex>>, 64> knightMoves;
+  std::array<std::vector<std::vector<SquareIndex>>, 64> bishopMoves;
+  std::array<std::vector<std::vector<SquareIndex>>, 64> rookMoves;
+  std::array<std::vector<std::vector<SquareIndex>>, 64> queenMoves;
+  std::array<std::vector<std::vector<SquareIndex>>, 64> kingMoves;
 
   // Iterator interface methods
   void start(PieceColor color, PieceType piece, SquareIndex src) override;
@@ -53,10 +53,6 @@ private:
   std::vector<std::vector<SquareIndex>> *_currentListPointer;
   int _rayIndex;
   int _moveIndex;
-
-  // Private constructor to prevent creation of instances from outside the class.
-  PieceMovesNestedLists();
-
   void generateWhitePawnMoves();
   void generateBlackPawnMoves();
   void generateKnightMoves();
@@ -64,6 +60,17 @@ private:
   void generateRookMoves();
   void generateQueenMoves();
   void generateKingMoves();
+
+  // Private constructor to prevent creation of instances from outside the class.
+  PieceMovesNestedLists() : _rayIndex(0), _moveIndex(0) {
+    generateWhitePawnMoves();
+    generateBlackPawnMoves();
+    generateKnightMoves();
+    generateBishopMoves();
+    generateRookMoves();
+    generateQueenMoves();
+    generateKingMoves();
+  }
 };
 
 #endif

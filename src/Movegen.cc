@@ -1,7 +1,8 @@
 #include "Movegen.h"
 
-PieceValidMoves::PieceValidMoves(PieceMovesInterface &movesIterator)
+PieceValidMoves::PieceValidMoves(PieceMovesInterface *movesIterator)
     : movesIterator(movesIterator) {}
+
 static SquareIndex Position(SquareIndex col, SquareIndex row) { return col + (row * 8); }
 
 // Set correct move ray list pointer and reset indices
@@ -62,16 +63,16 @@ void PieceMovesNestedLists::skipRay() {
   _rayIndex++;
 }
 
-// Private constructor to prevent creation of instances from outside the class.
-PieceMovesNestedLists::PieceMovesNestedLists() : _rayIndex(0), _moveIndex(0) {
-  generateWhitePawnMoves();
-  generateBlackPawnMoves();
-  generateKnightMoves();
-  generateBishopMoves();
-  generateRookMoves();
-  generateQueenMoves();
-  generateKingMoves();
-}
+// // Private constructor to prevent creation of instances from outside the class.
+// PieceMovesNestedLists::PieceMovesNestedLists() : _rayIndex(0), _moveIndex(0) {
+//   generateWhitePawnMoves();
+//   generateBlackPawnMoves();
+//   generateKnightMoves();
+//   generateBishopMoves();
+//   generateRookMoves();
+//   generateQueenMoves();
+//   generateKingMoves();
+// }
 
 void PieceMovesNestedLists::generateWhitePawnMoves() {
   for (int index = 0; index <= 64; index++) {

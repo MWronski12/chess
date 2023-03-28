@@ -1,24 +1,31 @@
 #include <iostream>
 
-#include "gui.hpp"
+#include "Gui.h"
 
 using namespace std;
+using namespace sf;
 
 int main() {
   cout << "Starting new game of chess...\n";
-  ConsoleGui gui;
+  // ConsoleGui gui;
 
+  // while (true) {
+  //   std::string input;
+  //   cin >> input;
+
+  //   try {
+  //     gui.makeMove(input);
+  //   } catch (exception &e) {
+  //     cout << e.what();
+  //     continue;
+  //   }
+  // }
+
+  // Window Gui
+  WindowGui wgui;
   while (true) {
     std::string input;
     cin >> input;
-
-    try {
-      gui.makeMove(input);
-    } catch (exception &e) {
-      cout << e.what();
-      continue;
-    }
   }
-
   return 1;
 }

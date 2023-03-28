@@ -16,6 +16,8 @@ add_compile_options(
 
 add_executable(chess main.cpp)
 
+add_executable(Gui src/GuiExample.cc )
+
 include_directories(include)
 add_subdirectory(src)
 add_subdirectory(tests)

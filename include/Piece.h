@@ -26,12 +26,12 @@ enum PieceColor { WHITE, BLACK };
 
 enum PieceType {
   EMPTY,
-  PAWN,
+  ROOK,
   KNIGHT,
   BISHOP,
-  ROOK,
-  KING,
   QUEEN,
+  KING,
+  PAWN,
 };
 
 using SquareIndex = uint8_t;

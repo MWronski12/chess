@@ -1,17 +1,17 @@
-add_library(engine Piece.cc Move.cc Board.cc Movegen.cc Evaluation.cc Search.cc Engine.cc)
-target_link_libraries(chess engine)
-
-add_executable(Gui
-Gui.cc
-)
-
+add_library(engine Piece.cc Move.cc Board.cc Movegen.cc Evaluation.cc Search.cc Engine.cc Gui.cc)
 
 include(FetchContent)
 FetchContent_Declare(SFML
-    GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG 2.6.x)
+GIT_REPOSITORY https://github.com/SFML/SFML.git
+GIT_TAG 2.6.x)
 FetchContent_MakeAvailable(SFML)
 
+target_link_libraries(chess engine sfml-graphics sfml-window sfml-system)
+
+# target_link_libraries(chess PRIVATE sfml-graphics)
+# target_link_libraries(chess PRIVATE sfml-window)
+# target_link_libraries(chess PRIVATE sfml-system)
+install (TARGETS chess)
 
 target_link_libraries(Gui PRIVATE sfml-graphics)
 target_link_libraries(Gui PRIVATE sfml-window)

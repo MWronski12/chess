@@ -1,6 +1,6 @@
 #include "catch2/catch_test_macros.hpp"
 
-#include "piece.hpp"
+#include "Piece.h"
 
 TEST_CASE("Piece constructor assigns correct values", "[Piece::Piece]") {
   Piece piece = Piece(WHITE, PAWN, false);

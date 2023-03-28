@@ -1,6 +1,6 @@
 #include "catch2/catch_test_macros.hpp"
 
-#include "move.hpp"
+#include "Move.h"
 
 TEST_CASE("Move constructor assigns correct values", "[MoveContent::MoveContent]") {
   MoveContent move = MoveContent(56, 49, EMPTY);

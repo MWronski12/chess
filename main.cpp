@@ -1,39 +1,22 @@
 #include <iostream>
 
-#include "Gui.hpp"
 #include "Movegen.h"
 
 using namespace std;
 
 int main() {
-    PieceMoves pm = PieceMoves::getInstance();
+    PieceMoves &pieceMoves = PieceMoves::getInstance();
+    int count = 0;
 
-    for ( auto &ray : pm.getMoveList( WHITE, ROOK, 0 ) ) {
-        cout << "ray: ";
-        for ( auto &move : ray ) {
-            cout << (int)move << " ";
-            if ( move == 24 ) {
-                cout << "skipping";
-                break;
+    for ( SquareIndex square = 0; square < 64; square++ )
+        for ( auto &ray : pieceMoves.getMoveList( WHITE, PAWN, square ) ) {
+            for ( auto &_ : ray ) {
+                (void)_;
+                count++;
             }
         }
-        cout << "\n";
-    }
 
-    // cout << "Starting new game of chess...\n";
-    // ConsoleGui gui;
-
-    // while ( true ) {
-    //     std::string input;
-    //     cin >> input;
-
-    //     try {
-    //         gui.makeMove( input );
-    //     } catch ( exception &e ) {
-    //         cout << e.what();
-    //         continue;
-    //     }
-    // }
+    cout << count << endl;
 
     return 1;
 }

@@ -9,13 +9,16 @@
 
 class Engine {
 public:
-    Engine( PieceMovesNestedLists &PieceMoves );
-    Board board;
-    std::stack<MoveContent> moveHistory;
+    void newGame();
+    void newGame( std::string fen );
+    void makeMove( SquareIndex src, SquareIndex dest );
+    PieceColor whoseove();
 
 private:
-    PieceMovesNestedLists &movesIterator;
-    PieceValidMoves validMoves;
+    Board _board;
+    Board _previousBoard;
+    PieceValidMoves _moveGenerator;
+    std::stack<MoveContent> _moveHistory;
 };
 
 #endif

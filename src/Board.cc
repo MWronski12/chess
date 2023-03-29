@@ -129,6 +129,8 @@ void Board::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) {
     }
     if ( pieceMoving != PAWN && pieceTaken == EMPTY ) {
         _fiftyMoveCounter++;
+    } else {
+        _fiftyMoveCounter = 0;
     }
 }
 

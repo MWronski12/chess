@@ -197,16 +197,16 @@ bool PieceValidMoves::analyzePawnMove( Board& board, SquareIndex srcSquare, Squa
     auto& pieceAttacked = board.squares[destSquare];
 
     // We attack the field if the pawn moves in diagonal
-    if ( abs( destSquare - srcSquare ) == 7 ) {
+    if ( abs( destSquare - srcSquare ) % 8 != 0 ) {
         pawnMoving->getColor() == WHITE ? _whiteAttackBoard[destSquare] = true : _blackAttackBoard[destSquare] = true;
     }
 
     /* ------------------------------- En passant ------------------------------- */
-    if ( abs( destSquare - srcSquare ) == 7 && destSquare == board.getEnPassantSquare() ) {
+    if ( abs( destSquare - srcSquare ) % 8 != 0 && destSquare == board.getEnPassantSquare() ) {
         return true;
     }
     /* ---------------------------- Diagonal capture ---------------------------- */
-    else if ( abs( destSquare - srcSquare ) == 7 ) {
+    else if ( abs( destSquare - srcSquare ) % 8 != 0 ) {
         // Destination square is occupied
         if ( pieceAttacked ) {
             // By allied piece
@@ -220,10 +220,11 @@ bool PieceValidMoves::analyzePawnMove( Board& board, SquareIndex srcSquare, Squa
                 return false;
             }
             // By normal enemy piece
-            else {
+            else if ( pieceAttacked->getColor() == pawnMoving->getColor() ) {
                 pieceAttacked->attackedValue += pawnMoving->getActionValue();
                 return true;
             }
+            return false;
         }
         // Destination square is empty - diagonal capture invalid
         else {
@@ -391,7 +392,7 @@ void PieceMoves::generateBlackPawnMoves() {
 
         // Forward moves
         ray.push_back( index + 8 );  // 1 forward
-        if ( y == 6 ) {
+        if ( y == 1 ) {
             ray.push_back( index + 16 );  // 2 forward
         }
         _blackPawnMoves[index].push_back( ray );

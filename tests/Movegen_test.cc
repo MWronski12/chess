@@ -1,5 +1,58 @@
+#include <stdint.h>
+
 #include "Movegen.h"
 #include "catch2/catch_test_macros.hpp"
+
+/* -------------------------------------------------------------------------- */
+/*                              Piece Valid Moves                             */
+/* -------------------------------------------------------------------------- */
+
+// TODO Shouldn't be coupled!
+#include "Engine.h"
+uint64_t perft( uint8_t depth, Engine& engine, PieceValidMoves& moveGenerator ) {
+    if ( depth == 0 ) {
+        return 1;
+    }
+    uint64_t nodes = 0;
+
+    moveGenerator.generateValidMoves( engine.board );
+
+    for ( SquareIndex srcSquare = 0; srcSquare < 64; srcSquare++ ) {
+        auto piece = engine.board.squares[srcSquare];
+        if ( !piece || piece->getColor() != engine.board.sideToMove ) {
+            continue;
+        }
+
+        for ( auto& destSquare : piece->validMoves ) {
+            Board prevBoard = engine.board;
+
+            if ( engine.makeMove( srcSquare, destSquare ) ) {
+                nodes += perft( depth - 1, engine, moveGenerator );
+            }
+            engine.board = prevBoard;
+        }
+    }
+
+    return nodes;
+}
+
+TEST_CASE( "All possible moves count at depth 1 is 20", "[perft]" ) {
+    Engine e;
+    PieceValidMoves g;
+    REQUIRE( perft( 1, e, g ) == 20 );
+}
+
+TEST_CASE( "All possible moves count at depth 2 is 400", "[perft]" ) {
+    Engine e;
+    PieceValidMoves g;
+    REQUIRE( perft( 2, e, g ) == 400 );
+}
+
+TEST_CASE( "All possible moves count at depth 3 is 8902", "[perft]" ) {
+    Engine e;
+    PieceValidMoves g;
+    REQUIRE( perft( 3, e, g ) == 8902 );
+}
 
 /* -------------------------------------------------------------------------- */
 /*                                 Piece Moves                                */
@@ -9,12 +62,12 @@
 // https://www.chess.com/blog/the_real_greco/another-silly-question-how-many-chess-moves-are-there
 
 static int countTotalMoves( PieceColor color, PieceType type ) {
-    PieceMoves &pieceMoves = PieceMoves::getInstance();
+    PieceMoves& pieceMoves = PieceMoves::getInstance();
     int count = 0;
 
     for ( SquareIndex square = 0; square < 64; square++ )
-        for ( auto &ray : pieceMoves.getMoveList( color, type, square ) ) {
-            for ( auto &_ : ray ) {
+        for ( auto& ray : pieceMoves.getMoveList( color, type, square ) ) {
+            for ( auto& _ : ray ) {
                 (void)_;
                 count++;
             }

@@ -1,22 +1,39 @@
 #include <iostream>
 
-#include "Movegen.h"
+#include "Engine.h"
 
 using namespace std;
 
-int main() {
-    PieceMoves &pieceMoves = PieceMoves::getInstance();
-    int count = 0;
+uint64_t perft( uint8_t depth, Engine& engine, PieceValidMoves& moveGenerator ) {
+    if ( depth == 0 ) {
+        return 1;
+    }
+    uint64_t nodes = 0;
 
-    for ( SquareIndex square = 0; square < 64; square++ )
-        for ( auto &ray : pieceMoves.getMoveList( WHITE, PAWN, square ) ) {
-            for ( auto &_ : ray ) {
-                (void)_;
-                count++;
-            }
+    moveGenerator.generateValidMoves( engine.board );
+
+    for ( SquareIndex srcSquare = 0; srcSquare < 64; srcSquare++ ) {
+        auto piece = engine.board.squares[srcSquare];
+        if ( !piece || piece->getColor() != engine.board.sideToMove ) {
+            continue;
         }
 
-    cout << count << endl;
+        for ( auto& destSquare : piece->validMoves ) {
+            Board prevBoard = engine.board;
 
-    return 1;
+            if ( engine.makeMove( srcSquare, destSquare ) ) {
+                nodes += perft( depth - 1, engine, moveGenerator );
+            }
+            engine.board = prevBoard;
+        }
+    }
+
+    return nodes;
+}
+
+int main() {
+    Engine engine;
+    PieceValidMoves moveGenerator;
+    cout << perft( 2, engine, moveGenerator ) << endl;
+    return 0;
 }

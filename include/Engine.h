@@ -9,16 +9,17 @@
 
 class Engine {
 public:
+    Engine();
     void newGame();
     void newGame( std::string fen );
-    void makeMove( SquareIndex src, SquareIndex dest );
-    PieceColor whoseove();
+    bool makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY );
+
+    Board board;
+    PieceValidMoves moveGenerator;
+    std::stack<MoveContent> moveHistory;
 
 private:
-    Board _board;
     Board _previousBoard;
-    PieceValidMoves _moveGenerator;
-    std::stack<MoveContent> _moveHistory;
 };
 
 #endif

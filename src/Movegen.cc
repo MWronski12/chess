@@ -410,7 +410,7 @@ void PieceMoves::generateBlackPawnMoves() {
 void PieceMoves::generateKnightMoves() {
     for ( SquareIndex y = 0; y < 8; y++ ) {
         for ( SquareIndex x = 0; x < 8; x++ ) {
-            SquareIndex index = ( SquareIndex )( y + ( x * 8 ) );
+            SquareIndex index = (SquareIndex)( y + ( x * 8 ) );
 
             SquareIndex move;
             std::vector<SquareIndex> ray;

@@ -3,37 +3,32 @@
 #include "Engine.h"
 
 using namespace std;
-
-uint64_t perft( uint8_t depth, Engine& engine, PieceValidMoves& moveGenerator ) {
-    if ( depth == 0 ) {
-        return 1;
-    }
-    uint64_t nodes = 0;
-
-    moveGenerator.generateValidMoves( engine.board );
-
-    for ( SquareIndex srcSquare = 0; srcSquare < 64; srcSquare++ ) {
-        auto piece = engine.board.squares[srcSquare];
-        if ( !piece || piece->getColor() != engine.board.sideToMove ) {
-            continue;
-        }
-
-        for ( auto& destSquare : piece->validMoves ) {
-            Board prevBoard = engine.board;
-
-            if ( engine.makeMove( srcSquare, destSquare ) ) {
-                nodes += perft( depth - 1, engine, moveGenerator );
-            }
-            engine.board = prevBoard;
-        }
-    }
-
-    return nodes;
-}
+using namespace sf;
 
 int main() {
-    Engine engine;
-    PieceValidMoves moveGenerator;
-    cout << perft( 2, engine, moveGenerator ) << endl;
-    return 0;
+    // PieceMoves &pieceMoves = PieceMoves::getInstance();
+    // int count = 0;
+
+    // for ( SquareIndex square = 0; square < 64; square++ )
+    //     for ( auto &ray : pieceMoves.getMoveList( WHITE, PAWN, square ) ) {
+    //         for ( auto &_ : ray ) {
+    //             (void)_;
+    //             count++;
+    //         }
+    //     }
+
+    // cout << count << endl;
+    WindowGui wgui = WindowGui();
+
+    while ( true ) {
+        // string stri;
+        // try {
+        //     wgui.makeMove( stri );
+        // } catch ( exception &e ) {
+        //     cout << "Bad move input!\n";
+        //     continue;
+        // }
+    }
+
+    return 1;
 }

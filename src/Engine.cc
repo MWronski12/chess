@@ -13,31 +13,29 @@ void Engine::newGame() {
     board = Board();
     _previousBoard = Board();
     moveHistory = std::stack<MoveContent>();
+
+    // Engine always keeps the board with pseudo valid moves calculated!
+    moveGenerator.generateValidMoves( board );
 }
 
 bool Engine::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) {
     // Cache state of the board
     Board temp( board );
 
-    // Make move
+    // Make move and recalculate pseudo valid moves
     board.makeMove( src, dest, promotion );
-
-    // Check if move didnt leave the king in check
     moveGenerator.generateValidMoves( board );
-    if ( board.sideToMove == BLACK && board.whiteIsChecked ) {
-        board = temp;
-        return false;
-    }
-    if ( board.sideToMove == WHITE && board.blackIsChecked ) {
-        board = temp;
+
+    // If the move leaves the king in check, it is invalid
+    if ( ( board.sideToMove == BLACK && board.whiteIsChecked ) ||
+         ( board.sideToMove == WHITE && board.blackIsChecked ) ) {
+        board = temp;  // Restore previous board
         return false;
     }
 
     // Add move to the history
-    moveHistory.push( MoveContent( src, dest, promotion ) );
-
+    moveHistory.push( board.lastMove );
     // Update previous board
     _previousBoard = temp;
-
     return true;
 }

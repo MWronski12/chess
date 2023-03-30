@@ -11,7 +11,7 @@ add_compile_options(
     # -fsanitize=leak
     # -fsanitize=address
     # -fsanitize=undefined
-    # -O2 # Enables compiler optimization
+    # -O3 # Enables compiler optimization
 )
 
 add_executable(chess main.cpp)

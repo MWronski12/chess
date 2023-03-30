@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include "Piece.h"
 
 Piece::Piece( PieceColor color, PieceType type, bool hasMoved )
@@ -34,9 +36,10 @@ void Piece::setPieceValue() {
 
         case KING:
             _value = KING_VALUE;
+            break;
 
         default:
-            break;
+            throw std::logic_error( "Invalid piece type!" );
     }
 }
 
@@ -64,8 +67,9 @@ void Piece::setPieceActionValue() {
 
         case KING:
             _actionValue = KING_ACTION_VALUE;
+            break;
 
         default:
-            break;
+            throw std::logic_error( "Invalid piece type!" );
     }
 }

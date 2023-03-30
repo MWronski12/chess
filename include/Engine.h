@@ -11,12 +11,13 @@ class Engine {
 public:
     Engine();
     void newGame();
+    // TODO
     void newGame( std::string fen );
     bool makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY );
 
     Board board;
-    PieceValidMoves moveGenerator;
     std::stack<MoveContent> moveHistory;
+    PieceValidMoves moveGenerator;
 
 private:
     Board _previousBoard;

@@ -54,6 +54,12 @@ TEST_CASE( "All possible moves count at depth 3 is 8902", "[perft]" ) {
     REQUIRE( perft( 3, e, g ) == 8902 );
 }
 
+TEST_CASE( "All possible moves count at depth 4 is 197 281", "[perft]" ) {
+    Engine e;
+    PieceValidMoves g;
+    REQUIRE( perft( 4, e, g ) == 197281 );
+}
+
 /* -------------------------------------------------------------------------- */
 /*                                 Piece Moves                                */
 /* -------------------------------------------------------------------------- */

@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "Board.h"
-#include "Piece.h"
 
 class PieceMoves {
 public:

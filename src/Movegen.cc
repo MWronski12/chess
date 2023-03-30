@@ -23,11 +23,9 @@ int PieceValidMoves::generateValidMoves( Board& board ) {
     _blackKingSquare = NULL_SQUARE;
     _whiteKingSquare = NULL_SQUARE;
 
-    // Reset piece attacked and defended values
-    for ( SquareIndex index = 0; index < 64; index++ ) {
-        board.squares[index]->attackedValue = 0;
-        board.squares[index]->defendedValue = 0;
-    }
+    // Reset checks
+    board.blackIsChecked = false;
+    board.whiteIsChecked = false;
 
     for ( SquareIndex srcSquare = 0; srcSquare < 64; srcSquare++ ) {
         auto& piece = board.squares[srcSquare];
@@ -37,6 +35,8 @@ int PieceValidMoves::generateValidMoves( Board& board ) {
             // requires adding piece.lastValidMovesCount to the Piece class
             // Clear the previous valid moves
             piece->validMoves.clear();
+            piece->attackedValue = 0;
+            piece->defendedValue = 0;
 
             // Kings need information about which squares are attacked,
             // which we gather during analysis, so we just record the position to analyze later
@@ -89,7 +89,7 @@ int PieceValidMoves::generateValidPawnMoves( Board& board, SquareIndex srcSquare
     auto& pawn = board.squares[srcSquare];
 
     for ( auto& ray : _pieceMoves.getMoveList( pawn->getColor(), PAWN, srcSquare ) ) {
-        for ( auto& destSquare : ray ) {
+        for ( auto destSquare : ray ) {
             if ( analyzePawnMove( board, srcSquare, destSquare ) ) {
                 pawn->validMoves.push_back( destSquare );
                 movesGeneratedCount++;
@@ -110,13 +110,13 @@ int PieceValidMoves::generateValidKingMoves( Board& board, SquareIndex srcSquare
 
     // Iterate through kings moves
     for ( auto& ray : _pieceMoves.getMoveList( king->getColor(), KING, srcSquare ) ) {
-        for ( auto& destSquare : ray ) {
+        for ( auto destSquare : ray ) {
             // Castling moves have to be generated last so skip for now
             if ( abs( destSquare - srcSquare ) == 2 ) {
                 continue;
             }
             // Normal move
-            else if ( analyzeMove( board, srcSquare, destSquare ) && king->getColor() == board.sideToMove ) {
+            else if ( analyzeMove( board, srcSquare, destSquare ) ) {
                 king->validMoves.push_back( destSquare );
                 movesGeneratedCount++;
             }
@@ -145,7 +145,7 @@ int PieceValidMoves::generateValidCastlingMoves( Board& board, SquareIndex srcSq
     }
 
     // White castle
-    if ( srcSquare == 60 ) {
+    else if ( srcSquare == 60 ) {
         // Kingside
         if ( analyzeCastlingMove( board, srcSquare, 62 ) ) {
             king->validMoves.push_back( 62 );
@@ -220,11 +220,10 @@ bool PieceValidMoves::analyzePawnMove( Board& board, SquareIndex srcSquare, Squa
                 return false;
             }
             // By normal enemy piece
-            else if ( pieceAttacked->getColor() == pawnMoving->getColor() ) {
+            else {
                 pieceAttacked->attackedValue += pawnMoving->getActionValue();
                 return true;
             }
-            return false;
         }
         // Destination square is empty - diagonal capture invalid
         else {
@@ -236,10 +235,11 @@ bool PieceValidMoves::analyzePawnMove( Board& board, SquareIndex srcSquare, Squa
         // Pawns can move forward only if the destination square is empty
         if ( pieceAttacked ) {
             return false;
-        } else {
-            return true;
         }
+        return true;
     }
+
+    throw std::logic_error( "End of analyzePawnMove method reached without returning a value!" );
 }
 
 bool PieceValidMoves::analyzeCastlingMove( Board& board, SquareIndex srcSquare, SquareIndex destSquare ) {
@@ -333,10 +333,10 @@ PieceMoves::PieceMoves() {
 }
 
 // Helper method to convert row/col number to square index
-static SquareIndex Position( SquareIndex col, SquareIndex row ) { return col + ( row * 8 ); }
+static constexpr SquareIndex position( SquareIndex col, SquareIndex row ) { return col + ( row * 8 ); }
 
 void PieceMoves::generateWhitePawnMoves() {
-    for ( int index = 0; index <= 64; index++ ) {
+    for ( SquareIndex index = 0; index <= 64; index++ ) {
         // Pawns cannot stand on 1st and 8th ranks
         if ( index < 8 || index > 55 ) {
             continue;
@@ -372,7 +372,7 @@ void PieceMoves::generateWhitePawnMoves() {
 }
 
 void PieceMoves::generateBlackPawnMoves() {
-    for ( int index = 0; index <= 64; index++ ) {
+    for ( SquareIndex index = 0; index <= 64; index++ ) {
         // Pawns cannot stand on 1st and 8th ranks
         if ( index < 8 || index > 55 ) {
             continue;
@@ -408,15 +408,15 @@ void PieceMoves::generateBlackPawnMoves() {
 }
 
 void PieceMoves::generateKnightMoves() {
-    for ( SquareIndex y = 0; y < 8; y++ ) {
-        for ( SquareIndex x = 0; x < 8; x++ ) {
+    for ( int y = 0; y < 8; y++ ) {
+        for ( int x = 0; x < 8; x++ ) {
             SquareIndex index = ( SquareIndex )( y + ( x * 8 ) );
 
             SquareIndex move;
             std::vector<SquareIndex> ray;
 
             if ( y < 6 && x > 0 ) {
-                move = Position( ( y + 2 ), ( x - 1 ) );
+                move = position( ( y + 2 ), ( x - 1 ) );
                 if ( move < 64 ) {
                     ray.push_back( move );
                     _knightMoves[index].push_back( ray );
@@ -425,7 +425,7 @@ void PieceMoves::generateKnightMoves() {
             }
 
             if ( y > 1 && x < 7 ) {
-                move = Position( ( y - 2 ), ( x + 1 ) );
+                move = position( ( y - 2 ), ( x + 1 ) );
                 if ( move < 64 ) {
                     ray.push_back( move );
                     _knightMoves[index].push_back( ray );
@@ -433,7 +433,7 @@ void PieceMoves::generateKnightMoves() {
                 }
             }
             if ( y > 1 && x > 0 ) {
-                move = Position( ( y - 2 ), ( x - 1 ) );
+                move = position( ( y - 2 ), ( x - 1 ) );
                 if ( move < 64 ) {
                     ray.push_back( move );
                     _knightMoves[index].push_back( ray );
@@ -441,7 +441,7 @@ void PieceMoves::generateKnightMoves() {
                 }
             }
             if ( y < 6 && x < 7 ) {
-                move = Position( ( y + 2 ), ( x + 1 ) );
+                move = position( ( y + 2 ), ( x + 1 ) );
                 if ( move < 64 ) {
                     ray.push_back( move );
                     _knightMoves[index].push_back( ray );
@@ -449,7 +449,7 @@ void PieceMoves::generateKnightMoves() {
                 }
             }
             if ( y > 0 && x < 6 ) {
-                move = Position( ( y - 1 ), ( x + 2 ) );
+                move = position( ( y - 1 ), ( x + 2 ) );
                 if ( move < 64 ) {
                     ray.push_back( move );
                     _knightMoves[index].push_back( ray );
@@ -457,7 +457,7 @@ void PieceMoves::generateKnightMoves() {
                 }
             }
             if ( y < 7 && x > 1 ) {
-                move = Position( ( y + 1 ), ( x - 2 ) );
+                move = position( ( y + 1 ), ( x - 2 ) );
                 if ( move < 64 ) {
                     ray.push_back( move );
                     _knightMoves[index].push_back( ray );
@@ -465,7 +465,7 @@ void PieceMoves::generateKnightMoves() {
                 }
             }
             if ( y > 0 && x > 1 ) {
-                move = Position( ( y - 1 ), ( x - 2 ) );
+                move = position( ( y - 1 ), ( x - 2 ) );
                 if ( move < 64 ) {
                     ray.push_back( move );
                     _knightMoves[index].push_back( ray );
@@ -473,7 +473,7 @@ void PieceMoves::generateKnightMoves() {
                 }
             }
             if ( y < 7 && x < 6 ) {
-                move = Position( ( y + 1 ), ( x + 2 ) );
+                move = position( ( y + 1 ), ( x + 2 ) );
                 if ( move < 64 ) {
                     ray.push_back( move );
                     _knightMoves[index].push_back( ray );
@@ -487,7 +487,7 @@ void PieceMoves::generateKnightMoves() {
 void PieceMoves::generateBishopMoves() {
     for ( int y = 0; y < 8; y++ ) {
         for ( int x = 0; x < 8; x++ ) {
-            int index = (int)( y + ( x * 8 ) );
+            SquareIndex index = (int)( y + ( x * 8 ) );
             int move;
             int row = x;
             int col = y;
@@ -497,7 +497,7 @@ void PieceMoves::generateBishopMoves() {
             while ( row < 7 && col < 7 ) {
                 row++;
                 col++;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
             }
             if ( ray.size() > 0 ) _bishopMoves[index].push_back( ray );
@@ -509,7 +509,7 @@ void PieceMoves::generateBishopMoves() {
             while ( row < 7 && col > 0 ) {
                 row++;
                 col--;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
             }
             if ( ray.size() > 0 ) _bishopMoves[index].push_back( ray );
@@ -521,7 +521,7 @@ void PieceMoves::generateBishopMoves() {
             while ( row > 0 && col < 7 ) {
                 row--;
                 col++;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
             }
             if ( ray.size() > 0 ) _bishopMoves[index].push_back( ray );
@@ -533,7 +533,7 @@ void PieceMoves::generateBishopMoves() {
             while ( row > 0 && col > 0 ) {
                 row--;
                 col--;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
             }
             if ( ray.size() > 0 ) _bishopMoves[index].push_back( ray );
@@ -554,7 +554,7 @@ void PieceMoves::generateRookMoves() {
             // Bottom side ray
             while ( row < 7 ) {
                 row++;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
             }
             if ( ray.size() > 0 ) _rookMoves[index].push_back( ray );
@@ -565,7 +565,7 @@ void PieceMoves::generateRookMoves() {
             // Top side ray
             while ( row > 0 ) {
                 row--;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
             }
             if ( ray.size() > 0 ) _rookMoves[index].push_back( ray );
@@ -576,7 +576,7 @@ void PieceMoves::generateRookMoves() {
             // Left side ray
             while ( col > 0 ) {
                 col--;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
             }
             if ( ray.size() > 0 ) _rookMoves[index].push_back( ray );
@@ -587,7 +587,7 @@ void PieceMoves::generateRookMoves() {
             // Right side ray
             while ( col < 7 ) {
                 col++;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
             }
             if ( ray.size() > 0 ) _rookMoves[index].push_back( ray );
@@ -608,7 +608,7 @@ void PieceMoves::generateQueenMoves() {
             // Bottom sie ray
             while ( row < 7 ) {
                 row++;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
             }
             if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
@@ -619,7 +619,7 @@ void PieceMoves::generateQueenMoves() {
             // Top side ray
             while ( row > 0 ) {
                 row--;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
             }
             if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
@@ -630,7 +630,7 @@ void PieceMoves::generateQueenMoves() {
             // Left side ray
             while ( col > 0 ) {
                 col--;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
             }
             if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
@@ -641,7 +641,7 @@ void PieceMoves::generateQueenMoves() {
             // Right side ray
             while ( col < 7 ) {
                 col++;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
             }
             if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
@@ -653,7 +653,7 @@ void PieceMoves::generateQueenMoves() {
             while ( row < 7 && col < 7 ) {
                 row++;
                 col++;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
             }
             if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
@@ -665,7 +665,7 @@ void PieceMoves::generateQueenMoves() {
             while ( row < 7 && col > 0 ) {
                 row++;
                 col--;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
             }
             if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
@@ -677,7 +677,7 @@ void PieceMoves::generateQueenMoves() {
             while ( row > 0 && col < 7 ) {
                 row--;
                 col++;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
             }
             if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
@@ -689,7 +689,7 @@ void PieceMoves::generateQueenMoves() {
             while ( row > 0 && col > 0 ) {
                 row--;
                 col--;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
             }
             if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
@@ -710,7 +710,7 @@ void PieceMoves::generateKingMoves() {
             // Bottom side ray
             if ( row < 7 ) {
                 row++;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
                 _kingMoves[index].push_back( ray );
             }
@@ -721,7 +721,7 @@ void PieceMoves::generateKingMoves() {
             // Top side ray
             if ( row > 0 ) {
                 row--;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
                 _kingMoves[index].push_back( ray );
             }
@@ -732,7 +732,7 @@ void PieceMoves::generateKingMoves() {
             // Left side ray
             if ( col > 0 ) {
                 col--;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
                 // Queen side castle
                 if ( index == 4 ) {
@@ -749,7 +749,7 @@ void PieceMoves::generateKingMoves() {
             // Right side ray
             if ( col < 7 ) {
                 col++;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
                 // King side castle
                 if ( index == 4 ) {
@@ -767,7 +767,7 @@ void PieceMoves::generateKingMoves() {
             if ( row < 7 && col < 7 ) {
                 row++;
                 col++;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
                 _kingMoves[index].push_back( ray );
             }
@@ -779,7 +779,7 @@ void PieceMoves::generateKingMoves() {
             if ( row < 7 && col > 0 ) {
                 row++;
                 col--;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
                 _kingMoves[index].push_back( ray );
             }
@@ -791,7 +791,7 @@ void PieceMoves::generateKingMoves() {
             if ( row > 0 && col < 7 ) {
                 row--;
                 col++;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
                 _kingMoves[index].push_back( ray );
             }
@@ -803,7 +803,7 @@ void PieceMoves::generateKingMoves() {
             if ( row > 0 && col > 0 ) {
                 row--;
                 col--;
-                move = Position( col, row );
+                move = position( col, row );
                 ray.push_back( move );
                 _kingMoves[index].push_back( ray );
             }

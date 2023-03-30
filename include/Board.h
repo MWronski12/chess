@@ -41,8 +41,7 @@ public:
     int score;
     std::array<std::optional<Piece>, 64> squares;
 
-    void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion );
-    void makeMove( std::string move );  // d2d4 notation (d7d8Q for promotion)
+    void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY );
 
     std::string toFEN() const;
 

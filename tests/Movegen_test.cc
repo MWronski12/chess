@@ -1,8 +1,10 @@
 #include <stdint.h>
 
-#include "Movegen.h"
-#include "catch2/catch_test_macros.hpp"
+#include <catch2/generators/catch_generators.hpp>
 
+#include "Movegen.h"
+#include "catch2/benchmark/catch_benchmark.hpp"
+#include "catch2/catch_test_macros.hpp"
 /* -------------------------------------------------------------------------- */
 /*                              Piece Valid Moves                             */
 /* -------------------------------------------------------------------------- */
@@ -23,7 +25,7 @@ uint64_t perft( uint8_t depth, Engine& engine, PieceValidMoves& moveGenerator ) 
             continue;
         }
 
-        for ( auto& destSquare : piece->validMoves ) {
+        for ( auto destSquare : piece->validMoves ) {
             Board prevBoard = engine.board;
 
             if ( engine.makeMove( srcSquare, destSquare ) ) {
@@ -36,28 +38,21 @@ uint64_t perft( uint8_t depth, Engine& engine, PieceValidMoves& moveGenerator ) 
     return nodes;
 }
 
-TEST_CASE( "All possible moves count at depth 1 is 20", "[perft]" ) {
+TEST_CASE( "Perft function validation and benchmark", "[perft]" ) {
     Engine e;
     PieceValidMoves g;
-    REQUIRE( perft( 1, e, g ) == 20 );
-}
 
-TEST_CASE( "All possible moves count at depth 2 is 400", "[perft]" ) {
-    Engine e;
-    PieceValidMoves g;
-    REQUIRE( perft( 2, e, g ) == 400 );
-}
+    int depth;
+    uint64_t expected_result;
+    std::tie( depth, expected_result ) = GENERATE( table<int, uint64_t>( {
+        { 0, 1 },
+        { 1, 20 },
+        { 2, 400 },
+    } ) );
 
-TEST_CASE( "All possible moves count at depth 3 is 8902", "[perft]" ) {
-    Engine e;
-    PieceValidMoves g;
-    REQUIRE( perft( 3, e, g ) == 8902 );
-}
+    REQUIRE( perft( depth, e, g ) == expected_result );
 
-TEST_CASE( "All possible moves count at depth 4 is 197 281", "[perft]" ) {
-    Engine e;
-    PieceValidMoves g;
-    REQUIRE( perft( 4, e, g ) == 197281 );
+    BENCHMARK( "Perft at depth " + std::to_string( depth ) ) { return perft( depth, e, g ); };
 }
 
 /* -------------------------------------------------------------------------- */

@@ -10,7 +10,7 @@
 /*                              Piece Valid Moves                             */
 /* -------------------------------------------------------------------------- */
 
-uint64_t perft( int depth, Engine& e ) {
+uint64_t perft( int depth, Engine &e ) {
     uint64_t nodes = 0;
 
     if ( depth == 0 ) {
@@ -67,12 +67,12 @@ TEST_CASE( "Perft function validation and benchmark", "[perft]" ) {
 // https://www.chess.com/blog/the_real_greco/another-silly-question-how-many-chess-moves-are-there
 
 static int countTotalMoves( PieceColor color, PieceType type ) {
-    PieceMoves& pieceMoves = PieceMoves::getInstance();
+    PieceMoves &pieceMoves = PieceMoves::getInstance();
     int count = 0;
 
     for ( SquareIndex square = 0; square < 64; square++ )
-        for ( auto& ray : pieceMoves.getMoveList( color, type, square ) ) {
-            for ( auto& _ : ray ) {
+        for ( auto &ray : pieceMoves.getMoveList( color, type, square ) ) {
+            for ( auto &_ : ray ) {
                 (void)_;
                 count++;
             }
@@ -84,12 +84,14 @@ static int countTotalMoves( PieceColor color, PieceType type ) {
 /* ---------------------------------- PAWNS --------------------------------- */
 
 TEST_CASE( "Number of total white pawn moves is 140", "[PieceMoves._whitePawnMoves]" ) {
-    // 6 ranks * (6 files * 3 moves per rank + 2 files * 2 moves per rank) + 8 double advance moves
+    // 6 ranks * (6 files * 3 moves per rank + 2 files * 2 moves per rank) + 8
+    // double advance moves
     REQUIRE( countTotalMoves( WHITE, PAWN ) == 6 * ( 6 * 3 + 2 * 2 ) + 8 );  // 140 moves total
 }
 
 TEST_CASE( "Number of total black pawn moves is 140", "[PieceMoves._blackPawnMoves]" ) {
-    // 6 ranks * (6 files * 3 moves per rank + 2 files * 2 moves per rank) + 8 double advance moves
+    // 6 ranks * (6 files * 3 moves per rank + 2 files * 2 moves per rank) + 8
+    // double advance moves
     REQUIRE( countTotalMoves( BLACK, PAWN ) == 6 * ( 6 * 3 + 2 * 2 ) + 8 );  // 140 moves total
 }
 

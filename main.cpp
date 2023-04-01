@@ -5,9 +5,9 @@
 using namespace std;
 
 int main() {
-    Gui* gui = new ConsoleGui();
+  Gui *gui = new ConsoleGui();
 
-    gui->start();
+  gui->start();
 
-    return 0;
+  return 0;
 }

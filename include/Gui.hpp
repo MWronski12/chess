@@ -19,7 +19,7 @@ class ConsoleGui : public Gui {
 public:
     ConsoleGui() : engine( Engine() ) {}
     void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY ) override {
-        auto& piece = engine.board->squares[src];
+        auto &piece = engine.board->squares[src];
 
         // Assert move is a pseudo valid move
         if ( std::find( piece->validMoves.cbegin(), piece->validMoves.cend(), dest ) == piece->validMoves.cend() ) {
@@ -87,7 +87,7 @@ public:
             std::cin >> move;
             try {
                 makeMove( move );
-            } catch ( std::exception& e ) {
+            } catch ( std::exception &e ) {
                 std::cout << e.what() << "\r\n";
             }
         }

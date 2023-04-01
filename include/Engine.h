@@ -14,13 +14,14 @@ public:
     // TODO
     void newGame( std::string fen );
     bool makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY );
+    PieceColor whooseMove() const;
 
-    Board board;
+    std::unique_ptr<Board> board;
     std::stack<MoveContent> moveHistory;
     PieceValidMoves moveGenerator;
 
 private:
-    Board _previousBoard;
+    std::unique_ptr<Board> _previousBoard;
 };
 
 #endif

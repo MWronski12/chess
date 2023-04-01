@@ -2,6 +2,7 @@
 
 #include <catch2/generators/catch_generators.hpp>
 
+#include "Engine.h"
 #include "Movegen.h"
 #include "catch2/benchmark/catch_benchmark.hpp"
 #include "catch2/catch_test_macros.hpp"
@@ -9,38 +10,41 @@
 /*                              Piece Valid Moves                             */
 /* -------------------------------------------------------------------------- */
 
-// TODO Shouldn't be coupled!
-#include "Engine.h"
-uint64_t perft( uint8_t depth, Engine& engine, PieceValidMoves& moveGenerator ) {
+uint64_t perft( int depth, Engine& e ) {
+    uint64_t nodes = 0;
+
     if ( depth == 0 ) {
         return 1;
     }
-    uint64_t nodes = 0;
-
-    moveGenerator.generateValidMoves( engine.board );
 
     for ( SquareIndex srcSquare = 0; srcSquare < 64; srcSquare++ ) {
-        auto piece = engine.board.squares[srcSquare];
-        if ( !piece || piece->getColor() != engine.board.sideToMove ) {
+        auto piece = e.board->squares[srcSquare];
+
+        if ( piece == std::nullopt || piece->getColor() != e.whooseMove() ) {
             continue;
         }
 
         for ( auto destSquare : piece->validMoves ) {
-            Board prevBoard = engine.board;
-
-            if ( engine.makeMove( srcSquare, destSquare ) ) {
-                nodes += perft( depth - 1, engine, moveGenerator );
+            std::unique_ptr<Board> root = std::make_unique<Board>( *e.board );
+            if ( e.makeMove( srcSquare, destSquare ) == true ) {
+                nodes += perft( depth - 1, e );
+                e.board = std::move( root );
             }
-            engine.board = prevBoard;
         }
     }
 
     return nodes;
 }
 
+// TEST_CASE( "Perft function validation and benchmark", "[perft]" ) {
+//     Engine e;
+//     REQUIRE( perft( 2, e ) == 400 );
+//     REQUIRE( perft( 3, e ) == 8902 );
+//     REQUIRE( perft( 4, e ) == 197281 );
+// }
+
 TEST_CASE( "Perft function validation and benchmark", "[perft]" ) {
     Engine e;
-    PieceValidMoves g;
 
     int depth;
     uint64_t expected_result;
@@ -50,9 +54,9 @@ TEST_CASE( "Perft function validation and benchmark", "[perft]" ) {
         { 2, 400 },
     } ) );
 
-    REQUIRE( perft( depth, e, g ) == expected_result );
+    REQUIRE( perft( depth, e ) == expected_result );
 
-    BENCHMARK( "Perft at depth " + std::to_string( depth ) ) { return perft( depth, e, g ); };
+    BENCHMARK( "Perft at depth " + std::to_string( depth ) ) { return perft( depth, e ); };
 }
 
 /* -------------------------------------------------------------------------- */

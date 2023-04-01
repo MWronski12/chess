@@ -19,7 +19,7 @@ class ConsoleGui : public Gui {
 public:
     ConsoleGui() : engine( Engine() ) {}
     void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY ) override {
-        auto& piece = engine.board.squares[src];
+        auto& piece = engine.board->squares[src];
 
         // Assert move is a pseudo valid move
         if ( std::find( piece->validMoves.cbegin(), piece->validMoves.cend(), dest ) == piece->validMoves.cend() ) {
@@ -143,8 +143,8 @@ private:
             if ( i % 8 == 0 ) {
                 std::cout << ( 64 - i ) / 8 << " ";
             }
-            if ( engine.board.squares[i] ) {
-                std::cout << pieceToChar( engine.board.squares[i]->getColor(), engine.board.squares[i]->type );
+            if ( engine.board->squares[i] ) {
+                std::cout << pieceToChar( engine.board->squares[i]->getColor(), engine.board->squares[i]->type );
             } else {
                 std::cout << '-';
             }

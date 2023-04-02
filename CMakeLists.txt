@@ -8,7 +8,7 @@ add_compile_options(
     -Wextra
     -Wpedantic
     -Werror
-    -O3 # Enables compiler optimization
+    -Ofast # Enables compiler optimization
     # -fsanitize=leak
     # -fsanitize=address
     # -fsanitize=undefined

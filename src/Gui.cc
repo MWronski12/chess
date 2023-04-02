@@ -5,7 +5,7 @@ WindowGui::WindowGui() : Gui(), board( Board() ), window( VideoMode( 504, 504 ),
     // window = RenderWindow((VideoMode(504, 504), "The Chess!"));
     // ConnectToEngine("stockfish.exe");
 
-    Texture t1, t2;
+    // Texture t1, t2;
     t1.loadFromFile( "../images/figures.png" );
     t2.loadFromFile( "../images/board.png" );
 
@@ -22,7 +22,7 @@ void WindowGui::loadPosition() {
         for ( int j = 0; j < 8; j++ ) {
             std::optional<Piece> piece = board.squares[j + i * 8];
             if ( piece.has_value() ) {
-                int x = abs( piece->getValue() ) - 1;
+                int x = abs( piece->type ) - 1;
                 int y = piece->getColor() == WHITE ? 1 : 0;
                 f[k].setTextureRect( IntRect( size * x, size * y, size, size ) );
                 f[k].setPosition( size * j, size * i );
@@ -65,4 +65,11 @@ void WindowGui::draw() {
     window.draw( f[n] );
     for ( int i = 0; i < 32; i++ ) f[i].move( -offset );
     window.display();
+}
+
+std::string WindowGui::toChessNote( Vector2f p ) {
+    std::string s = "";
+    s += char( p.x / size + 97 );
+    s += char( 7 - p.y / size + 49 );
+    return s;
 }

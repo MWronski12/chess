@@ -11,7 +11,6 @@
 #include "Board.h"
 #include "Piece.h"
 
-
 class Gui {
 public:
     Gui() = default;
@@ -41,15 +40,21 @@ public:
     virtual void makeMove( std::string move ) override;
     virtual void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) override;
     virtual void draw() override;
+    std::string toChessNote( Vector2f p );
+    RenderWindow window;        // ok
+    Vector2f offset;            // ok
+    Sprite f[32];               // ?? teoretyczne
+    bool isMove = false;        // ok
+    float dx = 0, dy = 0;       // ok
+    int n = 0;                  // ok
+    Vector2f oldPos, newPos;    // ok
+    int size = 56;              // ok
+    std::string str;            // ok
+    std::string position = "";  // ok
 
 private:
-    Board board;
-    RenderWindow window;
-    Vector2f offset;
-    int size = 56;
-    Sprite f[32];  // figures
-    std::string position = "";
-    int n = 0;
+    Texture t1, t2;  // ok
+    Board board;     // ok
     Sprite sBoard;
     void loadPosition();
     void _move( std::string str );

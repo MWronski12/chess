@@ -1,4 +1,4 @@
-add_library(engine Piece.cc Move.cc Board.cc Movegen.cc)
+add_library(engine Piece.cc Move.cc Board.cc Movegen.cc Engine.cc)
 include(FetchContent)
 FetchContent_Declare(SFML
     GIT_REPOSITORY https://github.com/SFML/SFML.git
@@ -13,14 +13,14 @@ target_link_libraries(chess engine sfml-graphics sfml-window sfml-system)
 # )
 # tutaj taki jest problem że tworzym bibliotekę, która jest zależna od biblioteki?
 
-# target_link_libraries(Gui PRIVATE sfml-graphics)
-# target_link_libraries(Gui PRIVATE sfml-window)
-# target_link_libraries(Gui PRIVATE sfml-system)
-# # if (WIN32 AND BUILD_SHARED_LIBS)
-# #     add_custom_command(TARGET CMakeSFMLProject POST_BUILD
-# #         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:CMakeSFMLProject> $<TARGET_FILE_DIR:CMakeSFMLProject> COMMAND_EXPAND_LISTS)
-# # endif()
-# install(TARGETS Gui)
+target_link_libraries(Gui PRIVATE sfml-graphics)
+target_link_libraries(Gui PRIVATE sfml-window)
+target_link_libraries(Gui PRIVATE sfml-system)
+# if (WIN32 AND BUILD_SHARED_LIBS)
+#     add_custom_command(TARGET CMakeSFMLProject POST_BUILD
+#         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:CMakeSFMLProject> $<TARGET_FILE_DIR:CMakeSFMLProject> COMMAND_EXPAND_LISTS)
+# endif()
+install(TARGETS Gui)
 
 # To build static libraries?
 # unset(BUILD_SHARED_LIBS)

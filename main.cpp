@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "Engine.h"
+#include "Gui.h"
 
 using namespace std;
 using namespace sf;
@@ -19,7 +20,7 @@ int main() {
 
     // cout << count << endl;
     WindowGui wgui = WindowGui();
-
+    wgui.draw();
     while ( true ) {
         // string stri;
         // try {

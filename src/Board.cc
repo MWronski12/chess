@@ -48,6 +48,134 @@ Board::Board()
     }
 }
 
+Board::Board( std::string fen )
+    : whiteIsChecked( false ),
+      blackIsChecked( false ),
+      whiteIsCheckMated( false ),
+      blackIsCheckMated( false ),
+      staleMate( false ),
+      score( 0 ),
+      _threefoldRepetitionCounter( 0 ) {
+    /* ------------------------ Board squares description ----------------------- */
+    int numOfSlashes = 0;         // Should be exactly 7 slashes
+    SquareIndex squareIndex = 0;  // Should be exactly 64 squares
+    int lastSlashIndex = -1;      // Cant be two consecutive slashes
+    auto it = fen.cbegin();
+    while ( it != fen.cend() && *it != ' ' ) {
+        // Is piece "pnbrqkPNBRQK"
+        if ( isalpha( *it ) ) {
+            std::string validPieces = "pnbrqkPNBRQK";
+            if ( std::find( validPieces.cbegin(), validPieces.cend(), *it ) == validPieces.cend() ) {
+                throw std::invalid_argument( "Invalid FEN notation - unknown piece char" );
+            }
+            squares[squareIndex++] = Piece( *it );
+        }
+        // Is empty squares "12345678"
+        else if ( isdigit( *it ) ) {
+            int numOfEmptySquares = int( *it ) - 48;
+            if ( numOfEmptySquares < 1 || numOfEmptySquares > 8 ) {
+                throw std::invalid_argument( "Invalid FEN notation - invalid number of empty squares" );
+            }
+            for ( int i = 0; i < numOfEmptySquares; i++ ) {
+                squares[squareIndex++] = std::nullopt;
+            }
+        }
+        // Is separator '/'
+        else if ( *it == '/' ) {
+            if ( it - fen.cbegin() - lastSlashIndex == 1 || ++numOfSlashes > 7 ) {
+                throw std::invalid_argument( "Invalid FEN notation - invalid number of slashes" );
+            }
+            lastSlashIndex = it - fen.cbegin();
+        }
+        // Anyhing else is invalid
+        else {
+            throw std::invalid_argument( "Invalid FEN notation - invalid char encountered" );
+        }
+        ++it;
+    }
+
+    if ( squareIndex != 64 || numOfSlashes != 7 ) {
+        throw std::invalid_argument( "Invalid FEN notation - invalid number of squares described or slashes" );
+    }
+
+    /* ------------------------------ side to move ------------------------------ */
+    if ( ++it == fen.cend() ) throw std::invalid_argument( "Invalid FEN notation - side to move required" );
+
+    if ( *it == 'w' ) {
+        sideToMove = WHITE;
+    } else if ( *it == 'b' ) {
+        sideToMove = BLACK;
+    } else {
+        throw std::invalid_argument( "Invalid FEN notation - invalid side to move" );
+    }
+
+    if ( ++it == fen.cend() || *it != ' ' )
+        throw std::invalid_argument( "Invalid FEN notation - castling rights required" );
+
+    /* ----------------------------- Castling rights ---------------------------- */
+    while ( ++it != fen.cend() && *it != ' ' ) {
+        if ( *it == '-' ) {
+            _blackHasCastled = true;
+            _whiteHasCastled = true;
+            continue;
+        } else if ( *it == 'K' ) {
+            if ( !squares[63] || squares[63]->type != ROOK || squares[63]->getColor() != WHITE ) {
+                throw std::invalid_argument( "Invalid FEN notation - white king side castling requires a rook on H1" );
+            }
+            _whiteHasCastled = false;
+        } else if ( *it == 'Q' ) {
+            if ( !squares[56] || squares[56]->type != ROOK || squares[56]->getColor() != WHITE ) {
+                throw std::invalid_argument( "Invalid FEN notation - white queen side castling requires a rook on A1" );
+            }
+            _whiteHasCastled = false;
+        } else if ( *it == 'k' ) {
+            if ( !squares[7] || squares[7]->type != ROOK || squares[7]->getColor() != BLACK ) {
+                throw std::invalid_argument( "Invalid FEN notation - black king side castling requires a rook on H8" );
+            }
+            _blackHasCastled = false;
+        } else if ( *it == 'q' ) {
+            if ( !squares[0] || squares[0]->type != ROOK || squares[0]->getColor() != BLACK ) {
+                throw std::invalid_argument( "Invalid FEN notation - black king side castling requires a rook on A8" );
+            }
+            _blackHasCastled = false;
+        } else {
+            throw std::invalid_argument( "Invalid FEN notation - invalid castling rights" );
+        }
+    }
+
+    /* ------------------------------- En passant ------------------------------- */
+    if ( ++it == fen.cend() ) throw std::invalid_argument( "Invalid FEN notation - en passant required" );
+
+    if ( *it == '-' ) {
+        ++it;
+    } else {
+        char file = tolower( *it );
+        if ( ++it == fen.cend() ) throw std::invalid_argument( "Invalid FEN notation - en passant square description" );
+        char rank = *it;
+        if ( file < 'a' || file > 'h' || rank < '1' || rank > '8' ) {
+            throw std::invalid_argument( "Invalid FEN notation - en passant square description" );
+        }
+        _enPassantSquare = 8 * ( 8 - ( int( rank ) - 48 ) ) + ( int( file ) - 97 );
+    }
+
+    if ( it == fen.cend() || *it != ' ' )
+        throw std::invalid_argument( "Invalid FEN notation - fifty move count required" );
+
+    /* --------------------------- fifty move counter --------------------------- */
+    std::string fiftyMoveCount;
+    while ( ++it != fen.cend() && *it != ' ' ) {
+        fiftyMoveCount += *it;
+    }
+    _fiftyMoveCounter = std::stoi( fiftyMoveCount );
+    if ( it == fen.cend() ) throw std::invalid_argument( "Invalid FEN notation - turn count required" );
+
+    /* ------------------------------- turn count ------------------------------- */
+    std::string turnCount;
+    while ( ++it != fen.cend() ) {
+        turnCount += *it;
+    }
+}
+
 Board Board::fastCopy() {
     Board newBoard;
     newBoard.sideToMove = this->sideToMove;

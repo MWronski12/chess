@@ -45,6 +45,7 @@ class Piece {
 public:
     // constructors
     Piece( PieceColor color, PieceType type, bool hasMoved );
+    Piece( char piece );
 
     // getters for values that never change
     PieceColor getColor() const;

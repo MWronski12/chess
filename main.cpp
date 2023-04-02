@@ -29,7 +29,7 @@ uint64_t perft( int depth, Board &board, PieceValidMoves &generator ) {
             board.makeMove( srcSquare, destSquare );
             generator.generateValidMoves( board );
 
-            // Add subnodes count if the move is valid
+            // Count the subnodes count if the move is valid
             if ( !( board.blackIsChecked && board.sideToMove == WHITE ) &&
                  !( board.whiteIsChecked && board.sideToMove == BLACK ) ) {
                 nodes += perft( depth - 1, board, generator );
@@ -47,9 +47,9 @@ int main() {
     Board b;
     PieceValidMoves g;
     g.generateValidMoves( b );
-
-    uint64_t nodes = perft( 5, b, g );
-    cout << "Perft(5) == " << nodes << endl;
+    int depth = 4;
+    uint64_t nodes = perft( depth, b, g );
+    cout << "Perft(" << depth << ") == " << nodes << endl;
 
     return 0;
 }

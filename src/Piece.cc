@@ -8,6 +8,42 @@ Piece::Piece( PieceColor color, PieceType type, bool hasMoved )
     setPieceActionValue();
 }
 
+Piece::Piece( char piece ) : hasMoved( false ), attackedValue( 0 ), defendedValue( 0 ) {
+    _color = isupper( piece ) ? WHITE : BLACK;
+    piece = tolower( piece );
+    switch ( piece ) {
+        case 'p':
+            type = PAWN;
+            break;
+
+        case 'n':
+            type = KNIGHT;
+            break;
+
+        case 'b':
+            type = BISHOP;
+            break;
+
+        case 'r':
+            type = ROOK;
+            break;
+
+        case 'q':
+            type = QUEEN;
+            break;
+
+        case 'k':
+            type = KING;
+            break;
+
+        default:
+            throw std::invalid_argument( "Invalid piece type" );
+            break;
+    }
+    setPieceValue();
+    setPieceActionValue();
+}
+
 PieceColor Piece::getColor() const { return _color; }
 int Piece::getValue() const { return _value; }
 int Piece::getActionValue() const { return _actionValue; }

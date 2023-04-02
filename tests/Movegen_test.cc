@@ -29,6 +29,7 @@ uint64_t perft( int depth, Board &board, PieceValidMoves &generator ) {
 
         // Iterate through every pseudo valid move for the piece
         for ( auto destSquare : piece->validMoves ) {
+            // TODO: This is ugly, fix it
             // For pawn promotions
             if ( piece->type == PAWN && ( destSquare < 8 || destSquare > 55 ) ) {
                 for ( PieceType promotionType : { KNIGHT, BISHOP, ROOK, QUEEN } ) {

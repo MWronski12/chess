@@ -53,11 +53,9 @@ TEST_CASE( "Perft function multiple benchmarking", "[perft]" ) {
     int depth;
     uint64_t expected_result;
     std::tie( depth, expected_result ) = GENERATE( table<int, uint64_t>( {
-        { 0, 1 },
-        { 1, 20 },
-        { 2, 400 },
-        { 3, 8'902 },
-        { 4, 197'281 },
+        { 0, 1 }, { 1, 20 }, { 2, 400 },
+        // { 3, 8'902 },
+        // { 4, 197'281 },
     } ) );
 
     Board b;

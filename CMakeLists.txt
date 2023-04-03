@@ -15,6 +15,7 @@ add_compile_options(
 )
 
 add_executable(chess main.cpp src/Gui.cc)
+add_executable(chess_console main_console.cpp src/Gui.cc)
 
 add_executable(Gui src/GuiExample.cc )
 

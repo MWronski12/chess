@@ -8,10 +8,7 @@ FetchContent_MakeAvailable(SFML)
 install(TARGETS chess)
 target_link_libraries(chess engine sfml-graphics sfml-window sfml-system)
 
-# add_executable(Gui
-# Gui.cc
-# )
-# tutaj taki jest problem że tworzym bibliotekę, która jest zależna od biblioteki?
+target_link_libraries(chess_console engine sfml-graphics sfml-window sfml-system)
 
 target_link_libraries(Gui PRIVATE sfml-graphics)
 target_link_libraries(Gui PRIVATE sfml-window)
@@ -22,6 +19,7 @@ target_link_libraries(Gui PRIVATE sfml-system)
 # endif()
 install(TARGETS Gui)
 
+include_directories (/usr/include/freetype2)
 # To build static libraries?
 # unset(BUILD_SHARED_LIBS)
 # You CMake code isn't how you find SFML.
@@ -37,4 +35,3 @@ install(TARGETS Gui)
 
 # Note also that SFML will automatically look for its dependencies and link them, so you don't really need to search for freetype in your own CMake script.
 
-include_directories (/usr/include/freetype2)

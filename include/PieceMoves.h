@@ -19,6 +19,7 @@ public:
 private:
     // Private constructor to prevent creation of instances from outside the class.
     PieceMoves();
+    PieceMoves( PieceMoves &other ) = delete;
 
     std::array<std::vector<std::vector<SquareIndex>>, 64> _whitePawnMoves;
     std::array<std::vector<std::vector<SquareIndex>>, 64> _blackPawnMoves;

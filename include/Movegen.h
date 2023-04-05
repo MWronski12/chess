@@ -11,9 +11,15 @@
 class PieceValidMoves {
 public:
     PieceValidMoves();
+    PieceValidMoves( PieceValidMoves & ) = delete;
+    PieceValidMoves( PieceValidMoves && ) = delete;
 
-    // Generate all valid moves for the given board filling Piece.validMoves vectors
+    // Generate all pseudo legal moves for the given board filling Piece.validMoves vectors
     int generateValidMoves( Board &board );
+
+    // This method looks at the board and determines if previously made move didnt leave the king in check and thus was
+    // a fully legal move. All pseudo legal moves generated with generateValidMoves method have to be validated!
+    bool validateMove( const Board &board ) const;
 
 private:
     // Kings and pawns have different restrictions on moves so they are handled separately

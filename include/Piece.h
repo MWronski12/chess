@@ -23,6 +23,8 @@ auto const KING_ACTION_VALUE = 1;
 
 auto const NULL_SQUARE = 64;
 
+auto const CAPTURE_MOVE_REWARD = 1;
+
 /* ---------------------------------- enums --------------------------------- */
 
 enum PieceColor { WHITE, BLACK };

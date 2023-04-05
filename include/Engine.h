@@ -4,7 +4,7 @@
 #include <stack>
 
 #include "Board.h"
-#include "Move.h"
+#include "MoveContent.h"
 #include "Movegen.h"
 
 class Engine {

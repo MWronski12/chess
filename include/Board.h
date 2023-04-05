@@ -4,7 +4,7 @@
 #include <array>
 #include <optional>
 
-#include "Move.h"
+#include "MoveContent.h"
 #include "Piece.h"
 
 /* -------------------------- starting position map ------------------------- */
@@ -23,7 +23,7 @@ public:
     Board();
     // TODO
     Board( std::string FENString );
-    Board fastCopy();
+    Board fastCopy() const;
 
     // getters for values that are changed only by class methods
     bool whiteHasCastled() const;

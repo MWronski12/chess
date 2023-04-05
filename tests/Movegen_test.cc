@@ -29,7 +29,6 @@ uint64_t perft( int depth, Board &board, PieceValidMoves &generator ) {
 
         // Iterate through every pseudo valid move for the piece
         for ( auto destSquare : piece->validMoves ) {
-            // TODO: This is ugly, fix it
             // For pawn promotions
             if ( piece->type == PAWN && ( destSquare < 8 || destSquare > 55 ) ) {
                 for ( PieceType promotionType : { KNIGHT, BISHOP, ROOK, QUEEN } ) {
@@ -38,8 +37,7 @@ uint64_t perft( int depth, Board &board, PieceValidMoves &generator ) {
                     generator.generateValidMoves( board );
 
                     // Add subnodes count if the move is valid
-                    if ( !( board.blackIsChecked && board.sideToMove == WHITE ) &&
-                         !( board.whiteIsChecked && board.sideToMove == BLACK ) ) {
+                    if ( generator.validateMove( board ) == true ) {
                         nodes += perft( depth - 1, board, generator );
                     }
 
@@ -55,8 +53,7 @@ uint64_t perft( int depth, Board &board, PieceValidMoves &generator ) {
                 generator.generateValidMoves( board );
 
                 // Add subnodes count if the move is valid
-                if ( !( board.blackIsChecked && board.sideToMove == WHITE ) &&
-                     !( board.whiteIsChecked && board.sideToMove == BLACK ) ) {
+                if ( generator.validateMove( board ) ) {
                     nodes += perft( depth - 1, board, generator );
                 }
 
@@ -85,13 +82,6 @@ uint64_t perft( int depth, Board &board, PieceValidMoves &generator ) {
 //     g.generateValidMoves( b );
 //     REQUIRE( perft( depth, b, g ) == expected_result );
 //     BENCHMARK( "Perft at depth " + std::to_string( depth ) ) { return perft( depth, b, g ); };
-// }
-
-// TEST_CASE( "Perft function single test", "[perft]" ) {
-//     Board b;
-//     PieceValidMoves g;
-//     g.generateValidMoves( b );
-//     REQUIRE( perft( 5, b, g ) == 4'865'609 );
 // }
 
 /* --------------------- different fen loaded positions --------------------- */

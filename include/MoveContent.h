@@ -10,7 +10,8 @@
 class MoveContent {
 public:
     MoveContent();
-    MoveContent( SquareIndex src, SquareIndex dest, PieceType promotion );
+    MoveContent( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY, PieceType pieceMoving = EMPTY,
+                 PieceType pieceTaken = EMPTY, bool isEnPassantCapture = false, int score = 0 );
 
     SquareIndex src;
     SquareIndex dest;
@@ -20,7 +21,10 @@ public:
     bool isEnPassantCapture;
     int score;
 
+    // TODO:
     std::string toPGN() const;
+
+    static int compare( const MoveContent &m1, const MoveContent &m2 );
 };
 
 #endif

@@ -84,6 +84,16 @@ int PieceValidMoves::generateValidMoves( Board& board ) {
     return movesGeneratedCount;
 }
 
+bool PieceValidMoves::validateMove( const Board& board ) const {
+    if ( board.sideToMove == WHITE && board.blackIsChecked ) {
+        return false;
+    } else if ( board.sideToMove == BLACK && board.whiteIsChecked ) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
 int PieceValidMoves::generateValidPawnMoves( Board& board, SquareIndex srcSquare ) {
     int movesGeneratedCount = 0;
     auto& pawn = board.squares[srcSquare];

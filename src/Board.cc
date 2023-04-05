@@ -176,7 +176,7 @@ Board::Board( std::string fen )
     }
 }
 
-Board Board::fastCopy() {
+Board Board::fastCopy() const {
     Board newBoard;
     newBoard.sideToMove = this->sideToMove;
     newBoard.whiteIsChecked = this->whiteIsChecked;

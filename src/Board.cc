@@ -62,7 +62,7 @@ Board::Board( std::string fen )
     int lastSlashIndex = -1;      // Cant be two consecutive slashes
     auto it = fen.cbegin();
     while ( it != fen.cend() && *it != ' ' ) {
-        // Is piece "pnbrqkPNBRQK"
+        // Is piece - one of: "pnbrqkPNBRQK"
         if ( isalpha( *it ) ) {
             std::string validPieces = "pnbrqkPNBRQK";
             if ( std::find( validPieces.cbegin(), validPieces.cend(), *it ) == validPieces.cend() ) {
@@ -70,7 +70,7 @@ Board::Board( std::string fen )
             }
             squares[squareIndex++] = Piece( *it );
         }
-        // Is empty squares "12345678"
+        // Is n empty squares - one of: "12345678"
         else if ( isdigit( *it ) ) {
             int numOfEmptySquares = int( *it ) - 48;
             if ( numOfEmptySquares < 1 || numOfEmptySquares > 8 ) {

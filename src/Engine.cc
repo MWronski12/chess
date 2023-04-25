@@ -19,8 +19,7 @@ bool Engine::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) 
     board->makeMove( src, dest, promotion );
     moveGenerator.generateValidMoves( *board );
 
-    if ( ( board->sideToMove == BLACK && board->whiteIsChecked ) ||
-         ( board->sideToMove == WHITE && board->blackIsChecked ) ) {
+    if ( !moveGenerator.validateBoard( *board ) ) {
         board = std::move( currentBoard );
         return false;
     }

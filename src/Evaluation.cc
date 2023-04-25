@@ -2,7 +2,7 @@
 
 #include "Evaluation.h"
 
-int Evaluation::evaluate( const Board &board ) {
+int Evaluation::evaluateBoard( const Board &board ) {
     // Accumulate material balance
     return std::accumulate(
         board.squares.begin(), board.squares.end(), 0, []( int score, std::optional<Piece> square ) -> auto {

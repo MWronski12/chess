@@ -4,5 +4,5 @@ class Evaluation {
 public:
     Evaluation() = delete;
 
-    static int evaluate( const Board &board );
+    static int evaluateBoard( const Board &board );
 };

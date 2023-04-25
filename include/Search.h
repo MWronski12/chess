@@ -6,19 +6,24 @@
 #include "MoveContent.h"
 #include "Movegen.h"
 
+/* ------------------- Minimum and maximum score constants ------------------ */
+static const int POSITIVE_INFINITY = std::numeric_limits<int>::max();
+static const int NEGATIVE_INFINITY = std::numeric_limits<int>::min();
+
 class Search {
 public:
     Search() {}
     Search( Search& ) = delete;
     Search( Search&& ) = delete;
 
-    MoveContent getBestMove( const Board& board, int depth );
-    int miniMax( int depth, const Board& board );
-    // int quiescence( Board& board ) {}
-    std::vector<MoveContent> evaluateMoves( const Board& board );
+    int alphaBeta( const Board& board, int depth, int alpha, int beta, bool maximizingPlayer ) const;
+    // TODO: Implement quiescent search.
+    int quiescentSearch( const Board& board, int alpha, int beta, int depth, int maxDepth ) const;
+    MoveContent getBestMove( const Board& board, int maxDepth, bool maximizingPlayer ) const;
+
+    std::vector<MoveContent> evaluateMoves( const Board& board ) const;
 
 private:
-    PieceValidMoves generator;
-    MoveContent miniMaxMove( PieceColor sideToMove, const std::vector<MoveContent>& moves );
-    int miniMaxScore( PieceColor sideToMove, const std::vector<MoveContent>& moves );
+    mutable PieceValidMoves generator;
+    int endOfTheGameScore( const Board& board ) const;
 };

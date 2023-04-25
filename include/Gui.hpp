@@ -18,6 +18,7 @@ public:
 class ConsoleGui : public Gui {
 public:
     ConsoleGui() : engine( Engine() ) {}
+
     void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY ) override {
         auto &piece = engine.board->squares[src];
 

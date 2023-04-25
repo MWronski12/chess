@@ -15,3 +15,23 @@
 15) Private class members should start with underscore '_' and use camel case naming convention (ex. _myPrivateMember).
 16) Library headers should be included first and project headers after.
 17) 'std' namespace should be included in source files, and shouldn't be included in header files.
+
+
+Function and class block comment template:
+
+/**
+ * Brief description of the function.
+ * 
+ * @param param1 Description of the first parameter.
+ * @param param2 Description of the second parameter.
+ * @return Description of the return value.
+ * @throw Description of the exception thrown (if any).
+ * 
+ * Detailed description of the function, including any assumptions made,
+ * potential side effects, and any other relevant information.
+ * 
+ * Examples of usage:
+ * <code>
+ * int result = myFunction(arg1, arg2);
+ * </code>
+ */

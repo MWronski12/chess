@@ -1,0 +1,13 @@
+CORE:
+- alphaBeta
+- getBestMove (iterative deepening)
+- quiescenceSearch
+- searchForMate:
+    - 
+
+REST:
+- Insufficient material in evaluation function
+- evaluateMoves:
+    - Operate on Move struct instead of whole MoveContent
+    - Reward castling and first move of the piece
+    - It also includes pseudo legal moves, which is a problem when trying to see if its staleMate

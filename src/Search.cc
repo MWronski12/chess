@@ -1,58 +1,155 @@
+#include <algorithm>
+#include <limits>
+
 #include "Search.h"
 
-int Search::miniMaxScore( PieceColor sideToMove, const std::vector<MoveContent>& moves ) {
-    if ( sideToMove == WHITE ) {
-        auto maxMovePtr = std::max_element( moves.begin(), moves.end(), MoveContent::compare );
-        return maxMovePtr->score;
-    } else {
-        auto minMovePtr = std::min_element( moves.begin(), moves.end(), MoveContent::compare );
-        return minMovePtr->score;
-    }
-}
+/**
+ * Returns the best possible move for the current player.
+ * It assumes that the board has valid moves calculated and the game is not over yet!
+ *
+ * @param board position to examine.
+ * @param maxDepth maximum depth of search.
+ * @param maximizingPlayer true if the current player is WHITE, false if BLACK.
+ *
+ * @return MoveContent representing the best move for the current player.
+ */
+MoveContent Search::getBestMove( const Board& board, int maxDepth, bool maximizingPlayer ) const {
+    MoveContent bestMove;
+    bestMove.score = maximizingPlayer ? NEGATIVE_INFINITY : POSITIVE_INFINITY;
 
-int Search::miniMax( int depth, const Board& board ) {
-    if ( depth == 0 ) return Evaluation::evaluate( board );
+    for ( int depth = 1; depth <= maxDepth; depth++ ) {
+        std::vector<MoveContent> possibleMoves = evaluateMoves( board );
 
-    std::vector<MoveContent> moves = evaluateMoves( board );
+        for ( auto move : possibleMoves ) {
+            Board boardCopy = board.fastCopy();
+            boardCopy.makeMove( move.src, move.dest, move.promotion );
+            generator.generateValidMoves( boardCopy );
+            if ( !generator.validateBoard( boardCopy ) ) {
+                continue;
+            }
 
-    for ( auto& move : moves ) {
-        Board boardCopy = board.fastCopy();
-        boardCopy.makeMove( move.src, move.dest );
-        generator.generateValidMoves( boardCopy );
-        if ( generator.validateMove( boardCopy ) == false ) {
-            continue;
+            int score = alphaBeta( boardCopy, depth, NEGATIVE_INFINITY, POSITIVE_INFINITY, !maximizingPlayer );
+
+            if ( maximizingPlayer && score > bestMove.score ) {
+                bestMove = move;
+                bestMove.score = score;
+            }
         }
-        move.score = miniMax( depth - 1, boardCopy );
+        // TODO: Should be possible to terminate the search at any given time
+        // if ( timeIsUp() ) {
+        //     break;
+        // }
     }
-
-    return miniMaxScore( board.sideToMove, moves );
+    return bestMove;
 }
 
-MoveContent Search::miniMaxMove( PieceColor sideToMove, const std::vector<MoveContent>& moves ) {
-    if ( sideToMove == WHITE ) {
-        return *std::max_element( moves.begin(), moves.end(), MoveContent::compare );
-    } else {
-        return *std::min_element( moves.begin(), moves.end(), MoveContent::compare );
+/**
+ * Calculates the score for the current board and player, recursively searching the game tree.
+ *
+ * @param board position to examine.
+ * @param depth maximum depth of search.
+ * @param alpha maximizing player best score.
+ * @param beta minimizing player best score.
+ * @param maximizingPlayer true if the current player is WHITE, false if BLACK.
+ *
+ * @return int score for the current board and player.
+ */
+int Search::alphaBeta( const Board& board, int depth, int alpha, int beta, bool maximizingPlayer ) const {
+    if ( depth == 0 ) {
+        return Evaluation::evaluateBoard( board );
+    }
+
+    // If no legal moves found we decide that the game is over.
+    bool isEndOfTheGame = true;
+
+    /* ---------------------------- Maximizing Player --------------------------- */
+    if ( maximizingPlayer ) {
+        int maxEval = POSITIVE_INFINITY;
+        std::vector<MoveContent> possibleMoves = evaluateMoves( board );
+
+        for ( auto move : possibleMoves ) {
+            Board boardCopy = board.fastCopy();
+            boardCopy.makeMove( move.src, move.dest, move.promotion );
+            generator.generateValidMoves( boardCopy );
+            if ( !generator.validateBoard( boardCopy ) ) {
+                continue;
+            }
+
+            // We found a legal move, the game is not over.
+            isEndOfTheGame = false;
+            int eval = alphaBeta( boardCopy, depth - 1, alpha, beta, false );
+            maxEval = std::max( maxEval, eval );
+            alpha = std::max( alpha, eval );
+            if ( beta <= alpha ) {
+                break;
+            }
+        }
+
+        if ( isEndOfTheGame ) return endOfTheGameScore( board );
+
+        return maxEval;
+
+    }
+    /* ---------------------------- Minimizing player --------------------------- */
+    else {
+        int minEval = NEGATIVE_INFINITY;
+        std::vector<MoveContent> possibleMoves = evaluateMoves( board );
+
+        for ( auto move : possibleMoves ) {
+            Board boardCopy = board.fastCopy();
+            boardCopy.makeMove( move.src, move.dest, move.promotion );
+            generator.generateValidMoves( boardCopy );
+            if ( !generator.validateBoard( boardCopy ) ) {
+                continue;
+            }
+
+            isEndOfTheGame = false;
+            int eval = alphaBeta( boardCopy, depth - 1, alpha, beta, false );
+            minEval = std::min( minEval, eval );
+            beta = std::min( beta, eval );
+            if ( beta <= alpha ) {
+                break;
+            }
+        }
+
+        return minEval;
     }
 }
 
-MoveContent Search::getBestMove( const Board& board, int depth ) {
-    std::vector<MoveContent> moves = evaluateMoves( board );
-    for ( auto& move : moves ) {
-        move.score = miniMax( depth - 1, board );
+/**
+ * Calculates the score for the end of the game.
+ * Assumes that the given board represents a game over.
+ *
+ * @param board position to examine.
+ *
+ * @return int score for the end of the game.
+ */
+int Search::endOfTheGameScore( const Board& board ) const {
+    // White is check mated
+    if ( board.sideToMove == WHITE && board.whiteIsChecked ) {
+        return NEGATIVE_INFINITY;
     }
-    return miniMaxMove( board.sideToMove, moves );
+    // Black is check mated
+    else if ( board.sideToMove == BLACK && board.blackIsChecked ) {
+        return POSITIVE_INFINITY;
+    }
+    // Stale mate
+    else {
+        return 0;
+    }
 }
 
-std::vector<MoveContent> Search::evaluateMoves( const Board& board ) {
-    // CONSIDERATIONS:
-    // promotions
-    //  --> QUEEN first
-    // captures
-    //  --> difference in pieceValue
-    //  --> difference in pieceAttacked/Defended value
-    // enpassant captures
-
+/**
+ * Generates a list of pseudo evaluated possible moves for the current board position.
+ * Pseudo evaluation tries to guess which moves are the most promising, so they can be searched first.
+ * It assumes that the board has valid moves calculated.
+ * Considerations: promotions, captures, enpassant captures (TODO: castling and piece first move).
+ *
+ * @param board Board to examine, it has to have valid moves calculated.
+ *
+ * @return vector of pseudo evaluated moves for the current board.
+ */
+std::vector<MoveContent> Search::evaluateMoves( const Board& board ) const {
     std::vector<MoveContent> moves;
 
     for ( SquareIndex srcSquare = 0; srcSquare < 64; srcSquare++ ) {

@@ -3,12 +3,34 @@
 #include "Evaluation.h"
 
 int Evaluation::evaluateBoard( const Board &board ) {
-    // Accumulate material balance
-    return std::accumulate(
-        board.squares.begin(), board.squares.end(), 0, []( int score, std::optional<Piece> square ) -> auto {
-            if ( square.has_value() ) {
-                return square->getColor() == WHITE ? score + square->getValue() : score - square->getValue();
+    int score = 0;
+
+    for ( SquareIndex square = 0; square < 64; square++ ) {
+        if ( board.squares[square] != std::nullopt ) {
+            const auto piece = board.squares[square];
+            const auto color = piece->getColor();
+
+            /* ----------------------- Accumulate material balance ---------------------- */
+            score += color == WHITE ? piece->getValue() : -piece->getValue();
+
+            /* ------------------------- Evaluate piece position ------------------------ */
+            switch ( piece->type ) {
+                case PAWN:
+                    score += color == WHITE ? PAWN_TABLE[square] : -PAWN_TABLE[63 - square];
+                    break;
+                case KNIGHT:
+                    score += color == WHITE ? KNIGHT_TABLE[square] : -KNIGHT_TABLE[63 - square];
+                    break;
+                case BISHOP:
+                    score += color == WHITE ? BISHOP_TABLE[square] : -BISHOP_TABLE[63 - square];
+                    break;
+                case KING:
+                    score += color == WHITE ? KING_TABLE[square] : -KING_TABLE[63 - square];
+                    break;
+                default:
+                    break;
             }
-            return score;
-        } );
+        }
+    }
+    return score;
 }

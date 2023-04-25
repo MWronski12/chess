@@ -21,7 +21,7 @@ MoveContent Search::getBestMove( const Board& board, int maxDepth, bool maximizi
     // Perform iterative deepening search
     for ( int depth = 1; depth <= maxDepth; depth++ ) {
         auto compare = maximizingPlayer ? MoveContent::compareMax : MoveContent::compareMin;
-        std::sort( possibleMoves.cbegin(), possibleMoves.cend(), compare );
+        std::sort( possibleMoves.begin(), possibleMoves.end(), compare );
 
         for ( auto move : possibleMoves ) {
             Board boardCopy = board.fastCopy();
@@ -33,7 +33,8 @@ MoveContent Search::getBestMove( const Board& board, int maxDepth, bool maximizi
 
             move.score = alphaBeta( boardCopy, depth, NEGATIVE_INFINITY, POSITIVE_INFINITY, !maximizingPlayer );
 
-            if ( maximizingPlayer && move.score > bestMove.score || !maximizingPlayer && move.score < bestMove.score ) {
+            if ( ( maximizingPlayer && move.score > bestMove.score ) ||
+                 ( !maximizingPlayer && move.score < bestMove.score ) ) {
                 bestMove = move;
             }
         }
@@ -68,7 +69,7 @@ int Search::alphaBeta( const Board& board, int depth, int alpha, int beta, bool 
     if ( maximizingPlayer ) {
         int maxEval = POSITIVE_INFINITY;
         std::vector<MoveContent> possibleMoves = evaluateMoves( board );
-        std::sort( possibleMoves.cbegin(), possibleMoves.cend(), MoveContent::compareMax );
+        std::sort( possibleMoves.begin(), possibleMoves.end(), MoveContent::compareMax );
 
         for ( auto move : possibleMoves ) {
             Board boardCopy = board.fastCopy();
@@ -95,7 +96,7 @@ int Search::alphaBeta( const Board& board, int depth, int alpha, int beta, bool 
     else {
         int minEval = NEGATIVE_INFINITY;
         std::vector<MoveContent> possibleMoves = evaluateMoves( board );
-        std::sort( possibleMoves.cbegin(), possibleMoves.cend(), MoveContent::compareMin );
+        std::sort( possibleMoves.begin(), possibleMoves.end(), MoveContent::compareMin );
 
         for ( auto move : possibleMoves ) {
             Board boardCopy = board.fastCopy();

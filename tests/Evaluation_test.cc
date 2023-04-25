@@ -7,5 +7,5 @@
 
 TEST_CASE( "Evaluation of the board in initial position is 0", "[Evaluation.evaluate]" ) {
     Board b;
-    std::cout << Evaluation::evaluate( b );
+    std::cout << Evaluation::evaluateBoard( b );
 }

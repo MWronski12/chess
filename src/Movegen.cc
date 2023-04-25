@@ -84,7 +84,7 @@ int PieceValidMoves::generateValidMoves( Board& board ) {
     return movesGeneratedCount;
 }
 
-bool PieceValidMoves::validateMove( const Board& board ) const {
+bool PieceValidMoves::validateBoard( const Board& board ) const {
     if ( board.sideToMove == WHITE && board.blackIsChecked ) {
         return false;
     } else if ( board.sideToMove == BLACK && board.whiteIsChecked ) {

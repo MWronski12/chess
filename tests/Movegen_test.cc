@@ -37,7 +37,7 @@ uint64_t perft( int depth, Board &board, PieceValidMoves &generator ) {
                     generator.generateValidMoves( board );
 
                     // Add subnodes count if the move is valid
-                    if ( generator.validateMove( board ) == true ) {
+                    if ( generator.validateBoard( board ) == true ) {
                         nodes += perft( depth - 1, board, generator );
                     }
 
@@ -53,7 +53,7 @@ uint64_t perft( int depth, Board &board, PieceValidMoves &generator ) {
                 generator.generateValidMoves( board );
 
                 // Add subnodes count if the move is valid
-                if ( generator.validateMove( board ) ) {
+                if ( generator.validateBoard( board ) ) {
                     nodes += perft( depth - 1, board, generator );
                 }
 

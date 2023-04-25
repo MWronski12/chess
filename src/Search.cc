@@ -16,9 +16,12 @@
 MoveContent Search::getBestMove( const Board& board, int maxDepth, bool maximizingPlayer ) const {
     MoveContent bestMove;
     bestMove.score = maximizingPlayer ? NEGATIVE_INFINITY : POSITIVE_INFINITY;
+    std::vector<MoveContent> possibleMoves = evaluateMoves( board );
 
+    // Perform iterative deepening search
     for ( int depth = 1; depth <= maxDepth; depth++ ) {
-        std::vector<MoveContent> possibleMoves = evaluateMoves( board );
+        auto compare = maximizingPlayer ? MoveContent::compareMax : MoveContent::compareMin;
+        std::sort( possibleMoves.cbegin(), possibleMoves.cend(), compare );
 
         for ( auto move : possibleMoves ) {
             Board boardCopy = board.fastCopy();
@@ -28,11 +31,10 @@ MoveContent Search::getBestMove( const Board& board, int maxDepth, bool maximizi
                 continue;
             }
 
-            int score = alphaBeta( boardCopy, depth, NEGATIVE_INFINITY, POSITIVE_INFINITY, !maximizingPlayer );
+            move.score = alphaBeta( boardCopy, depth, NEGATIVE_INFINITY, POSITIVE_INFINITY, !maximizingPlayer );
 
-            if ( maximizingPlayer && score > bestMove.score ) {
+            if ( maximizingPlayer && move.score > bestMove.score || !maximizingPlayer && move.score < bestMove.score ) {
                 bestMove = move;
-                bestMove.score = score;
             }
         }
         // TODO: Should be possible to terminate the search at any given time
@@ -66,6 +68,7 @@ int Search::alphaBeta( const Board& board, int depth, int alpha, int beta, bool 
     if ( maximizingPlayer ) {
         int maxEval = POSITIVE_INFINITY;
         std::vector<MoveContent> possibleMoves = evaluateMoves( board );
+        std::sort( possibleMoves.cbegin(), possibleMoves.cend(), MoveContent::compareMax );
 
         for ( auto move : possibleMoves ) {
             Board boardCopy = board.fastCopy();
@@ -84,16 +87,15 @@ int Search::alphaBeta( const Board& board, int depth, int alpha, int beta, bool 
                 break;
             }
         }
-
         if ( isEndOfTheGame ) return endOfTheGameScore( board );
 
         return maxEval;
-
     }
     /* ---------------------------- Minimizing player --------------------------- */
     else {
         int minEval = NEGATIVE_INFINITY;
         std::vector<MoveContent> possibleMoves = evaluateMoves( board );
+        std::sort( possibleMoves.cbegin(), possibleMoves.cend(), MoveContent::compareMin );
 
         for ( auto move : possibleMoves ) {
             Board boardCopy = board.fastCopy();
@@ -111,6 +113,7 @@ int Search::alphaBeta( const Board& board, int depth, int alpha, int beta, bool 
                 break;
             }
         }
+        if ( isEndOfTheGame ) return endOfTheGameScore( board );
 
         return minEval;
     }

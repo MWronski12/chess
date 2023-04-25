@@ -24,7 +24,8 @@ public:
     // TODO:
     std::string toPGN() const;
 
-    static int compare( const MoveContent &m1, const MoveContent &m2 );
+    static int compareMin( const MoveContent &m1, const MoveContent &m2 );
+    static int compareMax( const MoveContent &m1, const MoveContent &m2 );
 };
 
 #endif

@@ -22,4 +22,5 @@ MoveContent::MoveContent()
 // TODO
 std::string MoveContent::toPGN() const { return "O-O-O"; }
 
-int MoveContent::compare( const MoveContent& m1, const MoveContent& m2 ) { return m1.score < m2.score; }
+int MoveContent::compareMin( const MoveContent& m1, const MoveContent& m2 ) { return m1.score < m2.score; }
+int MoveContent::compareMax( const MoveContent& m1, const MoveContent& m2 ) { return m1.score > m2.score; }

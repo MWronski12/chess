@@ -1,59 +1,43 @@
-#ifndef BOARD_HPP
-#define BOARD_HPP
+#ifndef BOARD_H
+#define BOARD_H
 
 #include <array>
 #include <optional>
 
+#include "Common.h"
 #include "MoveContent.h"
 #include "Piece.h"
 
-/* -------------------------- starting position map ------------------------- */
-
-const PieceType STARTING_POSITION[64] = {
-    ROOK,  KNIGHT, BISHOP, QUEEN, KING,  BISHOP, KNIGHT, ROOK,  PAWN,  PAWN,   PAWN,   PAWN,  PAWN,
-    PAWN,  PAWN,   PAWN,   EMPTY, EMPTY, EMPTY,  EMPTY,  EMPTY, EMPTY, EMPTY,  EMPTY,  EMPTY, EMPTY,
-    EMPTY, EMPTY,  EMPTY,  EMPTY, EMPTY, EMPTY,  EMPTY,  EMPTY, EMPTY, EMPTY,  EMPTY,  EMPTY, EMPTY,
-    EMPTY, EMPTY,  EMPTY,  EMPTY, EMPTY, EMPTY,  EMPTY,  EMPTY, EMPTY, PAWN,   PAWN,   PAWN,  PAWN,
-    PAWN,  PAWN,   PAWN,   PAWN,  ROOK,  KNIGHT, BISHOP, QUEEN, KING,  BISHOP, KNIGHT, ROOK };
-
-/* ------------------------------- Board class ------------------------------ */
-
 class Board {
 public:
+    // constructors
     Board();
-    // TODO
     Board( std::string FENString );
     Board fastCopy() const;
 
-    // getters for values that are changed only by class methods
-    bool whiteHasCastled() const;
-    bool blackHasCastled() const;
-    SquareIndex getEnPassantSquare() const;
-
-    // values that change
-    PieceColor sideToMove;
-    MoveContent lastMove;
+    // members
     bool whiteIsChecked;
     bool blackIsChecked;
+    bool whiteHasCastled;
+    bool blackHasCastled;
     bool whiteIsCheckMated;
     bool blackIsCheckMated;
     bool staleMate;
     int score;
+    PieceColor sideToMove;
+    MoveContent lastMove;
+    SquareIndex enPassantSquare;
     std::array<std::optional<Piece>, 64> squares;
 
+    // methods
     void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY );
 
+    // TODO: serializes Board object to FEN string notation
     std::string toFEN() const;
 
 private:
-    // Available by getters
-    bool _whiteHasCastled;
-    bool _blackHasCastled;
-    SquareIndex _enPassantSquare;
-
-    // Only used by class methods
-    int _fiftyMoveCounter;
-    int _threefoldRepetitionCounter;
+    int fiftyMoveCounter_;
+    int threefoldRepetitionCounter_;
 
     // Helper methods
     bool enPassantIsAvailable() const;

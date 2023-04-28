@@ -1,47 +1,9 @@
-#ifndef PIECE_HPP
-#define PIECE_HPP
-
-#include <inttypes.h>
+#ifndef PIECE_H
+#define PIECE_H
 
 #include <vector>
 
-/* -------------------------------- constants ------------------------------- */
-
-auto const PAWN_VALUE = 100;
-auto const KNIGHT_VALUE = 300;
-auto const BISHOP_VALUE = 325;
-auto const ROOK_VALUE = 500;
-auto const QUEEN_VALUE = 900;
-auto const KING_VALUE = 32767;
-
-auto const PAWN_ACTION_VALUE = 6;
-auto const KNIGHT_ACTION_VALUE = 3;
-auto const BISHOP_ACTION_VALUE = 3;
-auto const ROOK_ACTION_VALUE = 2;
-auto const QUEEN_ACTION_VALUE = 1;
-auto const KING_ACTION_VALUE = 1;
-
-auto const NULL_SQUARE = 64;
-
-auto const CAPTURE_MOVE_REWARD = 1;
-
-/* ---------------------------------- enums --------------------------------- */
-
-enum PieceColor { WHITE, BLACK };
-
-enum PieceType {
-    EMPTY,
-    PAWN,
-    KNIGHT,
-    BISHOP,
-    ROOK,
-    KING,
-    QUEEN,
-};
-
-using SquareIndex = uint8_t;
-
-/* ------------------------------- Piece class ------------------------------ */
+#include "Common.h"
 
 class Piece {
 public:
@@ -49,25 +11,19 @@ public:
     Piece( PieceColor color, PieceType type, bool hasMoved );
     Piece( char piece );
 
-    // getters for values that never change
-    PieceColor getColor() const;
-    int getValue() const;
-    int getActionValue() const;
-
-    // values that change
+    // members
+    PieceColor color;
     PieceType type;
     bool hasMoved;
     int attackedValue;
     int defendedValue;
+    int value;
+    int actionValue;
     std::vector<SquareIndex> validMoves;
 
-    void setPieceValue();
-    void setPieceActionValue();
-
-private:
-    PieceColor _color;
-    int _value;
-    int _actionValue;
+    // helper methods for creating Pieces
+    static int calculatePieceValue( PieceType piece );
+    static int calculatePieceActionValue( PieceType piece );
 };
 
 #endif

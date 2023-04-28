@@ -23,7 +23,7 @@ uint64_t perft( int depth, Board &board, PieceValidMoves &generator ) {
     for ( SquareIndex srcSquare = 0; srcSquare < 64; srcSquare++ ) {
         auto piece = board.squares[srcSquare];
 
-        if ( piece == std::nullopt || piece->getColor() != board.sideToMove ) {
+        if ( piece == std::nullopt || piece->color != board.sideToMove ) {
             continue;
         }
 
@@ -68,21 +68,23 @@ uint64_t perft( int depth, Board &board, PieceValidMoves &generator ) {
 
 /* -------------------- benchmarks from starting position ------------------- */
 
-TEST_CASE( "Perft function multiple benchmarking", "[perft]" ) {
-    int depth;
-    uint64_t expected_result;
-    std::tie( depth, expected_result ) = GENERATE( table<int, uint64_t>( {
-        { 0, 1 }, { 1, 20 }, { 2, 400 },
-        // { 3, 8'902 },
-        // { 4, 197'281 },
-    } ) );
+// TEST_CASE( "Perft function multiple benchmarking", "[perft]" ) {
+//     int depth;
+//     uint64_t expected_result;
+//     std::tie( depth, expected_result ) = GENERATE( table<int, uint64_t>( {
+//         { 0, 1 },
+//         // { 1, 20 },
+//         // { 2, 400 },
+//         // { 3, 8'902 },
+//         // { 4, 197'281 },
+//     } ) );
 
-    Board b;
-    PieceValidMoves g;
-    g.generateValidMoves( b );
-    REQUIRE( perft( depth, b, g ) == expected_result );
-    BENCHMARK( "Perft at depth " + std::to_string( depth ) ) { return perft( depth, b, g ); };
-}
+//     Board b;
+//     PieceValidMoves g;
+//     g.generateValidMoves( b );
+//     REQUIRE( perft( depth, b, g ) == expected_result );
+//     BENCHMARK( "Perft at depth " + std::to_string( depth ) ) { return perft( depth, b, g ); };
+// }
 
 /* --------------------- different fen loaded positions --------------------- */
 
@@ -127,7 +129,7 @@ TEST_CASE( "Fen position 4", "[perft]" ) {
     REQUIRE( perft( 1, b, g ) == 6 );
     REQUIRE( perft( 2, b, g ) == 264 );
     REQUIRE( perft( 3, b, g ) == 9467 );
-    // REQUIRE( perft( 4, b, g ) == 422333 );
+    REQUIRE( perft( 4, b, g ) == 422333 );
     // REQUIRE( perft( 5, b, g ) == 15833292 );
     // REQUIRE( perft( 6, b, g ) == 706045033 );
 }

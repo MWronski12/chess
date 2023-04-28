@@ -145,7 +145,7 @@ private:
                 std::cout << ( 64 - i ) / 8 << " ";
             }
             if ( engine.board->squares[i] ) {
-                std::cout << pieceToChar( engine.board->squares[i]->getColor(), engine.board->squares[i]->type );
+                std::cout << pieceToChar( engine.board->squares[i]->color, engine.board->squares[i]->type );
             } else {
                 std::cout << '-';
             }

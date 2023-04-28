@@ -8,10 +8,10 @@ int Evaluation::evaluateBoard( const Board &board ) {
     for ( SquareIndex square = 0; square < 64; square++ ) {
         if ( board.squares[square] != std::nullopt ) {
             const auto piece = board.squares[square];
-            const auto color = piece->getColor();
+            const auto color = piece->color;
 
             /* ----------------------- Accumulate material balance ---------------------- */
-            score += color == WHITE ? piece->getValue() : -piece->getValue();
+            score += color == WHITE ? piece->value : -piece->value;
 
             /* ------------------------- Evaluate piece position ------------------------ */
             switch ( piece->type ) {

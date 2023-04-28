@@ -24,7 +24,7 @@ MoveContent Search::getBestMove( const Board& board, int maxDepth, bool maximizi
         std::sort( possibleMoves.begin(), possibleMoves.end(), compare );
 
         for ( auto move : possibleMoves ) {
-            Board boardCopy = board.fastCopy();
+            Board boardCopy = board;
             boardCopy.makeMove( move.src, move.dest, move.promotion );
             generator.generateValidMoves( boardCopy );
             if ( !generator.validateBoard( boardCopy ) ) {
@@ -72,7 +72,7 @@ int Search::alphaBeta( const Board& board, int depth, int alpha, int beta, bool 
         std::sort( possibleMoves.begin(), possibleMoves.end(), MoveContent::compareMax );
 
         for ( auto move : possibleMoves ) {
-            Board boardCopy = board.fastCopy();
+            Board boardCopy = board;
             boardCopy.makeMove( move.src, move.dest, move.promotion );
             generator.generateValidMoves( boardCopy );
             if ( !generator.validateBoard( boardCopy ) ) {
@@ -96,7 +96,7 @@ int Search::alphaBeta( const Board& board, int depth, int alpha, int beta, bool 
         std::sort( possibleMoves.begin(), possibleMoves.end(), MoveContent::compareMin );
 
         for ( auto move : possibleMoves ) {
-            Board boardCopy = board.fastCopy();
+            Board boardCopy = board;
             boardCopy.makeMove( move.src, move.dest, move.promotion );
             generator.generateValidMoves( boardCopy );
             if ( !generator.validateBoard( boardCopy ) ) {
@@ -154,7 +154,7 @@ std::vector<MoveContent> Search::evaluateMoves( const Board& board ) const {
 
     for ( SquareIndex srcSquare = 0; srcSquare < 64; srcSquare++ ) {
         auto pieceMoving = board.squares[srcSquare];
-        if ( pieceMoving == std::nullopt || pieceMoving->getColor() != board.sideToMove ) continue;
+        if ( pieceMoving == std::nullopt || pieceMoving->color != board.sideToMove ) continue;
 
         MoveContent move;
         move.src = srcSquare;
@@ -192,13 +192,13 @@ std::vector<MoveContent> Search::evaluateMoves( const Board& board ) const {
                 move.pieceTaken = pieceTaken->type;
                 move.score += CAPTURE_MOVE_REWARD;
                 // Reward capturing with lowest valued piece
-                move.score += pieceMoving->getActionValue() - pieceTaken->getActionValue();
+                move.score += pieceMoving->actionValue - pieceTaken->actionValue;
                 // Reward capturing undefended pieces
                 move.score += pieceTaken->attackedValue - pieceTaken->defendedValue;
                 moves.push_back( move );
             }
             /* --------------------------- En passant captures -------------------------- */
-            else if ( pieceMoving->type == PAWN && destSquare == board.getEnPassantSquare() ) {
+            else if ( pieceMoving->type == PAWN && destSquare == board.enPassantSquare ) {
                 move.isEnPassantCapture = true;
                 move.pieceTaken = PAWN;
                 move.score += CAPTURE_MOVE_REWARD;

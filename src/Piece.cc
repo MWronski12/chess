@@ -3,13 +3,14 @@
 #include "Piece.h"
 
 Piece::Piece( PieceColor color, PieceType type, bool hasMoved )
-    : type( type ), hasMoved( hasMoved ), attackedValue( 0 ), defendedValue( 0 ), _color( color ) {
-    setPieceValue();
-    setPieceActionValue();
+    : color( color ), type( type ), hasMoved( hasMoved ), attackedValue( 0 ), defendedValue( 0 ) {
+    value = calculatePieceValue( type );
+    actionValue = calculatePieceActionValue( type );
 }
 
+// Creates a new piece based on char notation (ex. 'Q' for white queen, 'k' for black king)
 Piece::Piece( char piece ) : hasMoved( false ), attackedValue( 0 ), defendedValue( 0 ) {
-    _color = isupper( piece ) ? WHITE : BLACK;
+    color = isupper( piece ) ? WHITE : BLACK;
     piece = tolower( piece );
     switch ( piece ) {
         case 'p':
@@ -40,38 +41,34 @@ Piece::Piece( char piece ) : hasMoved( false ), attackedValue( 0 ), defendedValu
             throw std::invalid_argument( "Invalid piece type" );
             break;
     }
-    setPieceValue();
-    setPieceActionValue();
+    value = calculatePieceValue( type );
+    actionValue = calculatePieceActionValue( type );
 }
 
-PieceColor Piece::getColor() const { return _color; }
-int Piece::getValue() const { return _value; }
-int Piece::getActionValue() const { return _actionValue; }
-
-void Piece::setPieceValue() {
-    switch ( type ) {
+int Piece::calculatePieceValue( PieceType piece ) {
+    switch ( piece ) {
         case PAWN:
-            _value = PAWN_VALUE;
+            return PAWN_VALUE;
             break;
 
         case KNIGHT:
-            _value = KNIGHT_VALUE;
+            return KNIGHT_VALUE;
             break;
 
         case BISHOP:
-            _value = BISHOP_VALUE;
+            return BISHOP_VALUE;
             break;
 
         case ROOK:
-            _value = ROOK_VALUE;
+            return ROOK_VALUE;
             break;
 
         case QUEEN:
-            _value = QUEEN_VALUE;
+            return QUEEN_VALUE;
             break;
 
         case KING:
-            _value = KING_VALUE;
+            return KING_VALUE;
             break;
 
         default:
@@ -79,30 +76,30 @@ void Piece::setPieceValue() {
     }
 }
 
-void Piece::setPieceActionValue() {
-    switch ( type ) {
+int Piece::calculatePieceActionValue( PieceType piece ) {
+    switch ( piece ) {
         case PAWN:
-            _actionValue = PAWN_ACTION_VALUE;
+            return PAWN_ACTION_VALUE;
             break;
 
         case KNIGHT:
-            _actionValue = KNIGHT_ACTION_VALUE;
+            return KNIGHT_ACTION_VALUE;
             break;
 
         case BISHOP:
-            _actionValue = BISHOP_ACTION_VALUE;
+            return BISHOP_ACTION_VALUE;
             break;
 
         case ROOK:
-            _actionValue = ROOK_ACTION_VALUE;
+            return ROOK_ACTION_VALUE;
             break;
 
         case QUEEN:
-            _actionValue = QUEEN_ACTION_VALUE;
+            return QUEEN_ACTION_VALUE;
             break;
 
         case KING:
-            _actionValue = KING_ACTION_VALUE;
+            return KING_ACTION_VALUE;
             break;
 
         default:

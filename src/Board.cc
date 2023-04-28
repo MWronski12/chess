@@ -13,24 +13,23 @@
 
 #include "Board.h"
 
-/* -------------------------------------------------------------------------- */
-/*                                Constructors                                */
-/* -------------------------------------------------------------------------- */
+/* ------------------------------ Constructors ------------------------------ */
 
 // Creates a board with a starting position
 Board::Board()
-    : sideToMove( WHITE ),
-      whiteIsChecked( false ),
+    : whiteIsChecked( false ),
       blackIsChecked( false ),
+      whiteHasCastled( false ),
+      blackHasCastled( false ),
       whiteIsCheckMated( false ),
       blackIsCheckMated( false ),
       staleMate( false ),
       score( 0 ),
-      _whiteHasCastled( false ),
-      _blackHasCastled( false ),
-      _enPassantSquare( NULL_SQUARE ),
-      _fiftyMoveCounter( 0 ),
-      _threefoldRepetitionCounter( 0 ) {
+      sideToMove( WHITE ),
+      lastMove( MoveContent() ),
+      enPassantSquare( NULL_SQUARE ),
+      fiftyMoveCounter_( 0 ),
+      threefoldRepetitionCounter_( 0 ) {
     for ( SquareIndex i = 0; i < 64; i++ ) {
         if ( STARTING_POSITION[i] == EMPTY ) {
             continue;
@@ -55,7 +54,7 @@ Board::Board( std::string fen )
       blackIsCheckMated( false ),
       staleMate( false ),
       score( 0 ),
-      _threefoldRepetitionCounter( 0 ) {
+      threefoldRepetitionCounter_( 0 ) {
     /* ------------------------ Board squares description ----------------------- */
     int numOfSlashes = 0;         // Should be exactly 7 slashes
     SquareIndex squareIndex = 0;  // Should be exactly 64 squares
@@ -115,29 +114,29 @@ Board::Board( std::string fen )
     /* ----------------------------- Castling rights ---------------------------- */
     while ( ++it != fen.cend() && *it != ' ' ) {
         if ( *it == '-' ) {
-            _blackHasCastled = true;
-            _whiteHasCastled = true;
+            blackHasCastled = true;
+            whiteHasCastled = true;
             continue;
         } else if ( *it == 'K' ) {
-            if ( !squares[63] || squares[63]->type != ROOK || squares[63]->getColor() != WHITE ) {
+            if ( !squares[63] || squares[63]->type != ROOK || squares[63]->color != WHITE ) {
                 throw std::invalid_argument( "Invalid FEN notation - white king side castling requires a rook on H1" );
             }
-            _whiteHasCastled = false;
+            whiteHasCastled = false;
         } else if ( *it == 'Q' ) {
-            if ( !squares[56] || squares[56]->type != ROOK || squares[56]->getColor() != WHITE ) {
+            if ( !squares[56] || squares[56]->type != ROOK || squares[56]->color != WHITE ) {
                 throw std::invalid_argument( "Invalid FEN notation - white queen side castling requires a rook on A1" );
             }
-            _whiteHasCastled = false;
+            whiteHasCastled = false;
         } else if ( *it == 'k' ) {
-            if ( !squares[7] || squares[7]->type != ROOK || squares[7]->getColor() != BLACK ) {
+            if ( !squares[7] || squares[7]->type != ROOK || squares[7]->color != BLACK ) {
                 throw std::invalid_argument( "Invalid FEN notation - black king side castling requires a rook on H8" );
             }
-            _blackHasCastled = false;
+            blackHasCastled = false;
         } else if ( *it == 'q' ) {
-            if ( !squares[0] || squares[0]->type != ROOK || squares[0]->getColor() != BLACK ) {
+            if ( !squares[0] || squares[0]->type != ROOK || squares[0]->color != BLACK ) {
                 throw std::invalid_argument( "Invalid FEN notation - black king side castling requires a rook on A8" );
             }
-            _blackHasCastled = false;
+            blackHasCastled = false;
         } else {
             throw std::invalid_argument( "Invalid FEN notation - invalid castling rights" );
         }
@@ -155,7 +154,7 @@ Board::Board( std::string fen )
         if ( file < 'a' || file > 'h' || rank < '1' || rank > '8' ) {
             throw std::invalid_argument( "Invalid FEN notation - en passant square description" );
         }
-        _enPassantSquare = 8 * ( 8 - ( int( rank ) - 48 ) ) + ( int( file ) - 97 );
+        enPassantSquare = 8 * ( 8 - ( int( rank ) - 48 ) ) + ( int( file ) - 97 );
     }
 
     if ( it == fen.cend() || *it != ' ' )
@@ -166,7 +165,7 @@ Board::Board( std::string fen )
     while ( ++it != fen.cend() && *it != ' ' ) {
         fiftyMoveCount += *it;
     }
-    _fiftyMoveCounter = std::stoi( fiftyMoveCount );
+    fiftyMoveCounter_ = std::stoi( fiftyMoveCount );
     if ( it == fen.cend() ) throw std::invalid_argument( "Invalid FEN notation - turn count required" );
 
     /* ------------------------------- turn count ------------------------------- */
@@ -181,43 +180,27 @@ Board Board::fastCopy() const {
     newBoard.sideToMove = this->sideToMove;
     newBoard.whiteIsChecked = this->whiteIsChecked;
     newBoard.blackIsChecked = this->blackIsChecked;
-    newBoard._blackHasCastled = this->_blackHasCastled;
-    newBoard._whiteHasCastled = this->_whiteHasCastled;
-    newBoard._fiftyMoveCounter = this->_fiftyMoveCounter;
-    newBoard._threefoldRepetitionCounter = this->_fiftyMoveCounter;
+    newBoard.blackHasCastled = this->blackHasCastled;
+    newBoard.whiteHasCastled = this->whiteHasCastled;
+    newBoard.fiftyMoveCounter_ = this->fiftyMoveCounter_;
+    newBoard.threefoldRepetitionCounter_ = this->fiftyMoveCounter_;
     // Copy the pieces, including only their color, type and hasMoved fields
     for ( SquareIndex i = 0; i < 64; i++ ) {
         if ( this->squares[i] ) {
             auto &piece = this->squares[i];
-            newBoard.squares[i] = std::make_optional<Piece>( piece->getColor(), piece->type, piece->hasMoved );
+            newBoard.squares[i] = std::make_optional<Piece>( piece->color, piece->type, piece->hasMoved );
         }
     }
     return newBoard;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                                   getters                                  */
-/* -------------------------------------------------------------------------- */
-
-bool Board::whiteHasCastled() const { return _whiteHasCastled; }
-bool Board::blackHasCastled() const { return _blackHasCastled; }
-SquareIndex Board::getEnPassantSquare() const { return _enPassantSquare; }
-
-/* -------------------------------------------------------------------------- */
-/*                               makeMove methods                             */
-/* -------------------------------------------------------------------------- */
+/* --------------------------------- Methods -------------------------------- */
 
 void Board::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) {
     validateMove( src, dest, promotion );
 
     PieceType pieceMoving = squares[src] ? squares[src]->type : EMPTY;
     PieceType pieceTaken = squares[dest] ? squares[dest]->type : EMPTY;
-
-    // TODO: three fold repetition rule
-    if ( _fiftyMoveCounter == 50 || _threefoldRepetitionCounter == 3 ) {
-        staleMate = true;
-        return;
-    }
 
     // Record move details
     lastMove.src = src;
@@ -233,7 +216,7 @@ void Board::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) {
         recordEnPassant( src, dest );
     }
     // En passant capture
-    else if ( enPassantIsAvailable() && pieceMoving == PAWN && dest == getEnPassantSquare() ) {
+    else if ( enPassantIsAvailable() && pieceMoving == PAWN && dest == enPassantSquare ) {
         handleEnPassant();
     }
     // Castling
@@ -250,24 +233,33 @@ void Board::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) {
     squares[src] = std::nullopt;
     squares[dest]->hasMoved = true;
 
-    // Update other board information
+    // Update side to move
     sideToMove = sideToMove == WHITE ? BLACK : WHITE;
+
+    // Clear enPassantSquare
     if ( pieceMoving != PAWN || abs( src - dest ) != 16 ) {
-        _enPassantSquare = NULL_SQUARE;
+        enPassantSquare = NULL_SQUARE;
     }
+
+    // Update 50 repetition counter
     if ( pieceMoving != PAWN && pieceTaken == EMPTY ) {
-        _fiftyMoveCounter++;
+        fiftyMoveCounter_++;
+        if ( fiftyMoveCounter_ == 50 ) {
+            staleMate = true;
+            return;
+        }
     } else {
-        _fiftyMoveCounter = 0;
+        fiftyMoveCounter_ = 0;
     }
+
+    // TODO: Update threefoldRepetitionCounter
 }
 
-/* -------------------------------------------------------------------------- */
-/*                           makeMove helper methods                          */
-/* -------------------------------------------------------------------------- */
+/* ------------------------- makeMove helper methods ------------------------ */
+
 // Returns true if enPassant is available
 bool Board::enPassantIsAvailable() const {
-    if ( _enPassantSquare == NULL_SQUARE ) {
+    if ( enPassantSquare == NULL_SQUARE ) {
         return false;
     }
     return true;
@@ -291,12 +283,12 @@ void Board::validateMove( SquareIndex src, SquareIndex dest, PieceType promotion
     // Validate source square piece
     if ( !squares[src] ) {
         throw std::logic_error( "Source square must be occupied by a piece!" );
-    } else if ( sideToMove != squares[src]->getColor() ) {
+    } else if ( sideToMove != squares[src]->color ) {
         throw std::logic_error( "Source square must be occupied by a piece owned by the player whose turn it is!" );
     }
     // Validate dest square piece
     if ( squares[dest] ) {
-        if ( sideToMove == squares[dest]->getColor() ) {
+        if ( sideToMove == squares[dest]->color ) {
             throw std::logic_error( "Capturing allied piece is not allowed!" );
         }
     }
@@ -312,25 +304,25 @@ void Board::validateMove( SquareIndex src, SquareIndex dest, PieceType promotion
 
 // Sets en passant square according to destination square
 void Board::recordEnPassant( SquareIndex src, SquareIndex dest ) {
-    if ( squares[src]->getColor() == WHITE ) {
-        _enPassantSquare = dest + 8;
-    } else if ( squares[src]->getColor() == BLACK ) {
-        _enPassantSquare = dest - 8;
+    if ( squares[src]->color == WHITE ) {
+        enPassantSquare = dest + 8;
+    } else if ( squares[src]->color == BLACK ) {
+        enPassantSquare = dest - 8;
     }
 }
 
 // Clears enPassant square and records additional lastMove details
 void Board::handleEnPassant() {
     if ( sideToMove == WHITE ) {
-        squares[getEnPassantSquare() + 8] = std::nullopt;
+        squares[enPassantSquare + 8] = std::nullopt;
     } else if ( sideToMove == BLACK ) {
-        squares[getEnPassantSquare() - 8] = std::nullopt;
+        squares[enPassantSquare - 8] = std::nullopt;
     }
     lastMove.isEnPassantCapture = true;
     lastMove.pieceTaken = PAWN;
 }
 
-// Moves the rook
+// Moves the rook according to the castling move being made
 void Board::handleCastling( SquareIndex src, SquareIndex dest ) {
     // white castle
     if ( src == 60 ) {
@@ -346,7 +338,7 @@ void Board::handleCastling( SquareIndex src, SquareIndex dest ) {
             squares[59]->hasMoved = true;
             squares[56] = std::nullopt;
         }
-        _whiteHasCastled = true;
+        whiteHasCastled = true;
     }
     // black castle
     else if ( src == 4 ) {
@@ -362,13 +354,13 @@ void Board::handleCastling( SquareIndex src, SquareIndex dest ) {
             squares[3]->hasMoved = true;
             squares[0] = std::nullopt;
         }
-        _blackHasCastled = true;
+        blackHasCastled = true;
     }
 }
 
 // Changes type of promoted piece, while its still on the src square
 void Board::handlePromotion( SquareIndex src, PieceType promotion ) {
     squares[src]->type = promotion;
-    squares[src]->setPieceValue();
-    squares[src]->setPieceActionValue();
+    squares[src]->value = Piece::calculatePieceValue( promotion );
+    squares[src]->actionValue = Piece::calculatePieceActionValue( promotion );
 }

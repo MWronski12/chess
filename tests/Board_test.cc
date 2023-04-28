@@ -11,16 +11,16 @@ TEST_CASE( "Board constructs correct starting position by default", "[Board::Boa
         if ( board.squares[i] ) {
             REQUIRE( board.squares[i]->type == STARTING_POSITION[i] );
             if ( i < 16 ) {
-                REQUIRE( board.squares[i]->getColor() == BLACK );
+                REQUIRE( board.squares[i]->color == BLACK );
             } else if ( i > 47 ) {
-                REQUIRE( board.squares[i]->getColor() == WHITE );
+                REQUIRE( board.squares[i]->color == WHITE );
             }
         }
     }
 
-    REQUIRE( board.whiteHasCastled() == false );
-    REQUIRE( board.blackHasCastled() == false );
-    REQUIRE( board.getEnPassantSquare() == NULL_SQUARE );
+    REQUIRE( board.whiteHasCastled == false );
+    REQUIRE( board.blackHasCastled == false );
+    REQUIRE( board.enPassantSquare == NULL_SQUARE );
     REQUIRE( board.sideToMove == WHITE );
     REQUIRE( board.whiteIsChecked == false );
     REQUIRE( board.blackIsChecked == false );
@@ -98,19 +98,19 @@ TEST_CASE( "Move details are correctly recorded after making the move", "[Board:
 TEST_CASE( "Board keeps track of en passant square", "[Board::makeMove()]" ) {
     Board board;
     board.makeMove( 52, 36, EMPTY );
-    REQUIRE( board.getEnPassantSquare() == 44 );
+    REQUIRE( board.enPassantSquare == 44 );
 
     board.makeMove( 12, 28, EMPTY );
-    REQUIRE( board.getEnPassantSquare() == 20 );
+    REQUIRE( board.enPassantSquare == 20 );
 
     board.makeMove( 48, 40, EMPTY );
-    REQUIRE( board.getEnPassantSquare() == NULL_SQUARE );
+    REQUIRE( board.enPassantSquare == NULL_SQUARE );
 }
 
 TEST_CASE( "En passant capture is handled properly", "[Board::makeMove()]" ) {
     Board board;
     board.makeMove( 52, 36, EMPTY );
-    REQUIRE( board.getEnPassantSquare() == 44 );
+    REQUIRE( board.enPassantSquare == 44 );
     board.makeMove( 13, 44, EMPTY );
     REQUIRE( board.squares[36] == std::nullopt );
     REQUIRE( board.lastMove.isEnPassantCapture == true );
@@ -133,13 +133,13 @@ TEST_CASE( "Castle king side is handled properly", "Board::makeMove()" ) {
     REQUIRE( board.squares[63] == std::nullopt );
     REQUIRE( board.squares[61]->type == ROOK );
     REQUIRE( board.squares[61]->hasMoved == true );
-    REQUIRE( board.whiteHasCastled() == true );
+    REQUIRE( board.whiteHasCastled == true );
     // black castle king side
     board.makeMove( 4, 6, EMPTY );
     REQUIRE( board.squares[7] == std::nullopt );
     REQUIRE( board.squares[5]->type == ROOK );
     REQUIRE( board.squares[5]->hasMoved == true );
-    REQUIRE( board.blackHasCastled() == true );
+    REQUIRE( board.blackHasCastled == true );
 }
 
 TEST_CASE( "Castle queen side is handled properly", "Board::makeMove()" ) {
@@ -152,21 +152,21 @@ TEST_CASE( "Castle queen side is handled properly", "Board::makeMove()" ) {
     REQUIRE( board.squares[56] == std::nullopt );
     REQUIRE( board.squares[59]->type == ROOK );
     REQUIRE( board.squares[59]->hasMoved == true );
-    REQUIRE( board.whiteHasCastled() == true );
+    REQUIRE( board.whiteHasCastled == true );
     // black castle king side
     board.makeMove( 4, 2, EMPTY );
     REQUIRE( board.squares[0] == std::nullopt );
     REQUIRE( board.squares[3]->type == ROOK );
     REQUIRE( board.squares[3]->hasMoved == true );
-    REQUIRE( board.blackHasCastled() == true );
+    REQUIRE( board.blackHasCastled == true );
 }
 
 TEST_CASE( "Promotion is handled correctly", "Board::makeMove()" ) {
     Board board;
     board.makeMove( 55, 7, KNIGHT );
     REQUIRE( board.squares[7]->type == KNIGHT );
-    REQUIRE( board.squares[7]->getValue() == KNIGHT_VALUE );
-    REQUIRE( board.squares[7]->getActionValue() == KNIGHT_ACTION_VALUE );
+    REQUIRE( board.squares[7]->value == KNIGHT_VALUE );
+    REQUIRE( board.squares[7]->actionValue == KNIGHT_ACTION_VALUE );
 }
 
 TEST_CASE( "Pieces are moved correctly", "[Board::makeMove()]" ) {

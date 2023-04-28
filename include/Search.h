@@ -16,14 +16,16 @@ public:
     Search( Search& ) = delete;
     Search( Search&& ) = delete;
 
-    int alphaBeta( const Board& board, int depth, int alpha, int beta, bool maximizingPlayer ) const;
-    // TODO: Implement quiescent search.
-    int quiescentSearch( const Board& board, int alpha, int beta, int depth, int maxDepth ) const;
     MoveContent getBestMove( const Board& board, int maxDepth, bool maximizingPlayer ) const;
-
-    std::vector<MoveContent> evaluateMoves( const Board& board ) const;
 
 private:
     mutable PieceValidMoves generator;
+
+    int alphaBeta( const Board& board, int depth, int alpha, int beta, bool maximizingPlayer ) const;
+    int quiescentSearch( const Board& board, int alpha, int beta, bool maximizingPlayer ) const;
+
+    std::vector<MoveContent> evaluateMoves( const Board& board ) const;
+
+    // TODO: Implement quiescent search.
     int endOfTheGameScore( const Board& board ) const;
 };

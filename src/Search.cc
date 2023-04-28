@@ -17,10 +17,10 @@ MoveContent Search::getBestMove( const Board& board, int maxDepth, bool maximizi
     MoveContent bestMove;
     bestMove.score = maximizingPlayer ? NEGATIVE_INFINITY : POSITIVE_INFINITY;
     std::vector<MoveContent> possibleMoves = evaluateMoves( board );
+    auto compare = maximizingPlayer ? MoveContent::compareMax : MoveContent::compareMin;
 
     // Perform iterative deepening search
     for ( int depth = 1; depth <= maxDepth; depth++ ) {
-        auto compare = maximizingPlayer ? MoveContent::compareMax : MoveContent::compareMin;
         std::sort( possibleMoves.begin(), possibleMoves.end(), compare );
 
         for ( auto move : possibleMoves ) {
@@ -65,10 +65,10 @@ int Search::alphaBeta( const Board& board, int depth, int alpha, int beta, bool 
     // If no legal moves found we decide that the game is over.
     bool isEndOfTheGame = true;
 
+    std::vector<MoveContent> possibleMoves = evaluateMoves( board );
+
     /* ---------------------------- Maximizing Player --------------------------- */
     if ( maximizingPlayer ) {
-        int maxEval = POSITIVE_INFINITY;
-        std::vector<MoveContent> possibleMoves = evaluateMoves( board );
         std::sort( possibleMoves.begin(), possibleMoves.end(), MoveContent::compareMax );
 
         for ( auto move : possibleMoves ) {
@@ -82,7 +82,6 @@ int Search::alphaBeta( const Board& board, int depth, int alpha, int beta, bool 
             // We found a legal move, the game is not over.
             isEndOfTheGame = false;
             int eval = alphaBeta( boardCopy, depth - 1, alpha, beta, false );
-            maxEval = std::max( maxEval, eval );
             alpha = std::max( alpha, eval );
             if ( beta <= alpha ) {
                 break;
@@ -90,12 +89,10 @@ int Search::alphaBeta( const Board& board, int depth, int alpha, int beta, bool 
         }
         if ( isEndOfTheGame ) return endOfTheGameScore( board );
 
-        return maxEval;
+        return alpha;
     }
     /* ---------------------------- Minimizing player --------------------------- */
     else {
-        int minEval = NEGATIVE_INFINITY;
-        std::vector<MoveContent> possibleMoves = evaluateMoves( board );
         std::sort( possibleMoves.begin(), possibleMoves.end(), MoveContent::compareMin );
 
         for ( auto move : possibleMoves ) {
@@ -107,8 +104,7 @@ int Search::alphaBeta( const Board& board, int depth, int alpha, int beta, bool 
             }
 
             isEndOfTheGame = false;
-            int eval = alphaBeta( boardCopy, depth - 1, alpha, beta, false );
-            minEval = std::min( minEval, eval );
+            int eval = alphaBeta( boardCopy, depth - 1, alpha, beta, true );
             beta = std::min( beta, eval );
             if ( beta <= alpha ) {
                 break;
@@ -116,7 +112,7 @@ int Search::alphaBeta( const Board& board, int depth, int alpha, int beta, bool 
         }
         if ( isEndOfTheGame ) return endOfTheGameScore( board );
 
-        return minEval;
+        return beta;
     }
 }
 

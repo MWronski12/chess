@@ -1,17 +1,15 @@
 CORE:
-- alphaBeta
-- getBestMove (iterative deepening)
-- quiescenceSearch
+- timeout functionality in getBestMove
+- quiescenceSearch:
+    - No check move is available
+    - No capture move is available
 - searchForMate:
-    - 
+    - How is the mate being searched?
 
 REST:
 - Insufficient material in evaluation function
+- Keep track of game phase (mid or end game)
 - evaluateMoves:
     - Operate on Move struct instead of whole MoveContent
     - Reward castling and first move of the piece
     - It also includes pseudo legal moves, which is a problem when trying to see if its staleMate
-
-
-IMPROVEMENT IDEAS:
-- Replace sorting with min/max PQ when searching

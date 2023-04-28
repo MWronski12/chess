@@ -8,7 +8,7 @@
 class Piece {
 public:
     // constructors
-    Piece( PieceColor color, PieceType type, bool hasMoved );
+    Piece( PieceColor color, PieceType type, bool hasMoved = false );
     Piece( char piece );
 
     // members

@@ -4,6 +4,7 @@
 #include <array>
 #include <vector>
 
+#include "Common.h"
 #include "Piece.h"
 
 class PieceMoves {
@@ -17,17 +18,16 @@ public:
                                                               SquareIndex square ) const;
 
 private:
-    // Private constructor to prevent creation of instances from outside the class.
     PieceMoves();
     PieceMoves( PieceMoves &other ) = delete;
 
-    std::array<std::vector<std::vector<SquareIndex>>, 64> _whitePawnMoves;
-    std::array<std::vector<std::vector<SquareIndex>>, 64> _blackPawnMoves;
-    std::array<std::vector<std::vector<SquareIndex>>, 64> _knightMoves;
-    std::array<std::vector<std::vector<SquareIndex>>, 64> _bishopMoves;
-    std::array<std::vector<std::vector<SquareIndex>>, 64> _rookMoves;
-    std::array<std::vector<std::vector<SquareIndex>>, 64> _queenMoves;
-    std::array<std::vector<std::vector<SquareIndex>>, 64> _kingMoves;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> whitePawnMoves_;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> blackPawnMoves_;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> knightMoves_;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> bishopMoves_;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> rookMoves_;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> queenMoves_;
+    std::array<std::vector<std::vector<SquareIndex>>, 64> kingMoves_;
 
     void generateWhitePawnMoves();
     void generateBlackPawnMoves();

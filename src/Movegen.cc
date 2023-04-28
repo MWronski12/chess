@@ -5,23 +5,23 @@
 /* -------------------------------------------------------------------------- */
 
 PieceValidMoves::PieceValidMoves()
-    : _blackAttackBoard{ false },
-      _whiteAttackBoard{ false },
-      _blackKingSquare( NULL_SQUARE ),
-      _whiteKingSquare( NULL_SQUARE ),
-      _pieceMoves( PieceMoves::getInstance() ) {}
+    : blackAttackBoard_{ false },
+      whiteAttackBoard_{ false },
+      blackKingSquare_( NULL_SQUARE ),
+      whiteKingSquare_( NULL_SQUARE ),
+      pieceMoves_( PieceMoves::getInstance() ) {}
 
 // Generate valid moves for every piece on the board filling Piece.validMoves vectors
 int PieceValidMoves::generateValidMoves( Board& board ) {
     int movesGeneratedCount = 0;
 
     // Reset attack boards
-    _blackAttackBoard.fill( false );
-    _whiteAttackBoard.fill( false );
+    blackAttackBoard_.fill( false );
+    whiteAttackBoard_.fill( false );
 
     // Reset king position
-    _blackKingSquare = NULL_SQUARE;
-    _whiteKingSquare = NULL_SQUARE;
+    blackKingSquare_ = NULL_SQUARE;
+    whiteKingSquare_ = NULL_SQUARE;
 
     // Reset checks
     board.blackIsChecked = false;
@@ -41,7 +41,7 @@ int PieceValidMoves::generateValidMoves( Board& board ) {
             // Kings need information about which squares are attacked,
             // which we gather during analysis, so we just record the position to analyze later
             if ( piece->type == KING ) {
-                piece->color == WHITE ? _whiteKingSquare = srcSquare : _blackKingSquare = srcSquare;
+                piece->color == WHITE ? whiteKingSquare_ = srcSquare : blackKingSquare_ = srcSquare;
                 continue;
             }
 
@@ -52,7 +52,7 @@ int PieceValidMoves::generateValidMoves( Board& board ) {
             }
 
             // For all other pieces we iterate through all the rays and each move to generate valid moves
-            for ( auto& ray : _pieceMoves.getMoveList( piece->color, piece->type, srcSquare ) ) {
+            for ( auto& ray : pieceMoves_.getMoveList( piece->color, piece->type, srcSquare ) ) {
                 for ( auto destSquare : ray ) {
                     // Analyze the move to gather information about the board
                     // Analyze move method will return true if the move is valid
@@ -71,15 +71,15 @@ int PieceValidMoves::generateValidMoves( Board& board ) {
 
     // Now that we have gathered information about the board we can generate the kings moves
     if ( board.sideToMove == WHITE ) {
-        movesGeneratedCount += generateValidKingMoves( board, _blackKingSquare );
-        movesGeneratedCount += generateValidKingMoves( board, _whiteKingSquare );
+        movesGeneratedCount += generateValidKingMoves( board, blackKingSquare_ );
+        movesGeneratedCount += generateValidKingMoves( board, whiteKingSquare_ );
     } else {
-        movesGeneratedCount += generateValidKingMoves( board, _whiteKingSquare );
-        movesGeneratedCount += generateValidKingMoves( board, _blackKingSquare );
+        movesGeneratedCount += generateValidKingMoves( board, whiteKingSquare_ );
+        movesGeneratedCount += generateValidKingMoves( board, blackKingSquare_ );
     }
 
-    generateValidCastlingMoves( board, _whiteKingSquare );
-    generateValidCastlingMoves( board, _blackKingSquare );
+    generateValidCastlingMoves( board, whiteKingSquare_ );
+    generateValidCastlingMoves( board, blackKingSquare_ );
 
     return movesGeneratedCount;
 }
@@ -98,7 +98,7 @@ int PieceValidMoves::generateValidPawnMoves( Board& board, SquareIndex srcSquare
     int movesGeneratedCount = 0;
     auto& pawn = board.squares[srcSquare];
 
-    for ( auto& ray : _pieceMoves.getMoveList( pawn->color, PAWN, srcSquare ) ) {
+    for ( auto& ray : pieceMoves_.getMoveList( pawn->color, PAWN, srcSquare ) ) {
         for ( auto destSquare : ray ) {
             if ( analyzePawnMove( board, srcSquare, destSquare ) ) {
                 pawn->validMoves.push_back( destSquare );
@@ -119,7 +119,7 @@ int PieceValidMoves::generateValidKingMoves( Board& board, SquareIndex srcSquare
     auto& king = board.squares[srcSquare];
 
     // Iterate through kings moves
-    for ( auto& ray : _pieceMoves.getMoveList( king->color, KING, srcSquare ) ) {
+    for ( auto& ray : pieceMoves_.getMoveList( king->color, KING, srcSquare ) ) {
         for ( auto destSquare : ray ) {
             // Castling moves have to be generated last so skip for now
             if ( abs( destSquare - srcSquare ) == 2 ) {
@@ -177,7 +177,7 @@ bool PieceValidMoves::analyzeMove( Board& board, SquareIndex src, SquareIndex de
 
     // For all other pieces than pawns we attack every field where we can move
     // Pawns are analyzed by analyzePawnMove method
-    pieceMoving->color == WHITE ? _whiteAttackBoard[dest] = true : _blackAttackBoard[dest] = true;
+    pieceMoving->color == WHITE ? whiteAttackBoard_[dest] = true : blackAttackBoard_[dest] = true;
 
     // Destination square is occupied
     if ( pieceAttacked ) {
@@ -208,7 +208,7 @@ bool PieceValidMoves::analyzePawnMove( Board& board, SquareIndex srcSquare, Squa
 
     // We attack the field if the pawn moves in diagonal
     if ( abs( destSquare - srcSquare ) % 8 != 0 ) {
-        pawnMoving->color == WHITE ? _whiteAttackBoard[destSquare] = true : _blackAttackBoard[destSquare] = true;
+        pawnMoving->color == WHITE ? whiteAttackBoard_[destSquare] = true : blackAttackBoard_[destSquare] = true;
     }
 
     /* ------------------------------- En passant ------------------------------- */
@@ -264,7 +264,7 @@ bool PieceValidMoves::analyzeCastlingMove( Board& board, SquareIndex srcSquare, 
         // Squares between king and rook are occupied
         if ( board.squares[5] || board.squares[6] ) return false;
         // King passes through attacked squares
-        if ( _whiteAttackBoard[4] || _whiteAttackBoard[5] || _whiteAttackBoard[6] ) return false;
+        if ( whiteAttackBoard_[4] || whiteAttackBoard_[5] || whiteAttackBoard_[6] ) return false;
         return true;
     }
     /* ------------------------- Black queen side castle ------------------------ */
@@ -276,7 +276,7 @@ bool PieceValidMoves::analyzeCastlingMove( Board& board, SquareIndex srcSquare, 
         // Squares between king and rook are occupied
         if ( board.squares[1] || board.squares[2] || board.squares[3] ) return false;
         // King passes through attacked squares
-        if ( _whiteAttackBoard[2] || _whiteAttackBoard[3] || _whiteAttackBoard[4] ) return false;
+        if ( whiteAttackBoard_[2] || whiteAttackBoard_[3] || whiteAttackBoard_[4] ) return false;
         return true;
     }
     /* ------------------------- White king side castle ------------------------- */
@@ -288,7 +288,7 @@ bool PieceValidMoves::analyzeCastlingMove( Board& board, SquareIndex srcSquare, 
         // Squares between king and rook are occupied
         if ( board.squares[61] || board.squares[62] ) return false;
         // King passes through attacked squares
-        if ( _blackAttackBoard[60] || _blackAttackBoard[61] || _blackAttackBoard[62] ) return false;
+        if ( blackAttackBoard_[60] || blackAttackBoard_[61] || blackAttackBoard_[62] ) return false;
         return true;
     }
     /* ------------------------- White queen side castle ------------------------ */
@@ -300,7 +300,7 @@ bool PieceValidMoves::analyzeCastlingMove( Board& board, SquareIndex srcSquare, 
         // Squares between king and rook are occupied
         if ( board.squares[57] || board.squares[58] || board.squares[59] ) return false;
         // King passes through attacked squares
-        if ( _blackAttackBoard[58] || _blackAttackBoard[59] || _blackAttackBoard[60] ) return false;
+        if ( blackAttackBoard_[58] || blackAttackBoard_[59] || blackAttackBoard_[60] ) return false;
         return true;
     }
 

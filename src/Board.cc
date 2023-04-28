@@ -175,25 +175,6 @@ Board::Board( std::string fen )
     }
 }
 
-Board Board::fastCopy() const {
-    Board newBoard;
-    newBoard.sideToMove = this->sideToMove;
-    newBoard.whiteIsChecked = this->whiteIsChecked;
-    newBoard.blackIsChecked = this->blackIsChecked;
-    newBoard.blackHasCastled = this->blackHasCastled;
-    newBoard.whiteHasCastled = this->whiteHasCastled;
-    newBoard.fiftyMoveCounter_ = this->fiftyMoveCounter_;
-    newBoard.threefoldRepetitionCounter_ = this->fiftyMoveCounter_;
-    // Copy the pieces, including only their color, type and hasMoved fields
-    for ( SquareIndex i = 0; i < 64; i++ ) {
-        if ( this->squares[i] ) {
-            auto &piece = this->squares[i];
-            newBoard.squares[i] = std::make_optional<Piece>( piece->color, piece->type, piece->hasMoved );
-        }
-    }
-    return newBoard;
-}
-
 /* --------------------------------- Methods -------------------------------- */
 
 void Board::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) {

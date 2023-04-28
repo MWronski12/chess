@@ -2,6 +2,8 @@
 
 #include "Piece.h"
 
+/* ------------------------------ Constructors ------------------------------ */
+
 Piece::Piece( PieceColor color, PieceType type, bool hasMoved )
     : color( color ), type( type ), hasMoved( hasMoved ), attackedValue( 0 ), defendedValue( 0 ) {
     value = calculatePieceValue( type );
@@ -44,6 +46,8 @@ Piece::Piece( char piece ) : hasMoved( false ), attackedValue( 0 ), defendedValu
     value = calculatePieceValue( type );
     actionValue = calculatePieceActionValue( type );
 }
+
+/* ----------------------------- Helper methods ----------------------------- */
 
 int Piece::calculatePieceValue( PieceType piece ) {
     switch ( piece ) {

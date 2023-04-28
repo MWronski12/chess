@@ -153,7 +153,7 @@ std::vector<MoveContent> Search::evaluateMoves( const Board& board ) const {
     std::vector<MoveContent> moves;
 
     for ( SquareIndex srcSquare = 0; srcSquare < 64; srcSquare++ ) {
-        auto pieceMoving = board.squares[srcSquare];
+        const auto& pieceMoving = board.squares[srcSquare];
         if ( pieceMoving == std::nullopt || pieceMoving->color != board.sideToMove ) continue;
 
         MoveContent move;
@@ -161,7 +161,7 @@ std::vector<MoveContent> Search::evaluateMoves( const Board& board ) const {
         for ( auto destSquare : pieceMoving->validMoves ) {
             move.dest = destSquare;
             move.pieceMoving = pieceMoving->type;
-            auto pieceTaken = board.squares[destSquare];
+            const auto& pieceTaken = board.squares[destSquare];
             pieceTaken ? move.pieceTaken = pieceTaken->type : move.pieceTaken = EMPTY;
 
             /* ----------------------------- Promotion moves ---------------------------- */

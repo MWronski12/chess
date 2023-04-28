@@ -17,11 +17,11 @@ uint64_t perft( int depth, Board &board, PieceValidMoves &generator ) {
     uint64_t nodes = 0;
 
     // Cache the board
-    Board currentBoard = Board( board );
+    Board currentBoard( board );
 
     // Iterate through every piece on the board
     for ( SquareIndex srcSquare = 0; srcSquare < 64; srcSquare++ ) {
-        auto piece = board.squares[srcSquare];
+        const auto piece = board.squares[srcSquare];
 
         if ( piece == std::nullopt || piece->color != board.sideToMove ) {
             continue;
@@ -53,7 +53,7 @@ uint64_t perft( int depth, Board &board, PieceValidMoves &generator ) {
                 generator.generateValidMoves( board );
 
                 // Add subnodes count if the move is valid
-                if ( generator.validateBoard( board ) ) {
+                if ( generator.validateBoard( board ) == true ) {
                     nodes += perft( depth - 1, board, generator );
                 }
 
@@ -68,23 +68,23 @@ uint64_t perft( int depth, Board &board, PieceValidMoves &generator ) {
 
 /* -------------------- benchmarks from starting position ------------------- */
 
-// TEST_CASE( "Perft function multiple benchmarking", "[perft]" ) {
-//     int depth;
-//     uint64_t expected_result;
-//     std::tie( depth, expected_result ) = GENERATE( table<int, uint64_t>( {
-//         { 0, 1 },
-//         // { 1, 20 },
-//         // { 2, 400 },
-//         // { 3, 8'902 },
-//         // { 4, 197'281 },
-//     } ) );
+TEST_CASE( "Perft function multiple benchmarking", "[perft]" ) {
+    int depth;
+    uint64_t expected_result;
+    std::tie( depth, expected_result ) = GENERATE( table<int, uint64_t>( {
+        { 0, 1 },
+        { 1, 20 },
+        { 2, 400 },
+        { 3, 8'902 },
+        { 4, 197'281 },
+    } ) );
 
-//     Board b;
-//     PieceValidMoves g;
-//     g.generateValidMoves( b );
-//     REQUIRE( perft( depth, b, g ) == expected_result );
-//     BENCHMARK( "Perft at depth " + std::to_string( depth ) ) { return perft( depth, b, g ); };
-// }
+    Board b;
+    PieceValidMoves g;
+    g.generateValidMoves( b );
+    REQUIRE( perft( depth, b, g ) == expected_result );
+    BENCHMARK( "Perft at depth " + std::to_string( depth ) ) { return perft( depth, b, g ); };
+}
 
 /* --------------------- different fen loaded positions --------------------- */
 

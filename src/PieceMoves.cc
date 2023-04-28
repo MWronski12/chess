@@ -8,17 +8,17 @@ const std::vector<std::vector<SquareIndex>>& PieceMoves::getMoveList( PieceColor
                                                                       SquareIndex squareIndex ) const {
     switch ( piece ) {
         case PAWN:
-            return color == WHITE ? _whitePawnMoves[squareIndex] : _blackPawnMoves[squareIndex];
+            return color == WHITE ? whitePawnMoves_[squareIndex] : blackPawnMoves_[squareIndex];
         case KNIGHT:
-            return _knightMoves[squareIndex];
+            return knightMoves_[squareIndex];
         case BISHOP:
-            return _bishopMoves[squareIndex];
+            return bishopMoves_[squareIndex];
         case ROOK:
-            return _rookMoves[squareIndex];
+            return rookMoves_[squareIndex];
         case QUEEN:
-            return _queenMoves[squareIndex];
+            return queenMoves_[squareIndex];
         case KING:
-            return _kingMoves[squareIndex];
+            return kingMoves_[squareIndex];
         default:
             throw std::logic_error( "Request for moves of incorrect piece type!" );
             break;
@@ -53,7 +53,7 @@ void PieceMoves::generateWhitePawnMoves() {
         // Diagonal kill to the left
         if ( x > 0 && y > 0 ) {
             ray.push_back( index - 8 - 1 );
-            _whitePawnMoves[index].push_back( ray );
+            whitePawnMoves_[index].push_back( ray );
         }
         ray.clear();
 
@@ -62,13 +62,13 @@ void PieceMoves::generateWhitePawnMoves() {
         if ( y == 6 ) {
             ray.push_back( index - 16 );  // 2 forward
         }
-        _whitePawnMoves[index].push_back( ray );
+        whitePawnMoves_[index].push_back( ray );
         ray.clear();
 
         // Diagonal Kill to the right
         if ( x < 7 && y > 0 ) {
             ray.push_back( index - 8 + 1 );
-            _whitePawnMoves[index].push_back( ray );
+            whitePawnMoves_[index].push_back( ray );
         }
         ray.clear();
     }
@@ -89,7 +89,7 @@ void PieceMoves::generateBlackPawnMoves() {
         // Diagonal kill to the left
         if ( x > 0 && y > 0 ) {
             ray.push_back( index + 8 - 1 );
-            _blackPawnMoves[index].push_back( ray );
+            blackPawnMoves_[index].push_back( ray );
         }
         ray.clear();
 
@@ -98,13 +98,13 @@ void PieceMoves::generateBlackPawnMoves() {
         if ( y == 1 ) {
             ray.push_back( index + 16 );  // 2 forward
         }
-        _blackPawnMoves[index].push_back( ray );
+        blackPawnMoves_[index].push_back( ray );
         ray.clear();
 
         // Diagonal Kill to the right
         if ( x < 7 && y > 0 ) {
             ray.push_back( index + 8 + 1 );
-            _blackPawnMoves[index].push_back( ray );
+            blackPawnMoves_[index].push_back( ray );
         }
         ray.clear();
     }
@@ -122,7 +122,7 @@ void PieceMoves::generateKnightMoves() {
                 move = position( ( y + 2 ), ( x - 1 ) );
                 if ( move < 64 ) {
                     ray.push_back( move );
-                    _knightMoves[index].push_back( ray );
+                    knightMoves_[index].push_back( ray );
                     ray.clear();
                 }
             }
@@ -131,7 +131,7 @@ void PieceMoves::generateKnightMoves() {
                 move = position( ( y - 2 ), ( x + 1 ) );
                 if ( move < 64 ) {
                     ray.push_back( move );
-                    _knightMoves[index].push_back( ray );
+                    knightMoves_[index].push_back( ray );
                     ray.clear();
                 }
             }
@@ -139,7 +139,7 @@ void PieceMoves::generateKnightMoves() {
                 move = position( ( y - 2 ), ( x - 1 ) );
                 if ( move < 64 ) {
                     ray.push_back( move );
-                    _knightMoves[index].push_back( ray );
+                    knightMoves_[index].push_back( ray );
                     ray.clear();
                 }
             }
@@ -147,7 +147,7 @@ void PieceMoves::generateKnightMoves() {
                 move = position( ( y + 2 ), ( x + 1 ) );
                 if ( move < 64 ) {
                     ray.push_back( move );
-                    _knightMoves[index].push_back( ray );
+                    knightMoves_[index].push_back( ray );
                     ray.clear();
                 }
             }
@@ -155,7 +155,7 @@ void PieceMoves::generateKnightMoves() {
                 move = position( ( y - 1 ), ( x + 2 ) );
                 if ( move < 64 ) {
                     ray.push_back( move );
-                    _knightMoves[index].push_back( ray );
+                    knightMoves_[index].push_back( ray );
                     ray.clear();
                 }
             }
@@ -163,7 +163,7 @@ void PieceMoves::generateKnightMoves() {
                 move = position( ( y + 1 ), ( x - 2 ) );
                 if ( move < 64 ) {
                     ray.push_back( move );
-                    _knightMoves[index].push_back( ray );
+                    knightMoves_[index].push_back( ray );
                     ray.clear();
                 }
             }
@@ -171,7 +171,7 @@ void PieceMoves::generateKnightMoves() {
                 move = position( ( y - 1 ), ( x - 2 ) );
                 if ( move < 64 ) {
                     ray.push_back( move );
-                    _knightMoves[index].push_back( ray );
+                    knightMoves_[index].push_back( ray );
                     ray.clear();
                 }
             }
@@ -179,7 +179,7 @@ void PieceMoves::generateKnightMoves() {
                 move = position( ( y + 1 ), ( x + 2 ) );
                 if ( move < 64 ) {
                     ray.push_back( move );
-                    _knightMoves[index].push_back( ray );
+                    knightMoves_[index].push_back( ray );
                     ray.clear();
                 }
             }
@@ -203,7 +203,7 @@ void PieceMoves::generateBishopMoves() {
                 move = position( col, row );
                 ray.push_back( move );
             }
-            if ( ray.size() > 0 ) _bishopMoves[index].push_back( ray );
+            if ( ray.size() > 0 ) bishopMoves_[index].push_back( ray );
             ray.clear();
             row = x;
             col = y;
@@ -215,7 +215,7 @@ void PieceMoves::generateBishopMoves() {
                 move = position( col, row );
                 ray.push_back( move );
             }
-            if ( ray.size() > 0 ) _bishopMoves[index].push_back( ray );
+            if ( ray.size() > 0 ) bishopMoves_[index].push_back( ray );
             ray.clear();
             row = x;
             col = y;
@@ -227,7 +227,7 @@ void PieceMoves::generateBishopMoves() {
                 move = position( col, row );
                 ray.push_back( move );
             }
-            if ( ray.size() > 0 ) _bishopMoves[index].push_back( ray );
+            if ( ray.size() > 0 ) bishopMoves_[index].push_back( ray );
             ray.clear();
             row = x;
             col = y;
@@ -239,7 +239,7 @@ void PieceMoves::generateBishopMoves() {
                 move = position( col, row );
                 ray.push_back( move );
             }
-            if ( ray.size() > 0 ) _bishopMoves[index].push_back( ray );
+            if ( ray.size() > 0 ) bishopMoves_[index].push_back( ray );
             ray.clear();
         }
     }
@@ -260,7 +260,7 @@ void PieceMoves::generateRookMoves() {
                 move = position( col, row );
                 ray.push_back( move );
             }
-            if ( ray.size() > 0 ) _rookMoves[index].push_back( ray );
+            if ( ray.size() > 0 ) rookMoves_[index].push_back( ray );
             ray.clear();
             row = x;
             col = y;
@@ -271,7 +271,7 @@ void PieceMoves::generateRookMoves() {
                 move = position( col, row );
                 ray.push_back( move );
             }
-            if ( ray.size() > 0 ) _rookMoves[index].push_back( ray );
+            if ( ray.size() > 0 ) rookMoves_[index].push_back( ray );
             ray.clear();
             row = x;
             col = y;
@@ -282,7 +282,7 @@ void PieceMoves::generateRookMoves() {
                 move = position( col, row );
                 ray.push_back( move );
             }
-            if ( ray.size() > 0 ) _rookMoves[index].push_back( ray );
+            if ( ray.size() > 0 ) rookMoves_[index].push_back( ray );
             ray.clear();
             row = x;
             col = y;
@@ -293,7 +293,7 @@ void PieceMoves::generateRookMoves() {
                 move = position( col, row );
                 ray.push_back( move );
             }
-            if ( ray.size() > 0 ) _rookMoves[index].push_back( ray );
+            if ( ray.size() > 0 ) rookMoves_[index].push_back( ray );
             ray.clear();
         }
     }
@@ -314,7 +314,7 @@ void PieceMoves::generateQueenMoves() {
                 move = position( col, row );
                 ray.push_back( move );
             }
-            if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
+            if ( ray.size() > 0 ) queenMoves_[index].push_back( ray );
             ray.clear();
             row = x;
             col = y;
@@ -325,7 +325,7 @@ void PieceMoves::generateQueenMoves() {
                 move = position( col, row );
                 ray.push_back( move );
             }
-            if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
+            if ( ray.size() > 0 ) queenMoves_[index].push_back( ray );
             ray.clear();
             row = x;
             col = y;
@@ -336,7 +336,7 @@ void PieceMoves::generateQueenMoves() {
                 move = position( col, row );
                 ray.push_back( move );
             }
-            if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
+            if ( ray.size() > 0 ) queenMoves_[index].push_back( ray );
             ray.clear();
             row = x;
             col = y;
@@ -347,7 +347,7 @@ void PieceMoves::generateQueenMoves() {
                 move = position( col, row );
                 ray.push_back( move );
             }
-            if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
+            if ( ray.size() > 0 ) queenMoves_[index].push_back( ray );
             ray.clear();
             row = x;
             col = y;
@@ -359,7 +359,7 @@ void PieceMoves::generateQueenMoves() {
                 move = position( col, row );
                 ray.push_back( move );
             }
-            if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
+            if ( ray.size() > 0 ) queenMoves_[index].push_back( ray );
             ray.clear();
             row = x;
             col = y;
@@ -371,7 +371,7 @@ void PieceMoves::generateQueenMoves() {
                 move = position( col, row );
                 ray.push_back( move );
             }
-            if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
+            if ( ray.size() > 0 ) queenMoves_[index].push_back( ray );
             ray.clear();
             row = x;
             col = y;
@@ -383,7 +383,7 @@ void PieceMoves::generateQueenMoves() {
                 move = position( col, row );
                 ray.push_back( move );
             }
-            if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
+            if ( ray.size() > 0 ) queenMoves_[index].push_back( ray );
             ray.clear();
             row = x;
             col = y;
@@ -395,7 +395,7 @@ void PieceMoves::generateQueenMoves() {
                 move = position( col, row );
                 ray.push_back( move );
             }
-            if ( ray.size() > 0 ) _queenMoves[index].push_back( ray );
+            if ( ray.size() > 0 ) queenMoves_[index].push_back( ray );
             ray.clear();
         }
     }
@@ -415,7 +415,7 @@ void PieceMoves::generateKingMoves() {
                 row++;
                 move = position( col, row );
                 ray.push_back( move );
-                _kingMoves[index].push_back( ray );
+                kingMoves_[index].push_back( ray );
             }
             ray.clear();
             row = x;
@@ -426,7 +426,7 @@ void PieceMoves::generateKingMoves() {
                 row--;
                 move = position( col, row );
                 ray.push_back( move );
-                _kingMoves[index].push_back( ray );
+                kingMoves_[index].push_back( ray );
             }
             ray.clear();
             row = x;
@@ -443,7 +443,7 @@ void PieceMoves::generateKingMoves() {
                 } else if ( index == 60 ) {
                     ray.push_back( 58 );
                 }
-                _kingMoves[index].push_back( ray );
+                kingMoves_[index].push_back( ray );
             }
             ray.clear();
             row = x;
@@ -460,7 +460,7 @@ void PieceMoves::generateKingMoves() {
                 } else if ( index == 60 ) {
                     ray.push_back( 62 );
                 }
-                _kingMoves[index].push_back( ray );
+                kingMoves_[index].push_back( ray );
             }
             ray.clear();
             row = x;
@@ -472,7 +472,7 @@ void PieceMoves::generateKingMoves() {
                 col++;
                 move = position( col, row );
                 ray.push_back( move );
-                _kingMoves[index].push_back( ray );
+                kingMoves_[index].push_back( ray );
             }
             ray.clear();
             row = x;
@@ -484,7 +484,7 @@ void PieceMoves::generateKingMoves() {
                 col--;
                 move = position( col, row );
                 ray.push_back( move );
-                _kingMoves[index].push_back( ray );
+                kingMoves_[index].push_back( ray );
             }
             ray.clear();
             row = x;
@@ -496,7 +496,7 @@ void PieceMoves::generateKingMoves() {
                 col++;
                 move = position( col, row );
                 ray.push_back( move );
-                _kingMoves[index].push_back( ray );
+                kingMoves_[index].push_back( ray );
             }
             ray.clear();
             row = x;
@@ -508,7 +508,7 @@ void PieceMoves::generateKingMoves() {
                 col--;
                 move = position( col, row );
                 ray.push_back( move );
-                _kingMoves[index].push_back( ray );
+                kingMoves_[index].push_back( ray );
             }
             ray.clear();
         }

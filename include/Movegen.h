@@ -34,14 +34,14 @@ private:
     bool analyzeCastlingMove( Board &board, SquareIndex srcSquare, SquareIndex destSquare );
 
     // Only used for castling moves
-    std::array<bool, 64> _blackAttackBoard;
-    std::array<bool, 64> _whiteAttackBoard;
+    std::array<bool, 64> blackAttackBoard_;
+    std::array<bool, 64> whiteAttackBoard_;
 
     // Track the king's position to analyze at the end
-    SquareIndex _blackKingSquare;
-    SquareIndex _whiteKingSquare;
+    SquareIndex blackKingSquare_;
+    SquareIndex whiteKingSquare_;
 
-    PieceMoves &_pieceMoves;
+    PieceMoves &pieceMoves_;
 };
 
 #endif

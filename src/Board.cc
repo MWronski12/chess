@@ -175,6 +175,23 @@ Board::Board( std::string fen )
     }
 }
 
+Board Board::fastCopy() const {
+    Board copy;
+    copy.sideToMove = this->sideToMove;
+    copy.whiteHasCastled = this->whiteHasCastled;
+    copy.blackHasCastled = this->blackHasCastled;
+    copy.fiftyMoveCounter_ = this->fiftyMoveCounter_;
+    copy.lastMove = this->lastMove;
+    copy.threefoldRepetitionCounter_ = this->threefoldRepetitionCounter_;
+    for ( int i = 0; i < 64; i++ ) {
+        if ( this->squares[i] != std::nullopt ) {
+            auto piece = Piece( this->squares[i]->color, this->squares[i]->type, this->squares[i]->hasMoved );
+            copy.squares[i] = std::make_optional<Piece>( piece );
+        }
+    }
+    return copy;
+}
+
 /* --------------------------------- Methods -------------------------------- */
 
 void Board::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) {

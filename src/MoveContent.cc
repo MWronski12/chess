@@ -19,6 +19,10 @@ MoveContent::MoveContent()
       isEnPassantCapture( false ),
       score( 0 ) {}
 
+bool MoveContent::operator==( const MoveContent& other ) const {
+    return src == other.src && dest == other.dest && promotion == other.promotion;
+}
+
 // TODO
 std::string MoveContent::toPGN() const { return "O-O-O"; }
 

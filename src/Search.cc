@@ -13,10 +13,10 @@
  *
  * @return MoveContent representing the best move for the current player.
  */
-MoveContent Search::getBestMove( const Board& board, int maxDepth, bool maximizingPlayer ) const {
+MoveContent Search::getBestMove( const Board& examineBoard, int maxDepth, bool maximizingPlayer ) const {
     MoveContent bestMove;
     bestMove.score = maximizingPlayer ? NEGATIVE_INFINITY : POSITIVE_INFINITY;
-    std::vector<MoveContent> possibleMoves = evaluateMoves( board );
+    std::vector<MoveContent> possibleMoves = evaluateMoves( examineBoard );
     auto compare = maximizingPlayer ? MoveContent::compareMax : MoveContent::compareMin;
 
     // Perform iterative deepening search
@@ -24,14 +24,14 @@ MoveContent Search::getBestMove( const Board& board, int maxDepth, bool maximizi
         std::sort( possibleMoves.begin(), possibleMoves.end(), compare );
 
         for ( auto move : possibleMoves ) {
-            Board boardCopy = board;
-            boardCopy.makeMove( move.src, move.dest, move.promotion );
-            generator.generateValidMoves( boardCopy );
-            if ( !generator.validateBoard( boardCopy ) ) {
+            Board board = examineBoard;
+            board.makeMove( move.src, move.dest, move.promotion );
+            generator.generateValidMoves( board );
+            if ( !generator.validateBoard( board ) ) {
                 continue;
             }
 
-            move.score = alphaBeta( boardCopy, depth, NEGATIVE_INFINITY, POSITIVE_INFINITY, !maximizingPlayer );
+            move.score = alphaBeta( board, depth, NEGATIVE_INFINITY, POSITIVE_INFINITY, !maximizingPlayer );
 
             if ( ( maximizingPlayer && move.score > bestMove.score ) ||
                  ( !maximizingPlayer && move.score < bestMove.score ) ) {
@@ -57,37 +57,37 @@ MoveContent Search::getBestMove( const Board& board, int maxDepth, bool maximizi
  *
  * @return int score for the current board and player.
  */
-int Search::alphaBeta( const Board& board, int depth, int alpha, int beta, bool maximizingPlayer ) const {
+int Search::alphaBeta( const Board& examineBoard, int depth, int alpha, int beta, bool maximizingPlayer ) const {
     if ( depth == 0 ) {
-        return Evaluation::evaluateBoard( board );
+        return Evaluation::evaluateBoard( examineBoard );
     }
 
     // If no legal moves found we decide that the game is over.
     bool isEndOfTheGame = true;
 
-    std::vector<MoveContent> possibleMoves = evaluateMoves( board );
+    std::vector<MoveContent> possibleMoves = evaluateMoves( examineBoard );
 
     /* ---------------------------- Maximizing Player --------------------------- */
     if ( maximizingPlayer ) {
         std::sort( possibleMoves.begin(), possibleMoves.end(), MoveContent::compareMax );
 
         for ( auto move : possibleMoves ) {
-            Board boardCopy = board;
-            boardCopy.makeMove( move.src, move.dest, move.promotion );
-            generator.generateValidMoves( boardCopy );
-            if ( !generator.validateBoard( boardCopy ) ) {
+            auto board = examineBoard;
+            board.makeMove( move.src, move.dest, move.promotion );
+            generator.generateValidMoves( board );
+            if ( !generator.validateBoard( board ) ) {
                 continue;
             }
 
             // We found a legal move, the game is not over.
             isEndOfTheGame = false;
-            int eval = alphaBeta( boardCopy, depth - 1, alpha, beta, false );
+            int eval = alphaBeta( board, depth - 1, alpha, beta, false );
             alpha = std::max( alpha, eval );
             if ( beta <= alpha ) {
                 break;
             }
         }
-        if ( isEndOfTheGame ) return endOfTheGameScore( board );
+        if ( isEndOfTheGame ) return endOfTheGameScore( examineBoard );
 
         return alpha;
     }
@@ -96,21 +96,21 @@ int Search::alphaBeta( const Board& board, int depth, int alpha, int beta, bool 
         std::sort( possibleMoves.begin(), possibleMoves.end(), MoveContent::compareMin );
 
         for ( auto move : possibleMoves ) {
-            Board boardCopy = board;
-            boardCopy.makeMove( move.src, move.dest, move.promotion );
-            generator.generateValidMoves( boardCopy );
-            if ( !generator.validateBoard( boardCopy ) ) {
+            auto board = examineBoard;
+            board.makeMove( move.src, move.dest, move.promotion );
+            generator.generateValidMoves( board );
+            if ( !generator.validateBoard( board ) ) {
                 continue;
             }
 
             isEndOfTheGame = false;
-            int eval = alphaBeta( boardCopy, depth - 1, alpha, beta, true );
+            int eval = alphaBeta( board, depth - 1, alpha, beta, true );
             beta = std::min( beta, eval );
             if ( beta <= alpha ) {
                 break;
             }
         }
-        if ( isEndOfTheGame ) return endOfTheGameScore( board );
+        if ( isEndOfTheGame ) return endOfTheGameScore( examineBoard );
 
         return beta;
     }

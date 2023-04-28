@@ -1,10 +1,21 @@
 CORE:
-- timeout functionality in getBestMove
+- How to assure that alphaBeta is properly implemented? 
+    - logic
+    - move ordering
+    - iterative deepening
+    - Gotta test some how if it prunes the branches correctly
 - quiescenceSearch:
-    - No check move is available
-    - No capture move is available
+    - Until no check move is available
+    - Until no capture move is available
+    - then evaluate
 - searchForMate:
-    - How is the mate being searched?
+    - gotta return from the getBestMove as soon as forced mate is found
+- timeout functionality in getBestMove
+
+HOW TO SPEEDUP:
+- Transposition hashing tables
+- getBestMove evaluates every move in a different thread
+- get Board::fastCopy to work
 
 REST:
 - Insufficient material in evaluation function

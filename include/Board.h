@@ -13,6 +13,7 @@ public:
     // constructors
     Board();
     Board( std::string FENString );
+    Board fastCopy() const;
 
     // members
     bool whiteIsChecked;

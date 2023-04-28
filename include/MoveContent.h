@@ -13,6 +13,8 @@ public:
     MoveContent( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY, PieceType pieceMoving = EMPTY,
                  PieceType pieceTaken = EMPTY, bool isEnPassantCapture = false, int score = 0 );
 
+    bool operator==( const MoveContent &other ) const;
+
     SquareIndex src;
     SquareIndex dest;
     PieceType promotion;

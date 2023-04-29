@@ -1,11 +1,21 @@
+#include <inttypes.h>
+#include <time.h>
+
+#include <SFML/Graphics.hpp>
 #include <algorithm>
 #include <exception>
 #include <iostream>
 
+#include "Board.h"
 #include "Engine.h"
+#include "Piece.h"
 
 class Gui {
 public:
+    Gui() = default;
+    Gui( const Gui& ) = delete;             // Delete copy constructor
+    Gui& operator=( const Gui& ) = delete;  // Delete copy assignment operator
+    //
     // By SquareIndex - upper left corner is 0 and bottom right corner is 63
     virtual void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY ) = 0;
 
@@ -13,14 +23,55 @@ public:
     virtual void makeMove( std::string move ) = 0;
 
     virtual void start() = 0;
+    virtual void draw() {}
 };
 
+/* ------------------------------------------------------------------------------------------------------------------ */
+/*                                                      WindowGui                                                     */
+/* ------------------------------------------------------------------------------------------------------------------ */
+
+using namespace sf;
+
+// Vector2f offset(28, 28);
+
+class WindowGui : public Gui {
+public:
+    WindowGui( Board& board );
+    virtual void makeMove( std::string move ) override;
+    virtual void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) override;
+    virtual void draw() override;
+    void start() override;
+    void dragAndDrop( Event e, Vector2i pos );
+    std::string toChessNote( Vector2f p );
+    RenderWindow window;   // ok
+    Vector2f offset;       // ok
+    Sprite f[32];          // ok
+    bool isMove = false;   // ok
+    float dx = 0, dy = 0;  // ok
+    int n = 0;             // ok
+
+private:
+    Board& board;    // ok
+    Texture t1, t2;  // ok
+    Sprite sBoard;
+    Vector2f oldPos, newPos;    // ok
+    std::string str;            // ok
+    std::string position = "";  // ok
+    int size = 56;              // ok
+    void loadPosition();
+    void _move( std::string str );
+    Vector2f toCoord( char a, char b );
+};
+
+/* ------------------------------------------------------------------------------------------------------------------ */
+/*                                                     Console Gui                                                    */
+/* ------------------------------------------------------------------------------------------------------------------ */
 class ConsoleGui : public Gui {
 public:
     ConsoleGui() : engine( Engine() ) {}
 
     void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY ) override {
-        auto &piece = engine.board->squares[src];
+        auto& piece = engine.board->squares[src];
 
         // Assert move is a pseudo valid move
         if ( std::find( piece->validMoves.cbegin(), piece->validMoves.cend(), dest ) == piece->validMoves.cend() ) {
@@ -88,7 +139,7 @@ public:
             std::cin >> move;
             try {
                 makeMove( move );
-            } catch ( std::exception &e ) {
+            } catch ( std::exception& e ) {
                 std::cout << e.what() << "\r\n";
             }
         }

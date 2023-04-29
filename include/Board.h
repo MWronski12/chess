@@ -30,7 +30,7 @@ public:
 
     // methods
     void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY );
-
+    void makeMove( std::string move );  // d2d4 notation (d7d8Q for promotion)
     // TODO: serializes Board object to FEN string notation
     std::string toFEN() const;
 

@@ -7,14 +7,14 @@ add_compile_options(
     -Wall
     -Wextra
     -Wpedantic
-    -Werror
+    # -Werror
     -Ofast # Enables compiler optimization
     # -fsanitize=leak
     # -fsanitize=address
     # -fsanitize=undefined
 )
 
-add_executable(chess main.cpp)
+add_executable(chess main.cpp src/Gui.cc)
 
 include_directories(include)
 add_subdirectory(src)

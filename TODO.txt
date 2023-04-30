@@ -24,3 +24,18 @@ REST:
     - Operate on Move struct instead of whole MoveContent
     - Reward castling and first move of the piece
     - It also includes pseudo legal moves, which is a problem when trying to see if its staleMate
+- TEST TRANSPOSITION TABLE WITH PERFT
+-evaluateMoves zmienić nazwę funkcji i dać do review
+- do review alfa beta czy to dobrze śmiga itd
+- pobrać jakiś działający kod i podpiąć do niego testy żeby mieć taki benchmark 
+
+1. Ogarnąc testowanie searcha ( np. przykłady z internetu )
+2. Wprowadzić transpositiontable i podejmowanie decyzji na podstawie Bazydanych
+3. quiescenceSearch
+4. Rozwinięcie ewaluacji
+5. OPTYMALIZACJA
+
+6. Napisanie bota i przetestowanie
+
+
+5. Optymalizacja wszystkiego 

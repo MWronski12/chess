@@ -29,6 +29,14 @@ public:
     SquareIndex enPassantSquare;
     std::array<std::optional<Piece>, 64> squares;
 
+    uint64_t piece_keys[12][64];
+    uint64_t side_key;
+    uint64_t castling_keys[4];
+    uint64_t hash_key;
+    uint64_t getHashKey();
+    uint64_t updateHashKey( uint64_t hash_key, const MoveContent& move );
+    void initZobrist();
+
     // methods
     void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY );
     void makeMove( std::string move );  // d2d4 notation (d7d8Q for promotion)

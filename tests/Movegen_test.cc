@@ -1,7 +1,10 @@
+#include "Movegen.h"
+
+#include <stdint.h>
+
 #include <catch2/generators/catch_generators.hpp>
 
 #include "Engine.h"
-#include "Movegen.h"
 #include "catch2/benchmark/catch_benchmark.hpp"
 #include "catch2/catch_test_macros.hpp"
 

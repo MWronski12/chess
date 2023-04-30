@@ -13,6 +13,7 @@
 #include <iostream>
 #include <stdexcept>
 
+#include "Search.h"
 
 /* ------------------------------ Constructors ------------------------------ */
 
@@ -109,8 +110,7 @@ Board::Board( std::string fen )
         throw std::invalid_argument( "Invalid FEN notation - invalid side to move" );
     }
 
-    if ( ++it == fen.cend() || *it != ' ' )
-        throw std::invalid_argument( "Invalid FEN notation - castling rights required" );
+    if ( ++it == fen.cend() || *it != ' ' ) throw std::invalid_argument( "Invalid FEN notation - castling rights required" );
 
     /* ----------------------------- Castling rights ---------------------------- */
     while ( ++it != fen.cend() && *it != ' ' ) {
@@ -158,8 +158,7 @@ Board::Board( std::string fen )
         enPassantSquare = 8 * ( 8 - ( int( rank ) - 48 ) ) + ( int( file ) - 97 );
     }
 
-    if ( it == fen.cend() || *it != ' ' )
-        throw std::invalid_argument( "Invalid FEN notation - fifty move count required" );
+    if ( it == fen.cend() || *it != ' ' ) throw std::invalid_argument( "Invalid FEN notation - fifty move count required" );
 
     /* --------------------------- fifty move counter --------------------------- */
     std::string fiftyMoveCount;
@@ -174,6 +173,8 @@ Board::Board( std::string fen )
     while ( ++it != fen.cend() ) {
         turnCount += *it;
     }
+
+    hash_key = getHashKey();
 }
 
 Board Board::fastCopy() const {
@@ -409,4 +410,92 @@ void Board::handlePromotion( SquareIndex src, PieceType promotion ) {
     squares[src]->type = promotion;
     squares[src]->value = Piece::calculatePieceValue( promotion );
     squares[src]->actionValue = Piece::calculatePieceActionValue( promotion );
+}
+/* ------------------------------------------------------------------------------------------------------------------ */
+/*                                                       Zobrist                                                      */
+/* ------------------------------------------------------------------------------------------------------------------ */
+void Board::initZobrist() {
+    std::mt19937_64 gen( std::random_device{}() );
+    std::uniform_int_distribution<uint64_t> dis( 0, UINT64_MAX );
+    for ( int i = 0; i < 12; i++ ) {
+        for ( int j = 0; j < 64; j++ ) {
+            piece_keys[i][j] = dis( gen );
+        }
+    }
+    side_key = dis( gen );
+    for ( int i = 0; i < 4; i++ ) {
+        castling_keys[i] = dis( gen );
+    }
+    // tez enpassant
+}
+
+uint64_t Board::getHashKey() {
+    uint64_t hash_key = 0;
+    for ( int i = 0; i < 64; i++ ) {
+        const auto& piece = squares[i];
+        if ( piece.has_value() ) {
+            PieceColor color = piece->color;
+            hash_key ^= piece_keys[color * 6 + piece->type][i];
+        }
+    }
+    if ( sideToMove == BLACK ) {
+        hash_key ^= side_key;
+    }
+    // if ( board.get_castling_rights() & Chess::WHITE_KINGSIDE_CASTLE ) {
+    //     hash_key ^= castling_keys[0];
+    // }
+    // if ( board.get_castling_rights() & Chess::WHITE_QUEENSIDE_CASTLE ) {
+    //     hash_key ^= castling_keys[1];
+    // }
+    // if ( board.get_castling_rights() & Chess::BLACK_KINGSIDE_CASTLE ) {
+    //     hash_key ^= castling_keys[2];
+    // }
+    // if ( board.get_castling_rights() & Chess::BLACK_QUEENSIDE_CASTLE ) {
+    //     hash_key ^= castling_keys[3];
+    // }
+
+    // TODO: enpassant
+    return hash_key;  // initialize at start of the game ( in board initialization for example), update after each move
+    // HASH_KEY SHOULD BE IN BOARD CLASS!!, but then it is not possible to pass board as const bcs we will update it
+}
+
+// function should be called after move is made
+// do we have to restore key after alphaBeta?? No bcs we copy the board, to be confirmed
+uint64_t Board::updateHashKey( uint64_t hash_key, const MoveContent& move ) {
+    SquareIndex src = move.src;
+    SquareIndex dest = move.dest;
+    const auto& piece = squares[src];
+    if ( !piece.has_value() ) {
+        return hash_key;
+    }
+    PieceColor color = piece->color;
+    hash_key ^= piece_keys[color * 6 + piece->type][src];
+    if ( move.promotion != EMPTY ) {
+        PieceType promoted_piece = move.promotion;
+        hash_key ^= piece_keys[color * 6 + promoted_piece][dest];
+    } else {
+        hash_key ^= piece_keys[color * 6 + piece->type][dest];
+    }
+    if ( move.pieceTaken != EMPTY ) {
+        SquareIndex capture_square = dest;
+        PieceType captured_piece = move.pieceTaken;
+        PieceColor capture_color = BLACK == color ? WHITE : BLACK;
+        hash_key ^= piece_keys[capture_color * 6 + captured_piece][capture_square];
+    }
+    if ( sideToMove == WHITE ) {
+        hash_key ^= side_key;
+    }
+    // if ( chess.get_castling_rights() & Chess::WHITE_KINGSIDE_CASTLE ) {
+    //     hash_key ^= castling_keys[0];
+    // }
+    // if ( chess.get_castling_rights() & Chess::WHITE_QUEENSIDE_CASTLE ) {
+    //     hash_key ^= castling_keys[1];
+    // }
+    // if ( chess.get_castling_rights() & Chess::BLACK_KINGSIDE_CASTLE ) {
+    //     hash_key ^= castling_keys[2];
+    // }
+    // if ( chess.get_castling_rights() & Chess::BLACK_QUEENSIDE_CASTLE ) {
+    //     hash_key ^= castling_keys[3];
+    // }
+    return hash_key;
 }

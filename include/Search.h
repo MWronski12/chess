@@ -1,10 +1,12 @@
 #include <algorithm>
+#include <limits>
 #include <vector>
 
 #include "Board.h"
 #include "Evaluation.h"
 #include "MoveContent.h"
 #include "Movegen.h"
+
 
 /* ------------------- Minimum and maximum score constants ------------------ */
 static const int POSITIVE_INFINITY = std::numeric_limits<int>::max();

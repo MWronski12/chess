@@ -8,10 +8,11 @@
  * Date: 24.03.2023
  */
 
+#include "Board.h"
+
 #include <iostream>
 #include <stdexcept>
 
-#include "Board.h"
 
 /* ------------------------------ Constructors ------------------------------ */
 
@@ -251,6 +252,53 @@ void Board::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) {
     }
 
     // TODO: Update threefoldRepetitionCounter
+}
+
+// TODO: separate conversion of the move representation
+// D2D4 notation (D2D4Q for promotion)
+void Board::makeMove( std::string move ) {
+    // Calculate and validate SquareIndex
+    int src = 8 * ( 8 - ( int( move[1] ) - 48 ) ) + ( int( toupper( move[0] ) ) - 65 );
+    int dest = 8 * ( 8 - ( int( move[3] ) - 48 ) ) + ( int( toupper( move[2] ) ) - 65 );
+    if ( src < 0 || src > 63 || dest < 0 || dest > 63 ) {
+        throw std::invalid_argument( "Invalid square notation!" );
+    }
+
+    PieceType promotion;
+
+    // Normal move like d2d4
+    if ( move.size() == 4 ) {
+        makeMove( src, dest, EMPTY );
+    }
+    // Promotion move like d7d8q
+    else if ( move.size() == 5 ) {
+        switch ( toupper( move[4] ) ) {
+            case 'Q':
+                promotion = QUEEN;
+                break;
+
+            case 'R':
+                promotion = ROOK;
+                break;
+
+            case 'B':
+                promotion = BISHOP;
+                break;
+
+            case 'N':
+                promotion = KNIGHT;
+                break;
+
+            default:
+                throw std::invalid_argument( "Invalid promotion type!" );
+                break;
+        }
+        makeMove( src, dest, promotion );
+    }
+    // Invalid move
+    else {
+        throw std::invalid_argument( "Invalid move notation!" );
+    }
 }
 
 /* ------------------------- makeMove helper methods ------------------------ */

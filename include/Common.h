@@ -13,12 +13,12 @@ enum PieceColor { WHITE, BLACK };
 
 enum PieceType {
     EMPTY,
-    PAWN,
+    ROOK,
     KNIGHT,
     BISHOP,
-    ROOK,
-    KING,
     QUEEN,
+    KING,
+    PAWN,
 };
 
 /* -------------------------------- CONSTANTS ------------------------------- */

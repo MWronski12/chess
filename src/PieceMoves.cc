@@ -1,5 +1,7 @@
 #include "PieceMoves.h"
 
+#include <stdexcept>
+
 /* -------------------------------------------------------------------------- */
 /*                                 Piece Moves                                */
 /* -------------------------------------------------------------------------- */
@@ -113,7 +115,7 @@ void PieceMoves::generateBlackPawnMoves() {
 void PieceMoves::generateKnightMoves() {
     for ( int y = 0; y < 8; y++ ) {
         for ( int x = 0; x < 8; x++ ) {
-            SquareIndex index = ( SquareIndex )( y + ( x * 8 ) );
+            SquareIndex index = (SquareIndex)( y + ( x * 8 ) );
 
             SquareIndex move;
             std::vector<SquareIndex> ray;

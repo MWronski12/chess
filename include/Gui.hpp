@@ -9,13 +9,13 @@
 #include "Board.h"
 #include "Engine.h"
 #include "Piece.h"
+#include "Search.h"
 
 class Gui {
 public:
     Gui() = default;
     Gui( const Gui& ) = delete;             // Delete copy constructor
     Gui& operator=( const Gui& ) = delete;  // Delete copy assignment operator
-    //
     // By SquareIndex - upper left corner is 0 and bottom right corner is 63
     virtual void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY ) = 0;
 
@@ -32,17 +32,19 @@ public:
 
 using namespace sf;
 
-// Vector2f offset(28, 28);
-
 class WindowGui : public Gui {
 public:
-    WindowGui( Board& board );
+    WindowGui();
     virtual void makeMove( std::string move ) override;
     virtual void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) override;
     virtual void draw() override;
     void start() override;
+
     void dragAndDrop( Event e, Vector2i pos );
+    void compMove( Search& s );
     std::string toChessNote( Vector2f p );
+    void ifIsMoveThenUpdatePosition( Vector2i pos );
+
     RenderWindow window;      // ok
     Vector2f offset;          // ok
     Sprite f[32];             // ok
@@ -53,13 +55,15 @@ public:
     Vector2f toCoord( char a, char b );
     Sprite sBoard;
     std::string position = "";  // ok
+    Engine engine;
 
 private:
-    Board& board;     // ok
-    Texture t1, t2;   // ok
-    std::string str;  // ok
-    int size = 56;    // ok
+    // Board& board;
+    Texture t1, t2;
+    std::string str;
+    const int size = 56;
     void loadPosition();
+    void _move( SquareIndex src, SquareIndex dest );
     void _move( std::string str );
 };
 

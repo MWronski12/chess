@@ -49,3 +49,8 @@ i jak napisać na to sensownego testa? Trzeba chyba sobie na kartce to wszystko 
 
 
 5. Optymalizacja wszystkiego 
+
+
+#####
+
+1 maj skonczyłeś na integracji gui do silnika i tam trzeba interfejs dopasować na unique pptr

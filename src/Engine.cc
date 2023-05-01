@@ -3,7 +3,7 @@
 Engine::Engine() : moveGenerator( PieceValidMoves() ) { newGame(); }
 
 void Engine::newGame() {
-    board = std::make_unique<Board>();
+    board = std::make_unique<Board>( "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" );
     _previousBoard = std::make_unique<Board>();
     moveHistory = std::stack<MoveContent>();
 

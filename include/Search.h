@@ -1,3 +1,6 @@
+#ifndef SEARCH_H
+#define SEARCH_H
+
 #include <algorithm>
 #include <cstdint>
 #include <limits>
@@ -32,3 +35,4 @@ private:
 
     int endOfTheGameScore( Board& board );
 };
+#endif

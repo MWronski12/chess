@@ -10,6 +10,7 @@
 
 class Board {
 public:
+    enum { WHITE_KING_SIDE = 1, WHITE_QUEEN_SIDE = 2, BLACK_KING_SIDE = 4, BLACK_QUEEN_SIDE = 8 };
     // constructors
     Board();
     Board( std::string FENString );
@@ -18,8 +19,9 @@ public:
     // members
     bool whiteIsChecked;
     bool blackIsChecked;
-    bool whiteHasCastled;
-    bool blackHasCastled;
+    // bool whiteHasCastled;
+    // bool blackHasCastled;
+    int castlingRights;
     bool whiteIsCheckMated;
     bool blackIsCheckMated;
     bool staleMate;
@@ -29,9 +31,10 @@ public:
     SquareIndex enPassantSquare;
     std::array<std::optional<Piece>, 64> squares;
 
-    uint64_t piece_keys[12][64];
+    uint64_t piece_keys[2][6][64];
     uint64_t side_key;
-    uint64_t castling_keys[4];
+    uint64_t castle_keys[16];
+    uint64_t enpassant_keys[64];
     uint64_t hash_key;
     uint64_t getHashKey();
     uint64_t updateHashKey( uint64_t hash_key, const MoveContent& move );
@@ -53,7 +56,7 @@ private:
     void recordEnPassant( SquareIndex src, SquareIndex dest );
     void handleEnPassant();
     void handleCastling( SquareIndex src, SquareIndex dest );
-    void handlePromotion( SquareIndex src, PieceType promotion );
+    void handlePromotion( SquareIndex src, SquareIndex dest, PieceType promotion );
 };
 
 #endif

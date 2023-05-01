@@ -1,4 +1,4 @@
-add_library(engine Piece.cc MoveContent.cc Board.cc PieceMoves.cc Movegen.cc Engine.cc Evaluation.cc Search.cc)
+add_library(engine Piece.cc MoveContent.cc Board.cc PieceMoves.cc Movegen.cc Engine.cc Evaluation.cc Search.cc TranspositionTable.cc)
 # target_link_libraries(chess engine)
 target_link_libraries(chess engine sfml-graphics sfml-window sfml-system)
 

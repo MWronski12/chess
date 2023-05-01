@@ -22,7 +22,7 @@ void WindowGui::loadPosition() {
         for ( int j = 0; j < 8; j++ ) {
             std::optional<Piece> piece = board.squares[j + i * 8];
             if ( piece.has_value() ) {
-                int x = abs( piece->type ) - 1;
+                int x = abs( piece->type );
                 int y = piece->color == WHITE ? 1 : 0;
                 f[k].setTextureRect( IntRect( size * x, size * y, size, size ) );
                 f[k].setPosition( size * j, size * i );

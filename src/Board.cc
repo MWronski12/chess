@@ -15,14 +15,33 @@
 
 #include "Search.h"
 
+/*
+                           castling   move     in      in
+                              right update     binary  decimal
+ king & rooks didn't move:     1111 & 1111  =  1111    15
+        white king  moved:     1111 & 1100  =  1100    12
+  white king's rook moved:     1111 & 1110  =  1110    14
+ white queen's rook moved:     1111 & 1101  =  1101    13
+
+         black king moved:     1111 & 0011  =  1011    3
+  black king's rook moved:     1111 & 1011  =  1011    11
+ black queen's rook moved:     1111 & 0111  =  0111    7
+*/
+
+// castling rights update constants
+const int castling_rights[64] = { 7,  15, 15, 15, 3,  15, 15, 11, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+                                  15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+                                  15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 13, 15, 15, 15, 12, 15, 15, 14 };
+
 /* ------------------------------ Constructors ------------------------------ */
 
 // Creates a board with a starting position
 Board::Board()
     : whiteIsChecked( false ),
       blackIsChecked( false ),
-      whiteHasCastled( false ),
-      blackHasCastled( false ),
+      //   whiteHasCastled( false ),
+      //   blackHasCastled( false ),
+      castlingRights( WHITE_KING_SIDE | WHITE_QUEEN_SIDE | BLACK_KING_SIDE | BLACK_QUEEN_SIDE ),
       whiteIsCheckMated( false ),
       blackIsCheckMated( false ),
       staleMate( false ),
@@ -52,6 +71,7 @@ Board::Board()
 Board::Board( std::string fen )
     : whiteIsChecked( false ),
       blackIsChecked( false ),
+      castlingRights( 0 ),
       whiteIsCheckMated( false ),
       blackIsCheckMated( false ),
       staleMate( false ),
@@ -115,29 +135,30 @@ Board::Board( std::string fen )
     /* ----------------------------- Castling rights ---------------------------- */
     while ( ++it != fen.cend() && *it != ' ' ) {
         if ( *it == '-' ) {
-            blackHasCastled = true;
-            whiteHasCastled = true;
+            // blackHasCastled = true;
+            // whiteHasCastled = true;
+            castlingRights = 0;
             continue;
         } else if ( *it == 'K' ) {
             if ( !squares[63] || squares[63]->type != ROOK || squares[63]->color != WHITE ) {
                 throw std::invalid_argument( "Invalid FEN notation - white king side castling requires a rook on H1" );
             }
-            whiteHasCastled = false;
+            castlingRights |= WHITE_KING_SIDE;
         } else if ( *it == 'Q' ) {
             if ( !squares[56] || squares[56]->type != ROOK || squares[56]->color != WHITE ) {
                 throw std::invalid_argument( "Invalid FEN notation - white queen side castling requires a rook on A1" );
             }
-            whiteHasCastled = false;
+            castlingRights |= WHITE_QUEEN_SIDE;
         } else if ( *it == 'k' ) {
             if ( !squares[7] || squares[7]->type != ROOK || squares[7]->color != BLACK ) {
                 throw std::invalid_argument( "Invalid FEN notation - black king side castling requires a rook on H8" );
             }
-            blackHasCastled = false;
+            castlingRights |= BLACK_KING_SIDE;
         } else if ( *it == 'q' ) {
             if ( !squares[0] || squares[0]->type != ROOK || squares[0]->color != BLACK ) {
                 throw std::invalid_argument( "Invalid FEN notation - black king side castling requires a rook on A8" );
             }
-            blackHasCastled = false;
+            castlingRights |= BLACK_QUEEN_SIDE;
         } else {
             throw std::invalid_argument( "Invalid FEN notation - invalid castling rights" );
         }
@@ -173,15 +194,16 @@ Board::Board( std::string fen )
     while ( ++it != fen.cend() ) {
         turnCount += *it;
     }
-
+    initZobrist();
     hash_key = getHashKey();
 }
 
 Board Board::fastCopy() const {
     Board copy;
     copy.sideToMove = this->sideToMove;
-    copy.whiteHasCastled = this->whiteHasCastled;
-    copy.blackHasCastled = this->blackHasCastled;
+    // copy.whiteHasCastled = this->whiteHasCastled;
+    // copy.blackHasCastled = this->blackHasCastled;
+    copy.castlingRights = this->castlingRights;
     copy.fiftyMoveCounter_ = this->fiftyMoveCounter_;
     copy.lastMove = this->lastMove;
     copy.threefoldRepetitionCounter_ = this->threefoldRepetitionCounter_;
@@ -201,6 +223,7 @@ void Board::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) {
 
     PieceType pieceMoving = squares[src] ? squares[src]->type : EMPTY;
     PieceType pieceTaken = squares[dest] ? squares[dest]->type : EMPTY;
+    PieceColor colorMoving = squares[src]->color;
 
     // Record move details
     lastMove.src = src;
@@ -209,6 +232,10 @@ void Board::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) {
     lastMove.pieceTaken = pieceTaken;
     lastMove.promotion = promotion;
     lastMove.isEnPassantCapture = false;
+
+    hash_key ^= piece_keys[colorMoving][pieceMoving][src];   // remove piece from source square in hash key
+    hash_key ^= piece_keys[colorMoving][pieceMoving][dest];  // set piece to the target square in hash key
+    if ( pieceTaken != EMPTY ) hash_key ^= piece_keys[1 - colorMoving][pieceTaken][dest];  // remove the piece from hash key
 
     // Detect special move scenario and handle extra behaviour
     // Pawn move by 2
@@ -225,7 +252,7 @@ void Board::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) {
     }
     // Pawn promotion
     else if ( pieceMoving == PAWN && ( dest < 8 || dest > 55 ) ) {
-        handlePromotion( src, promotion );
+        handlePromotion( src, dest, promotion );
     }
 
     // Handle behaviour common to every move
@@ -238,6 +265,7 @@ void Board::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) {
 
     // Clear enPassantSquare
     if ( pieceMoving != PAWN || abs( src - dest ) != 16 ) {
+        hash_key ^= enpassant_keys[enPassantSquare];
         enPassantSquare = NULL_SQUARE;
     }
 
@@ -252,6 +280,17 @@ void Board::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) {
         fiftyMoveCounter_ = 0;
     }
 
+    // hash castling
+    hash_key ^= castle_keys[castlingRights];
+
+    // update castling rights
+    castlingRights &= castling_rights[src];
+    castlingRights &= castling_rights[dest];
+
+    // hash castling
+    hash_key ^= castle_keys[castlingRights];
+
+    hash_key ^= side_key;
     // TODO: Update threefoldRepetitionCounter
 }
 
@@ -356,14 +395,17 @@ void Board::recordEnPassant( SquareIndex src, SquareIndex dest ) {
     } else if ( squares[src]->color == BLACK ) {
         enPassantSquare = dest - 8;
     }
+    hash_key ^= enpassant_keys[enPassantSquare];
 }
 
 // Clears enPassant square and records additional lastMove details
 void Board::handleEnPassant() {
     if ( sideToMove == WHITE ) {
         squares[enPassantSquare + 8] = std::nullopt;
+        hash_key ^= piece_keys[WHITE][PAWN][enPassantSquare + 8];  // remove pawn from hash key
     } else if ( sideToMove == BLACK ) {
         squares[enPassantSquare - 8] = std::nullopt;
+        hash_key ^= piece_keys[BLACK][PAWN][enPassantSquare - 8];  // remove pawn from hash key
     }
     lastMove.isEnPassantCapture = true;
     lastMove.pieceTaken = PAWN;
@@ -378,14 +420,21 @@ void Board::handleCastling( SquareIndex src, SquareIndex dest ) {
             squares[61] = std::move( squares[63] );
             squares[61]->hasMoved = true;
             squares[63] = std::nullopt;
+
+            // hash rook
+            hash_key ^= piece_keys[WHITE][ROOK][63];  // remove rook from h1 from hash key
+            hash_key ^= piece_keys[WHITE][ROOK][61];  // put rook on f1 into a hash key
         }
         // queen side
         if ( dest == 58 ) {
             squares[59] = std::move( squares[56] );
             squares[59]->hasMoved = true;
             squares[56] = std::nullopt;
+
+            // hash rook
+            hash_key ^= piece_keys[WHITE][ROOK][56];  // remove rook from h1 from hash key
+            hash_key ^= piece_keys[WHITE][ROOK][59];  // put rook on f1 into a hash key
         }
-        whiteHasCastled = true;
     }
     // black castle
     else if ( src == 4 ) {
@@ -394,22 +443,33 @@ void Board::handleCastling( SquareIndex src, SquareIndex dest ) {
             squares[5] = std::move( squares[7] );
             squares[5]->hasMoved = true;
             squares[7] = std::nullopt;
+
+            // hash rook
+            hash_key ^= piece_keys[BLACK][ROOK][7];  // remove rook from h1 from hash key
+            hash_key ^= piece_keys[BLACK][ROOK][5];  // put rook on f1 into a hash key
         }
         // queen side
         else if ( dest == 2 ) {
             squares[3] = std::move( squares[0] );
             squares[3]->hasMoved = true;
             squares[0] = std::nullopt;
+
+            // hash rook
+            hash_key ^= piece_keys[BLACK][ROOK][0];  // remove rook from h1 from hash key
+            hash_key ^= piece_keys[BLACK][ROOK][3];  // put rook on f1 into a hash key
         }
-        blackHasCastled = true;
     }
 }
 
 // Changes type of promoted piece, while its still on the src square
-void Board::handlePromotion( SquareIndex src, PieceType promotion ) {
+void Board::handlePromotion( SquareIndex src, SquareIndex dest, PieceType promotion ) {
+    hash_key ^= piece_keys[squares[src]->color][squares[src]->type][dest];  // remove pawn
+
     squares[src]->type = promotion;
     squares[src]->value = Piece::calculatePieceValue( promotion );
     squares[src]->actionValue = Piece::calculatePieceActionValue( promotion );
+
+    hash_key ^= piece_keys[squares[src]->color][promotion][dest];  // add promoted piece
 }
 /* ------------------------------------------------------------------------------------------------------------------ */
 /*                                                       Zobrist                                                      */
@@ -417,85 +477,37 @@ void Board::handlePromotion( SquareIndex src, PieceType promotion ) {
 void Board::initZobrist() {
     std::mt19937_64 gen( std::random_device{}() );
     std::uniform_int_distribution<uint64_t> dis( 0, UINT64_MAX );
-    for ( int i = 0; i < 12; i++ ) {
-        for ( int j = 0; j < 64; j++ ) {
-            piece_keys[i][j] = dis( gen );
+    for ( int y = 0; y < 2; y++ ) {
+        for ( int i = 0; i < 6; i++ ) {
+            for ( int j = 0; j < 64; j++ ) {
+                piece_keys[y][i][j] = dis( gen );
+            }
         }
     }
     side_key = dis( gen );
-    for ( int i = 0; i < 4; i++ ) {
-        castling_keys[i] = dis( gen );
+    for ( int i = 0; i < 16; i++ ) {
+        castle_keys[i] = dis( gen );
     }
-    // tez enpassant
+    for ( int i = 0; i < 64; i++ ) {
+        enpassant_keys[i] = dis( gen );
+    }
 }
 
 uint64_t Board::getHashKey() {
-    uint64_t hash_key = 0;
+    uint64_t final_key = 0;
     for ( int i = 0; i < 64; i++ ) {
         const auto& piece = squares[i];
         if ( piece.has_value() ) {
             PieceColor color = piece->color;
-            hash_key ^= piece_keys[color * 6 + piece->type][i];
+            final_key ^= piece_keys[color][piece->type][i];
         }
     }
     if ( sideToMove == BLACK ) {
-        hash_key ^= side_key;
+        final_key ^= side_key;
     }
-    // if ( board.get_castling_rights() & Chess::WHITE_KINGSIDE_CASTLE ) {
-    //     hash_key ^= castling_keys[0];
-    // }
-    // if ( board.get_castling_rights() & Chess::WHITE_QUEENSIDE_CASTLE ) {
-    //     hash_key ^= castling_keys[1];
-    // }
-    // if ( board.get_castling_rights() & Chess::BLACK_KINGSIDE_CASTLE ) {
-    //     hash_key ^= castling_keys[2];
-    // }
-    // if ( board.get_castling_rights() & Chess::BLACK_QUEENSIDE_CASTLE ) {
-    //     hash_key ^= castling_keys[3];
-    // }
+    final_key ^= castle_keys[castlingRights];
 
-    // TODO: enpassant
-    return hash_key;  // initialize at start of the game ( in board initialization for example), update after each move
+    if ( enPassantSquare != NULL_SQUARE ) final_key ^= enpassant_keys[enPassantSquare];
+    return final_key;  // initialize at start of the game ( in board initialization for example), update after each move
     // HASH_KEY SHOULD BE IN BOARD CLASS!!, but then it is not possible to pass board as const bcs we will update it
-}
-
-// function should be called after move is made
-// do we have to restore key after alphaBeta?? No bcs we copy the board, to be confirmed
-uint64_t Board::updateHashKey( uint64_t hash_key, const MoveContent& move ) {
-    SquareIndex src = move.src;
-    SquareIndex dest = move.dest;
-    const auto& piece = squares[src];
-    if ( !piece.has_value() ) {
-        return hash_key;
-    }
-    PieceColor color = piece->color;
-    hash_key ^= piece_keys[color * 6 + piece->type][src];
-    if ( move.promotion != EMPTY ) {
-        PieceType promoted_piece = move.promotion;
-        hash_key ^= piece_keys[color * 6 + promoted_piece][dest];
-    } else {
-        hash_key ^= piece_keys[color * 6 + piece->type][dest];
-    }
-    if ( move.pieceTaken != EMPTY ) {
-        SquareIndex capture_square = dest;
-        PieceType captured_piece = move.pieceTaken;
-        PieceColor capture_color = BLACK == color ? WHITE : BLACK;
-        hash_key ^= piece_keys[capture_color * 6 + captured_piece][capture_square];
-    }
-    if ( sideToMove == WHITE ) {
-        hash_key ^= side_key;
-    }
-    // if ( chess.get_castling_rights() & Chess::WHITE_KINGSIDE_CASTLE ) {
-    //     hash_key ^= castling_keys[0];
-    // }
-    // if ( chess.get_castling_rights() & Chess::WHITE_QUEENSIDE_CASTLE ) {
-    //     hash_key ^= castling_keys[1];
-    // }
-    // if ( chess.get_castling_rights() & Chess::BLACK_KINGSIDE_CASTLE ) {
-    //     hash_key ^= castling_keys[2];
-    // }
-    // if ( chess.get_castling_rights() & Chess::BLACK_QUEENSIDE_CASTLE ) {
-    //     hash_key ^= castling_keys[3];
-    // }
-    return hash_key;
 }

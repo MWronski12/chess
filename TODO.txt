@@ -28,6 +28,8 @@ REST:
 -evaluateMoves zmienić nazwę funkcji i dać do review
 - do review alfa beta czy to dobrze śmiga itd
 - pobrać jakiś działający kod i podpiąć do niego testy żeby mieć taki benchmark 
+- inital zobrist keys można dać jako globala a nie że do tablicy
+- review czy hashing jest zgodny z tym kodem : https://github.com/maksimKorzh/bbc/blob/master/src/bbc_nnue/bbc.c
 
 1. Ogarnąc testowanie searcha ( np. przykłady z internetu )
 2. Wprowadzić transpositiontable i podejmowanie decyzji na podstawie Bazydanych

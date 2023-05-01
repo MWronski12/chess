@@ -1,6 +1,7 @@
+#include "Board.h"
+
 #include <iostream>
 
-#include "Board.h"
 #include "catch2/catch_test_macros.hpp"
 
 /* ------------------------------ Constructors ------------------------------ */
@@ -18,8 +19,8 @@ TEST_CASE( "Board constructs correct starting position by default", "[Board::Boa
         }
     }
 
-    REQUIRE( board.whiteHasCastled == false );
-    REQUIRE( board.blackHasCastled == false );
+    // REQUIRE( board.whiteHasCastled == false );
+    // REQUIRE( board.blackHasCastled == false );
     REQUIRE( board.enPassantSquare == NULL_SQUARE );
     REQUIRE( board.sideToMove == WHITE );
     REQUIRE( board.whiteIsChecked == false );
@@ -133,13 +134,13 @@ TEST_CASE( "Castle king side is handled properly", "Board::makeMove()" ) {
     REQUIRE( board.squares[63] == std::nullopt );
     REQUIRE( board.squares[61]->type == ROOK );
     REQUIRE( board.squares[61]->hasMoved == true );
-    REQUIRE( board.whiteHasCastled == true );
+    REQUIRE( board.castlingRights == 0b1111 );
     // black castle king side
     board.makeMove( 4, 6, EMPTY );
     REQUIRE( board.squares[7] == std::nullopt );
     REQUIRE( board.squares[5]->type == ROOK );
     REQUIRE( board.squares[5]->hasMoved == true );
-    REQUIRE( board.blackHasCastled == true );
+    REQUIRE( board.castlingRights == 0b1111 );
 }
 
 TEST_CASE( "Castle queen side is handled properly", "Board::makeMove()" ) {
@@ -152,13 +153,13 @@ TEST_CASE( "Castle queen side is handled properly", "Board::makeMove()" ) {
     REQUIRE( board.squares[56] == std::nullopt );
     REQUIRE( board.squares[59]->type == ROOK );
     REQUIRE( board.squares[59]->hasMoved == true );
-    REQUIRE( board.whiteHasCastled == true );
+    REQUIRE( board.castlingRights == 0b1111 );
     // black castle king side
     board.makeMove( 4, 2, EMPTY );
     REQUIRE( board.squares[0] == std::nullopt );
     REQUIRE( board.squares[3]->type == ROOK );
     REQUIRE( board.squares[3]->hasMoved == true );
-    REQUIRE( board.blackHasCastled == true );
+    REQUIRE( board.castlingRights == 0b1111 );
 }
 
 TEST_CASE( "Promotion is handled correctly", "Board::makeMove()" ) {

@@ -22,10 +22,10 @@ MoveContent Search::getBestMove( Board& examineBoard, int maxDepth, bool maximiz
     std::vector<MoveContent> possibleMoves = evaluateMoves( examineBoard );
     auto compare = maximizingPlayer ? MoveContent::compareMax : MoveContent::compareMin;
 
-    std::optional<TranspositionEntry> entry = tt.getEntry( examineBoard.hash_key );
-    if ( entry.has_value() && entry.value().depth >= maxDepth && entry.value().NodeType == EXACT ) {
-        return entry.value().best_move.value();
-    }
+    // std::optional<TranspositionEntry> entry = tt.getEntry( examineBoard.hash_key );
+    // if ( entry.has_value() && entry.value().depth >= maxDepth && entry.value().NodeType == EXACT ) {
+    //     return entry.value().best_move.value();
+    // }
     // change so that we can know depth // to raczej trzeba wywołać w alfa beta
     // This position has already been searched to the desired depth or deeper, so we can use the cached score.
 
@@ -44,7 +44,7 @@ MoveContent Search::getBestMove( Board& examineBoard, int maxDepth, bool maximiz
             move.score = alphaBeta( board, depth, NEGATIVE_INFINITY, POSITIVE_INFINITY, !maximizingPlayer );
 
             if ( ( maximizingPlayer && move.score > bestMove.score ) || ( !maximizingPlayer && move.score < bestMove.score ) ) {
-                tt.putEntry( board.hash_key, move.score, depth, EXACT, move );
+                // tt.putEntry( board.hash_key, move.score, depth, EXACT, move );
                 bestMove = move;
             }
         }
@@ -68,14 +68,20 @@ MoveContent Search::getBestMove( Board& examineBoard, int maxDepth, bool maximiz
  * @return int score for the current board and player.
  */
 int Search::alphaBeta( Board& examineBoard, int depth, int alpha, int beta, bool maximizingPlayer ) {
-    // std::optional<TranspositionEntry> entry = tt.getEntry( examineBoard.hash_key );
-    // if ( entry.has_value() && entry.value().depth >= depth ) {
-    //     return entry.value().score;
-    // }
-
     if ( depth == 0 ) {
         return Evaluation::evaluateBoard( examineBoard );
     }
+
+    // std::optional<TranspositionEntry> entry = tt.getEntry( examineBoard.hash_key );
+    // if ( entry.has_value() && entry.value().depth >= depth && entry.value().NodeType == EXACT ) {
+    //     return entry.value().score;
+    // } else if ( entry.has_value() && entry.value().depth >= depth && entry.value().score >= beta &&
+    //             entry.value().NodeType == LOWERBOUND ) {
+    //     return beta;
+    // } else if ( entry.has_value() && entry.value().depth >= depth && entry.value().score <= alpha &&
+    //             entry.value().NodeType == LOWERBOUND ) {
+    //     return alpha;
+    // }
 
     // If no legal moves found we decide that the game is over.
     bool isEndOfTheGame = true;
@@ -99,7 +105,7 @@ int Search::alphaBeta( Board& examineBoard, int depth, int alpha, int beta, bool
             int eval = alphaBeta( board, depth - 1, alpha, beta, false );
             alpha = std::max( alpha, eval );
             if ( beta <= alpha ) {
-                // tt.putEntry( board.hash_key, alpha, depth, LOWERBOUND, std::nullopt );
+                // tt.putEntry( board.hash_key, alpha, depth, UPPERBOUND, std::nullopt );
                 break;
             }
         }
@@ -123,7 +129,7 @@ int Search::alphaBeta( Board& examineBoard, int depth, int alpha, int beta, bool
             int eval = alphaBeta( board, depth - 1, alpha, beta, true );
             beta = std::min( beta, eval );
             if ( beta <= alpha ) {
-                // tt.putEntry( board.hash_key, beta, depth, UPPERBOUND, std::nullopt );
+                // tt.putEntry( board.hash_key, beta, depth, LOWERBOUND, std::nullopt );
                 break;
             }
         }

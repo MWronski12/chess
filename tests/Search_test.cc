@@ -62,16 +62,39 @@ TEST_CASE( "Don't stalemate if you can win", "[search]" ) {
     // search.negaMaxRoot( 5 );
     // Move move = search.myBestMove;
     // REQUIRE( move.toShortString() == "f1f8" );
+    SECTION( "7k/8/7K/8/8/8/8/5R2 w - - 51 142" ) {
+        Search s;
+        Board b( "7k/8/7K/8/8/8/8/5R2 w - - 51 142" );
+        PieceValidMoves g;
+        g.generateValidMoves( b );
+        auto bestMove = s.getBestMove( b, 5, b.sideToMove == WHITE );
 
-    Search s;
-    Board b( "7k/8/7K/8/8/8/8/5R2 w - - 51 142" );
-    PieceValidMoves g;
-    g.generateValidMoves( b );
-    auto bestMove = s.getBestMove( b, 5, b.sideToMove == WHITE );
+        REQUIRE( bestMove.src == 61 );
+        REQUIRE( bestMove.dest == 5 );
+        // BENCHMARK( "getBestMove search at depth 5 " ) { return s.getBestMove( b, 5, true ); };
+    }
+    SECTION( "1k6/p6p/K6P/8/8/8/8/1q4q1 b - - 0 1" ) {
+        Search s;
+        Board b( "1k6/p6p/K6P/8/8/8/8/1q4q1 b - - 0 1" );
+        PieceValidMoves g;
+        g.generateValidMoves( b );
+        auto bestMove = s.getBestMove( b, 3, b.sideToMove == WHITE );
 
-    REQUIRE( bestMove.dest == 5 );
-    REQUIRE( bestMove.src == 61 );
-    BENCHMARK( "getBestMove search at depth 5 " ) { return s.getBestMove( b, 5, true ); };
+        REQUIRE( bestMove.src == 62 );
+        REQUIRE( bestMove.dest == 17 );
+        // BENCHMARK( "getBestMove search at depth 5 " ) { return s.getBestMove( b, 5, true ); };
+    }
+    SECTION( "k6r/8/8/8/8/8/8/2bPKPb1 b - - 0 1" ) {
+        Search s;
+        Board b( "k6r/8/8/8/8/8/8/2bPKPb1 b - - 0 1" );
+        PieceValidMoves g;
+        g.generateValidMoves( b );
+        auto bestMove = s.getBestMove( b, 3, b.sideToMove == WHITE );
+
+        REQUIRE( bestMove.src == 7 );
+        REQUIRE( bestMove.dest == 4 );
+        // BENCHMARK( "getBestMove search at depth 5 " ) { return s.getBestMove( b, 5, true ); };
+    }
 }
 
 TEST_CASE( "Search", "[search]" ) {
@@ -145,7 +168,7 @@ TEST_CASE( "Search", "[search]" ) {
             auto bestMove = s.getBestMove( b, i, b.sideToMove == WHITE );
             REQUIRE( bestMove.src == 11 );
             REQUIRE( bestMove.dest == 15 );
-            // BENCHMARK( "getBestMove search at depth " + std::to_string( i ) ) { return s.getBestMove( b, i, true ); };
+            BENCHMARK( "getBestMove search at depth " + std::to_string( i ) ) { return s.getBestMove( b, i, true ); };
         }
     }
 }

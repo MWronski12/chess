@@ -37,6 +37,7 @@ void WindowGui::loadPosition() {
 void WindowGui::_move( std::string str ) {
     Vector2f oldPos = toCoord( str[0], str[1] );
     Vector2f newPos = toCoord( str[2], str[3] );
+    // w gui dodać promotion
 
     for ( int i = 0; i < 32; i++ )
         if ( f[i].getPosition() == newPos ) f[i].setPosition( -100, -100 );

@@ -2,8 +2,6 @@ add_library(engine Piece.cc MoveContent.cc Board.cc PieceMoves.cc Movegen.cc Eng
 # target_link_libraries(chess engine)
 target_link_libraries(chess engine sfml-graphics sfml-window sfml-system)
 
-
-
 include(FetchContent)
 FetchContent_Declare(SFML
     GIT_REPOSITORY https://github.com/SFML/SFML.git

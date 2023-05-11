@@ -140,16 +140,16 @@ int Search::endOfTheGameScore( const Board& board ) const {
 }
 
 /**
- * Generates a list of pseudo evaluated possible moves for the current board position.
+ * Generates a list of pseudo evaluated possible moves sorted by highest scored first.
  * Pseudo evaluation tries to guess which moves are the most promising, so they can be searched first.
  * It assumes that the board has valid moves calculated.
- * Considerations: promotions, captures, enpassant captures (TODO: castling and piece first move).
+ * Considerations: captures only (TODO: promotion, enpassant, castling and piece's first move).
  *
  * @param board Board to examine, it has to have valid moves calculated.
  *
- * @return vector of pseudo evaluated moves for the current board.
+ * @return vector of pseudo evaluated moves for the current board sorted by highest scored first.
  */
-std::vector<MoveContent> Search::evaluateMoves( const Board& board ) const {
+std::vector<MoveContent> Search::getPossibleMoves( const Board& board ) const {
     std::vector<MoveContent> moves;
 
     for ( SquareIndex srcSquare = 0; srcSquare < 64; srcSquare++ ) {
@@ -164,52 +164,17 @@ std::vector<MoveContent> Search::evaluateMoves( const Board& board ) const {
             const auto& pieceTaken = board.squares[destSquare];
             pieceTaken ? move.pieceTaken = pieceTaken->type : move.pieceTaken = EMPTY;
 
-            /* ----------------------------- Promotion moves ---------------------------- */
-            if ( pieceMoving->type == PAWN && ( destSquare < 8 || destSquare > 55 ) ) {
-                for ( auto promotion : { QUEEN, ROOK, BISHOP, KNIGHT } ) {
-                    move.promotion = promotion;
-                    switch ( promotion ) {
-                        case QUEEN:
-                            move.score += QUEEN_VALUE;
-                            break;
-                        case ROOK:
-                            move.score += ROOK_VALUE;
-                            break;
-                        case BISHOP:
-                            move.score += BISHOP_VALUE;
-                            break;
-                        case KNIGHT:
-                            move.score += KNIGHT_VALUE;
-                            break;
-                        default:
-                            break;
-                    }
-                    moves.push_back( move );
-                }
-            }
             /* -------------------------------- Captures -------------------------------- */
-            else if ( pieceTaken ) {
-                move.pieceTaken = pieceTaken->type;
+            if ( pieceTaken ) {
                 move.score += CAPTURE_MOVE_REWARD;
-                // Reward capturing with lowest valued piece
-                move.score += pieceMoving->actionValue - pieceTaken->actionValue;
-                // Reward capturing undefended pieces
-                move.score += pieceTaken->attackedValue - pieceTaken->defendedValue;
-                moves.push_back( move );
+                move.score += pieceMoving->actionValue - pieceTaken->actionValue;     // Lowest value attacker
+                move.score += pieceTaken->attackedValue - pieceTaken->defendedValue;  // Highest value attacked
             }
-            /* --------------------------- En passant captures -------------------------- */
-            else if ( pieceMoving->type == PAWN && destSquare == board.enPassantSquare ) {
-                move.isEnPassantCapture = true;
-                move.pieceTaken = PAWN;
-                move.score += CAPTURE_MOVE_REWARD;
-                moves.push_back( move );
-            }
-            /* ------------------------------- Normal move ------------------------------ */
-            else {
-                move.score = 0;
-                moves.push_back( move );
-            }
+
+            moves.push_back( move );
         }
     }
+
+    std::sort( moves.begin(), moves.end(), []( MoveContent m1, MoveContent m2 ) { return m1.score > m2.score; } );
     return moves;
 }

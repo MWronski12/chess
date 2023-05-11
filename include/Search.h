@@ -7,7 +7,6 @@
 #include "MoveContent.h"
 #include "Movegen.h"
 
-
 /* ------------------- Minimum and maximum score constants ------------------ */
 static const int POSITIVE_INFINITY = std::numeric_limits<int>::max();
 static const int NEGATIVE_INFINITY = std::numeric_limits<int>::min();
@@ -19,7 +18,7 @@ public:
     Search( Search&& ) = delete;
 
     MoveContent getBestMove( const Board& examineBoard, int maxDepth, bool maximizingPlayer ) const;
-    std::vector<MoveContent> evaluateMoves( const Board& board ) const;
+    std::vector<MoveContent> getPossibleMoves( const Board& board ) const;
 
 private:
     mutable PieceValidMoves generator;

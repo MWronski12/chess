@@ -8,7 +8,8 @@ Window gui and MiniMax algorithm for choosing the best move are currently under 
 
 - Make sure You have cmake, make and g++ installed
 - `git clone https://github.com/MWronski12/chess`
-- `cd chesss`
+- `cd chess`
+- `./install-packages.sh`
 - `cmake -B build .`
 - `cd build`
 - `make chess`

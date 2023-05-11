@@ -84,7 +84,7 @@ void WindowGui::dragAndDrop( Event e, Vector2i pos ) {
         if ( e.mouseButton.button == Mouse::Left ) {
             isMove = false;
             Vector2f p = f[n].getPosition() + Vector2f( size / 2, size / 2 );
-            newPos = Vector2f( size * int( p.x / size ), size * int( p.y / size ) );
+            newPos = Vector2f( size * int( p.x / size ), size* int( p.y / size ) );
             str = toChessNote( oldPos ) + toChessNote( newPos );
             makeMove( str );  // wrapper to our make move
             if ( oldPos != newPos ) position += str + " ";

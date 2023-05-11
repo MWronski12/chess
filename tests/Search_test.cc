@@ -1,7 +1,6 @@
-#include "Search.h"
-
 #include <catch2/generators/catch_generators.hpp>
 
+#include "Search.h"
 #include "catch2/benchmark/catch_benchmark.hpp"
 #include "catch2/catch_test_macros.hpp"
 
@@ -11,7 +10,7 @@ TEST_CASE( "Evaluate moves returns array of 20 moves scored to 0 at initial posi
     Board b;
     PieceValidMoves g;
     g.generateValidMoves( b );
-    auto moves = s.evaluateMoves( b );
+    auto moves = s.getPossibleMoves( b );
 
     REQUIRE( moves.size() == 20 );
     for ( auto move : moves ) {

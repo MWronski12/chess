@@ -13,10 +13,11 @@
  *
  * @return MoveContent representing the best move for the current player.
  */
-MoveContent Search::getBestMove( const Board& examineBoard, int maxDepth, bool maximizingPlayer ) const {
+MoveContent Search::getBestMove( const Board& examineBoard, int maxDepth, bool maximizingPlayer, int nodesExamined,
+                                 int nodesEvaluated, int nodesPruned ) const {
     MoveContent bestMove;
     bestMove.score = maximizingPlayer ? NEGATIVE_INFINITY : POSITIVE_INFINITY;
-    std::vector<MoveContent> possibleMoves = evaluateMoves( examineBoard );
+    std::vector<MoveContent> possibleMoves = getPossibleMoves( examineBoard );
     auto compare = maximizingPlayer ? MoveContent::compareMax : MoveContent::compareMin;
 
     // Perform iterative deepening search
@@ -31,7 +32,8 @@ MoveContent Search::getBestMove( const Board& examineBoard, int maxDepth, bool m
                 continue;
             }
 
-            move.score = alphaBeta( board, depth, NEGATIVE_INFINITY, POSITIVE_INFINITY, !maximizingPlayer );
+            move.score = alphaBeta( board, depth, NEGATIVE_INFINITY, POSITIVE_INFINITY, !maximizingPlayer,
+                                    nodesExamined, nodesEvaluated, nodesPruned );
 
             if ( ( maximizingPlayer && move.score > bestMove.score ) ||
                  ( !maximizingPlayer && move.score < bestMove.score ) ) {
@@ -57,15 +59,18 @@ MoveContent Search::getBestMove( const Board& examineBoard, int maxDepth, bool m
  *
  * @return int score for the current board and player.
  */
-int Search::alphaBeta( const Board& examineBoard, int depth, int alpha, int beta, bool maximizingPlayer ) const {
+int Search::alphaBeta( const Board& examineBoard, int depth, int alpha, int beta, bool maximizingPlayer,
+                       int& nodesExamined, int& nodesEvaluated, int& nodesPruned ) const {
+    nodesExamined++;
     if ( depth == 0 ) {
+        nodesEvaluated++;
         return Evaluation::evaluateBoard( examineBoard );
     }
 
     // If no legal moves found we decide that the game is over.
     bool isEndOfTheGame = true;
 
-    std::vector<MoveContent> possibleMoves = evaluateMoves( examineBoard );
+    std::vector<MoveContent> possibleMoves = getPossibleMoves( examineBoard );
 
     /* ---------------------------- Maximizing Player --------------------------- */
     if ( maximizingPlayer ) {
@@ -81,9 +86,10 @@ int Search::alphaBeta( const Board& examineBoard, int depth, int alpha, int beta
 
             // We found a legal move, the game is not over.
             isEndOfTheGame = false;
-            int eval = alphaBeta( board, depth - 1, alpha, beta, false );
+            int eval = alphaBeta( board, depth - 1, alpha, beta, false, nodesExamined, nodesEvaluated, nodesPruned );
             alpha = std::max( alpha, eval );
             if ( beta <= alpha ) {
+                nodesPruned++;
                 break;
             }
         }
@@ -104,9 +110,10 @@ int Search::alphaBeta( const Board& examineBoard, int depth, int alpha, int beta
             }
 
             isEndOfTheGame = false;
-            int eval = alphaBeta( board, depth - 1, alpha, beta, true );
+            int eval = alphaBeta( board, depth - 1, alpha, beta, true, nodesExamined, nodesEvaluated, nodesPruned );
             beta = std::min( beta, eval );
             if ( beta <= alpha ) {
+                nodesPruned++;
                 break;
             }
         }
@@ -140,14 +147,15 @@ int Search::endOfTheGameScore( const Board& board ) const {
 }
 
 /**
- * Generates a list of pseudo evaluated possible moves sorted by highest scored first.
+ * Generates a list of pseudo evaluated possible moves for the given board.
  * Pseudo evaluation tries to guess which moves are the most promising, so they can be searched first.
+ * Moves score for black is negative and for white is positive (black' best move is -inf).
  * It assumes that the board has valid moves calculated.
  * Considerations: captures only (TODO: promotion, enpassant, castling and piece's first move).
  *
  * @param board Board to examine, it has to have valid moves calculated.
  *
- * @return vector of pseudo evaluated moves for the current board sorted by highest scored first.
+ * @return vector of pseudo evaluated moves for the current board.
  */
 std::vector<MoveContent> Search::getPossibleMoves( const Board& board ) const {
     std::vector<MoveContent> moves;
@@ -171,10 +179,10 @@ std::vector<MoveContent> Search::getPossibleMoves( const Board& board ) const {
                 move.score += pieceTaken->attackedValue - pieceTaken->defendedValue;  // Highest value attacked
             }
 
+            if ( board.sideToMove == BLACK ) move.score = -move.score;
             moves.push_back( move );
         }
     }
 
-    std::sort( moves.begin(), moves.end(), []( MoveContent m1, MoveContent m2 ) { return m1.score > m2.score; } );
     return moves;
 }

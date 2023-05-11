@@ -17,13 +17,15 @@ public:
     Search( Search& ) = delete;
     Search( Search&& ) = delete;
 
-    MoveContent getBestMove( const Board& examineBoard, int maxDepth, bool maximizingPlayer ) const;
+    MoveContent getBestMove( const Board& examineBoard, int maxDepth, bool maximizingPlayer, int nodesExamined = 0,
+                             int nodesEvaluated = 0, int nodesPruned = 0 ) const;
     std::vector<MoveContent> getPossibleMoves( const Board& board ) const;
 
 private:
     mutable PieceValidMoves generator;
 
-    int alphaBeta( const Board& examineBoard, int depth, int alpha, int beta, bool maximizingPlayer ) const;
+    int alphaBeta( const Board& examineBoard, int depth, int alpha, int beta, bool maximizingPlayer, int& nodesExamined,
+                   int& nodesEvaluated, int& nodesPruned ) const;
     int quiescentSearch( const Board& board, int alpha, int beta, bool maximizingPlayer ) const;
 
     int endOfTheGameScore( const Board& board ) const;

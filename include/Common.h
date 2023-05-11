@@ -13,12 +13,12 @@ enum PieceColor { WHITE, BLACK };
 
 enum PieceType {
     EMPTY,
-    ROOK,
+    PAWN,
     KNIGHT,
     BISHOP,
+    ROOK,
     QUEEN,
     KING,
-    PAWN,
 };
 
 /* -------------------------------- CONSTANTS ------------------------------- */
@@ -39,7 +39,7 @@ auto const KING_ACTION_VALUE = 1;
 
 auto const NULL_SQUARE = 64;
 
-auto const CAPTURE_MOVE_REWARD = 1;
+auto const CAPTURE_MOVE_REWARD = 2;
 
 /* --------------------------- BOARD POSITION MAPS -------------------------- */
 

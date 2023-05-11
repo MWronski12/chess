@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iostream>
 #include <limits>
 
 #include "Search.h"
@@ -18,6 +19,13 @@ MoveContent Search::getBestMove( const Board& examineBoard, int maxDepth, bool m
     MoveContent bestMove;
     bestMove.score = maximizingPlayer ? NEGATIVE_INFINITY : POSITIVE_INFINITY;
     std::vector<MoveContent> possibleMoves = getPossibleMoves( examineBoard );
+
+    std::cout << "Move scores:" << std::endl;
+    for ( auto& m : possibleMoves ) {
+        std::cout << "pieceMvoing: " << m.pieceMoving << " src: " << (int)m.src << " dest " << (int)m.dest
+                  << " score: " << m.score << std::endl;
+    }
+
     auto compare = maximizingPlayer ? MoveContent::compareMax : MoveContent::compareMin;
 
     // Perform iterative deepening search
@@ -35,9 +43,16 @@ MoveContent Search::getBestMove( const Board& examineBoard, int maxDepth, bool m
             move.score = alphaBeta( board, depth, NEGATIVE_INFINITY, POSITIVE_INFINITY, !maximizingPlayer,
                                     nodesExamined, nodesEvaluated, nodesPruned );
 
+            // Found a better move
             if ( ( maximizingPlayer && move.score > bestMove.score ) ||
                  ( !maximizingPlayer && move.score < bestMove.score ) ) {
                 bestMove = move;
+            }
+
+            // Found a forced mate
+            if ( ( maximizingPlayer && bestMove.score == POSITIVE_INFINITY ) ||
+                 ( !maximizingPlayer && bestMove.score == NEGATIVE_INFINITY ) ) {
+                return bestMove;
             }
         }
         // TODO: Should be possible to terminate the search at any given time
@@ -45,6 +60,11 @@ MoveContent Search::getBestMove( const Board& examineBoard, int maxDepth, bool m
         //     break;
         // }
     }
+
+    std::cout << "Nodes examined: " << nodesExamined << std::endl;
+    std::cout << "Nodes evaluated: " << nodesEvaluated << std::endl;
+    std::cout << "Nodes pruned: " << nodesPruned << std::endl;
+
     return bestMove;
 }
 
@@ -93,7 +113,7 @@ int Search::alphaBeta( const Board& examineBoard, int depth, int alpha, int beta
                 break;
             }
         }
-        if ( isEndOfTheGame ) return endOfTheGameScore( examineBoard );
+        if ( isEndOfTheGame ) return NEGATIVE_INFINITY;
 
         return alpha;
     }
@@ -117,7 +137,7 @@ int Search::alphaBeta( const Board& examineBoard, int depth, int alpha, int beta
                 break;
             }
         }
-        if ( isEndOfTheGame ) return endOfTheGameScore( examineBoard );
+        if ( isEndOfTheGame ) return POSITIVE_INFINITY;
 
         return beta;
     }

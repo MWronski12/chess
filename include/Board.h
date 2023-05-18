@@ -31,14 +31,6 @@ public:
     void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY );
     void makeMove( std::string move );  // d2d4 notation (d7d8Q for promotion)
 
-    // Castling rights methods
-    bool whiteCanCastle() const;
-    bool whiteCanCastleKingSide() const;
-    bool whiteCanCastleQueenSide() const;
-    bool blackCanCastle() const;
-    bool blackCanCastleKingSide() const;
-    bool blackCanCastleQueenSide() const;
-
     std::string toFEN() const;
 
 private:
@@ -53,6 +45,14 @@ private:
     void handleEnPassant();
     void handleCastling( SquareIndex src, SquareIndex dest );
     void handlePromotion( SquareIndex src, PieceType promotion );
+
+    // Castling rights methods
+    bool whiteCanCastle() const;
+    bool whiteCanCastleKingSide() const;
+    bool whiteCanCastleQueenSide() const;
+    bool blackCanCastle() const;
+    bool blackCanCastleKingSide() const;
+    bool blackCanCastleQueenSide() const;
 };
 
 #endif

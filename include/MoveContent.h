@@ -24,8 +24,7 @@ public:
     int score;
 
     // TODO:
-    std::string toPGN() const;
-    std::string toSAN() const;  // D2D4, D7D8Q, d2d4, d7d8r
+    std::string toString() const;  // D2D4, D7D8Q, d2d4, d7d8r
 
     static int compareMin( const MoveContent &m1, const MoveContent &m2 );
     static int compareMax( const MoveContent &m1, const MoveContent &m2 );

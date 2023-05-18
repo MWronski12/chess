@@ -66,6 +66,7 @@ private:
 /* ------------------------------------------------------------------------------------------------------------------ */
 /*                                                     Console Gui                                                    */
 /* ------------------------------------------------------------------------------------------------------------------ */
+
 class ConsoleGui : public Gui {
 public:
     ConsoleGui() : engine_( Engine() ) {}
@@ -207,8 +208,8 @@ private:
 
         std::cout << "  A  B  C  D  E  F  G  H\r\n";
         std::cout << "Player to move: " << ( engine_.board.sideToMove == WHITE ? "White" : "Black" ) << "\r\n";
-        std::cout << "Best move: " << ( engine_.getBestMove() ) << "\r\n";
-        std::cout << "Evaluation: " << ( engine_.getEvaluation() ) << "\r\n";
+        std::cout << "Best move: " << ( engine_.getBestMove().toString() ) << "\r\n";
+        std::cout << "Evaluation: " << ( engine_.board.score ) << "\r\n";
         std::cout << "\n\n";
     }
 };

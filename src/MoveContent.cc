@@ -23,19 +23,17 @@ bool MoveContent::operator==( const MoveContent& other ) const {
     return src == other.src && dest == other.dest && promotion == other.promotion;
 }
 
-// TODO
-std::string MoveContent::toPGN() const { return "O-O-O"; }
-std::string MoveContent::toSAN() const {
-    std::string san = "";
-    san += (char)( 'a' + ( src % 8 ) );
-    san += (char)( '1' + ( 7 - src / 8 ) );
-    san += (char)( 'a' + ( dest % 8 ) );
-    san += (char)( '1' + ( 7 - dest / 8 ) );
+std::string MoveContent::toString() const {
+    std::string str = "";
+    str += (char)( 'a' + ( src % 8 ) );
+    str += (char)( '1' + ( 7 - src / 8 ) );
+    str += (char)( 'a' + ( dest % 8 ) );
+    str += (char)( '1' + ( 7 - dest / 8 ) );
     if ( promotion != EMPTY ) {
-        san += (char)( 'a' + ( promotion % 8 ) );
-        san += (char)( '1' + ( promotion / 8 ) );
+        str += (char)( 'a' + ( promotion % 8 ) );
+        str += (char)( '1' + ( promotion / 8 ) );
     }
-    return san;
+    return str;
 }
 
 int MoveContent::compareMin( const MoveContent& m1, const MoveContent& m2 ) { return m1.score < m2.score; }

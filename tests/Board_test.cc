@@ -202,9 +202,6 @@ TEST_CASE( "Board serializes and deserializes properly to fen", "Board::Board(st
     // Enpassant
     REQUIRE( board2.enPassantSquare == board.enPassantSquare );
 
-    // Castling rights
-    REQUIRE( board2.whiteCanCastleKingSide() == board.whiteCanCastleKingSide() );
-    REQUIRE( board2.whiteCanCastleQueenSide() == board.whiteCanCastleQueenSide() );
-    REQUIRE( board2.blackCanCastleKingSide() == board.blackCanCastleKingSide() );
-    REQUIRE( board2.blackCanCastleQueenSide() == board.blackCanCastleQueenSide() );
+    std::string fen2 = board2.toFEN();
+    REQUIRE( fen2 == fen );
 }

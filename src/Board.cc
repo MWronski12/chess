@@ -215,7 +215,6 @@ std::string Board::toFEN() const {
             fen << '/';
         }
     }
-
     fen << ' ';
 
     // Active color
@@ -487,8 +486,6 @@ bool Board::whiteCanCastleKingSide() const {
     if ( king->hasMoved ) return false;
     // Rook is gone or already moved
     if ( !squares[63] || squares[63]->type != ROOK || squares[63]->hasMoved ) return false;
-    // Squares between king and rook are occupied
-    if ( squares[61] || squares[62] ) return false;
     return true;
 }
 
@@ -500,8 +497,6 @@ bool Board::whiteCanCastleQueenSide() const {
     if ( king->hasMoved ) return false;
     // Rook is gone or already moved
     if ( !squares[56] || squares[56]->type != ROOK || squares[56]->hasMoved ) return false;
-    // Squares between king and rook are occupied
-    if ( squares[57] || squares[58] || squares[59] ) return false;
     return true;
 }
 
@@ -515,8 +510,6 @@ bool Board::blackCanCastleKingSide() const {
     if ( king->hasMoved ) return false;
     // Rook is gone or already moved
     if ( !squares[7] || squares[7]->type != ROOK || squares[7]->hasMoved ) return false;
-    // Squares between king and rook are occupied
-    if ( squares[5] || squares[6] ) return false;
     return true;
 }
 
@@ -528,7 +521,5 @@ bool Board::blackCanCastleQueenSide() const {
     if ( king->hasMoved ) return false;
     // Rook is gone or already moved
     if ( !squares[0] || squares[0]->type != ROOK || squares[0]->hasMoved ) return false;
-    // Squares between king and rook are occupied
-    if ( squares[1] || squares[2] || squares[3] ) return false;
     return true;
 }

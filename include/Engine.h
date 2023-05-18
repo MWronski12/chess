@@ -20,7 +20,7 @@ public:
 
     // Methods
     bool makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY );
-    MoveContent getBestMove( int maxDepth = 10, int timeoutSeconds = 5 ) const;
+    MoveContent getBestMove( int maxDepth = 100, int timeoutSeconds = 5 ) const;
 
 private:
     Search search_;

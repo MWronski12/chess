@@ -27,6 +27,36 @@ TEST_CASE( "Search finds the corect move for 1 ply fool's mate position for whit
     REQUIRE( bestMove.dest == 13 );
 }
 
+/* ----------------------------- quiescentSearch ---------------------------- */
+
+TEST_CASE( "getPossibleCaptureMoves returns correctly sorted capture moves ", "[Search.getPossibleCaptureMoves]" ) {
+    Search s;
+    Board b( "4n3/3bQp2/3qr3/8/8/8/8/k1K5 w - - 0 1" );
+    PieceValidMoves g;
+    g.generateValidMoves( b );
+    auto moves = s.getPossibleCaptureMoves( b );
+    REQUIRE( moves.size() == 5 );             // 5 captures
+    REQUIRE( moves[0].pieceTaken == QUEEN );  // Highest value attacked first
+    REQUIRE( moves[1].pieceTaken == ROOK );
+    REQUIRE( moves[2].pieceTaken == BISHOP );
+    REQUIRE( moves[3].pieceTaken == KNIGHT );
+    REQUIRE( moves[4].pieceTaken == PAWN );
+}
+
+TEST_CASE( "quiescentSearch returns evaluation of a quiet position ", "[Search.quiescentSearch]" ) {
+    Search s;
+    Board b( "k7/8/8/8/8/8/6K1/6n1 w - - 0 1" );
+    PieceValidMoves g;
+    g.generateValidMoves( b );
+    int nodesExamined = 0, nodesEvaluated = 0, nodesPruned = 0;
+    int quietEval = s.quiescentSearch( b, 5, NEGATIVE_INFINITY, POSITIVE_INFINITY, true, nodesExamined, nodesEvaluated,
+                                       nodesPruned );
+    REQUIRE( quietEval == 10 );
+    REQUIRE( nodesExamined == 2 );
+    REQUIRE( nodesEvaluated == 1 );
+    REQUIRE( nodesPruned == 0 );
+}
+
 /* --------------------------------------------- testcases from internet -------------------------------------------- */
 
 TEST_CASE( "Don't stalemate if you can win", "[search]" ) {

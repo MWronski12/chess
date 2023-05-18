@@ -7,10 +7,7 @@
 using namespace std;
 
 int main() {
-    // Gui *gui = new ConsoleGui();
-    // gui->start();
-
-    Board b;
-    cout << b.toFEN() << endl;
+    Gui *gui = new ConsoleGui();
+    gui->start();
     return 0;
 }

@@ -60,6 +60,13 @@ MoveContent Search::getBestMove( const Board& examineBoard, int maxDepth, bool m
                 return bestMove;
             }
         }
+
+        // Break if it passed more than timeout seconds since start
+        auto end = std::chrono::steady_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::seconds>( end - start ).count();
+        if ( duration >= timeout ) {
+            break;
+        }
     }
 
     std::cout << "Nodes examined: " << nodesExamined << std::endl;
@@ -212,4 +219,107 @@ std::vector<MoveContent> Search::getPossibleMoves( const Board& board ) const {
     }
 
     return moves;
+}
+
+/**
+ * Generates a list of available capture moves for the given board.
+ * Moves are sorted such that captueres of highest value piece with lowest value piece are first.
+ *
+ * @param board Board to examine, it has to have valid moves calculated.
+ *
+ * @return vector of available capture moves for the given Board sorted by score.
+ */
+std::vector<MoveContent> Search::getPossibleCaptureMoves( const Board& board ) const {
+    std::vector<MoveContent> moves;
+
+    for ( SquareIndex srcSquare = 0; srcSquare < 64; srcSquare++ ) {
+        const auto& pieceMoving = board.squares[srcSquare];
+        if ( pieceMoving == std::nullopt || pieceMoving->color != board.sideToMove ) continue;
+
+        for ( auto destSquare : pieceMoving->validMoves ) {
+            const auto& pieceTaken = board.squares[destSquare];
+            if ( pieceTaken ) {
+                MoveContent move;
+                move.src = srcSquare;
+                move.dest = destSquare;
+                move.pieceMoving = pieceMoving->type;
+                move.pieceTaken = pieceTaken->type;
+                if ( pieceMoving->type == PAWN && ( destSquare < 8 || destSquare > 55 ) ) {
+                    move.promotion = QUEEN;
+                }
+                // Prefer capturing higher value pieces with lower value pieces.
+                move.score = pieceTaken->value - pieceMoving->value;
+                moves.push_back( move );
+            }
+        }
+    }
+
+    std::sort( moves.begin(), moves.end(), MoveContent::compareMax );
+    return moves;
+}
+
+/**
+ * Calculates the score for the current board and player, recursively searching the game tree.
+ *
+ * @param board position to examine.
+ * @param depth maximum depth of search.
+ * @param alpha maximizing player best score.
+ * @param beta minimizing player best score.
+ * @param maximizingPlayer true if the current player is WHITE, false if BLACK.
+ *
+ * @return int score for the current board and player.
+ */
+int Search::quiescentSearch( const Board& examineBoard, int depth, int alpha, int beta, bool maximizingPlayer,
+                             int& nodesExamined, int& nodesEvaluated, int& nodesPruned ) const {
+    nodesExamined++;
+    std::vector<MoveContent> possibleCaptureMoves = getPossibleCaptureMoves( examineBoard );
+
+    if ( depth == 0 || possibleCaptureMoves.empty() ) {
+        nodesEvaluated++;
+        return Evaluation::evaluateBoard( examineBoard );
+    }
+
+    /* ---------------------------- Maximizing Player --------------------------- */
+    if ( maximizingPlayer ) {
+        for ( auto move : possibleCaptureMoves ) {
+            auto board = examineBoard;
+            board.makeMove( move.src, move.dest, move.promotion );
+            generator.generateValidMoves( board );
+            if ( !generator.validateBoard( board ) ) {
+                continue;
+            }
+
+            // We found a legal move, the game is not over.
+            int eval =
+                quiescentSearch( board, depth - 1, alpha, beta, false, nodesExamined, nodesEvaluated, nodesPruned );
+            alpha = std::max( alpha, eval );
+            if ( beta <= alpha ) {
+                nodesPruned++;
+                break;
+            }
+        }
+
+        return alpha;
+    }
+    /* ---------------------------- Minimizing player --------------------------- */
+    else {
+        for ( auto move : possibleCaptureMoves ) {
+            auto board = examineBoard;
+            board.makeMove( move.src, move.dest, move.promotion );
+            generator.generateValidMoves( board );
+            if ( !generator.validateBoard( board ) ) {
+                continue;
+            }
+
+            int eval =
+                quiescentSearch( board, depth - 1, alpha, beta, true, nodesExamined, nodesEvaluated, nodesPruned );
+            beta = std::min( beta, eval );
+            if ( beta <= alpha ) {
+                nodesPruned++;
+                break;
+            }
+        }
+
+        return beta;
+    }
 }

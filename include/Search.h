@@ -20,8 +20,7 @@ public:
     Search( Search& ) = delete;
     Search( Search&& ) = delete;
 
-    MoveContent getBestMove( const Board& examineBoard, int maxDepth, bool maximizingPlayer, int timeout = 5,
-                             int nodesExamined = 0, int nodesEvaluated = 0, int nodesPruned = 0 ) const;
+    MoveContent getBestMove( const Board& examineBoard, int maxDepth, bool maximizingPlayer, int timeout = 5 ) const;
     std::vector<MoveContent> getPossibleMoves( const Board& board ) const;
 
     std::vector<MoveContent> getPossibleCaptureMoves( const Board& board ) const;
@@ -33,7 +32,8 @@ private:
     mutable PieceValidMoves generator;
 
     int alphaBeta( const Board& examineBoard, int depth, int alpha, int beta, bool maximizingPlayer, int& nodesExamined,
-                   int& nodesEvaluated, int& nodesPruned ) const;
+                   int& nodesEvaluated, int& nodesPruned, int& nodesExaminedQ, int& nodesEvaluatedQ,
+                   int& nodesPrunedQ ) const;
 
     int endOfTheGameScore( const Board& board ) const;
 };

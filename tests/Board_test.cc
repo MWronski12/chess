@@ -23,10 +23,7 @@ TEST_CASE( "Board constructs correct starting position by default", "[Board::Boa
     REQUIRE( board.enPassantSquare == NULL_SQUARE );
     REQUIRE( board.sideToMove == WHITE );
     REQUIRE( board.whiteIsChecked == false );
-    REQUIRE( board.blackIsChecked == false );
-    REQUIRE( board.whiteIsCheckMated == false );
-    REQUIRE( board.blackIsCheckMated == false );
-    REQUIRE( board.staleMate == false );
+    REQUIRE( board.gameResult == IN_PROGRESS );
     REQUIRE( board.score == 0 );
 }
 
@@ -34,15 +31,15 @@ TEST_CASE( "Board constructs correct starting position by default", "[Board::Boa
 
 TEST_CASE( "Cannot make move when the game is over!", "[Board::Validate()]" ) {
     Board board;
-    board.staleMate = true;
+    board.gameResult = DRAW;
     REQUIRE_THROWS_AS( board.makeMove( 55, 47, EMPTY ), std::logic_error );
 
     board = Board();
-    board.blackIsCheckMated = true;
+    board.gameResult = WHITE_WON;
     REQUIRE_THROWS_AS( board.makeMove( 55, 47, EMPTY ), std::logic_error );
 
     board = Board();
-    board.whiteIsCheckMated = true;
+    board.gameResult = BLACK_WON;
     REQUIRE_THROWS_AS( board.makeMove( 55, 47, EMPTY ), std::logic_error );
 }
 

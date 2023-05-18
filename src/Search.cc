@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <chrono>
 #include <iostream>
 #include <limits>
 
@@ -14,22 +15,19 @@
  *
  * @return MoveContent representing the best move for the current player.
  */
-MoveContent Search::getBestMove( const Board& examineBoard, int maxDepth, bool maximizingPlayer, int nodesExamined,
-                                 int nodesEvaluated, int nodesPruned ) const {
+MoveContent Search::getBestMove( const Board& examineBoard, int maxDepth, bool maximizingPlayer, int timeout,
+                                 int nodesExamined, int nodesEvaluated, int nodesPruned ) const {
+    auto start = std::chrono::steady_clock::now();
+
     MoveContent bestMove;
     bestMove.score = maximizingPlayer ? NEGATIVE_INFINITY : POSITIVE_INFINITY;
     std::vector<MoveContent> possibleMoves = getPossibleMoves( examineBoard );
 
-    std::cout << "Move scores:" << std::endl;
-    for ( auto& m : possibleMoves ) {
-        std::cout << "pieceMvoing: " << m.pieceMoving << " src: " << (int)m.src << " dest " << (int)m.dest
-                  << " score: " << m.score << std::endl;
-    }
-
     auto compare = maximizingPlayer ? MoveContent::compareMax : MoveContent::compareMin;
 
     // Perform iterative deepening search
-    for ( int depth = 1; depth <= maxDepth; depth++ ) {
+    int depth = 1;
+    for ( ; depth <= maxDepth; depth++ ) {
         std::sort( possibleMoves.begin(), possibleMoves.end(), compare );
 
         for ( auto move : possibleMoves ) {
@@ -38,6 +36,13 @@ MoveContent Search::getBestMove( const Board& examineBoard, int maxDepth, bool m
             generator.generateValidMoves( board );
             if ( !generator.validateBoard( board ) ) {
                 continue;
+            }
+
+            // Break if it passed more than timeout seconds since start
+            auto end = std::chrono::steady_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::seconds>( end - start ).count();
+            if ( duration >= timeout ) {
+                break;
             }
 
             move.score = alphaBeta( board, depth, NEGATIVE_INFINITY, POSITIVE_INFINITY, !maximizingPlayer,
@@ -55,15 +60,12 @@ MoveContent Search::getBestMove( const Board& examineBoard, int maxDepth, bool m
                 return bestMove;
             }
         }
-        // TODO: Should be possible to terminate the search at any given time
-        // if ( timeIsUp() ) {
-        //     break;
-        // }
     }
 
     std::cout << "Nodes examined: " << nodesExamined << std::endl;
     std::cout << "Nodes evaluated: " << nodesEvaluated << std::endl;
     std::cout << "Nodes pruned: " << nodesPruned << std::endl;
+    std::cout << "Depth searched: " << depth << std::endl;
 
     return bestMove;
 }
@@ -113,7 +115,7 @@ int Search::alphaBeta( const Board& examineBoard, int depth, int alpha, int beta
                 break;
             }
         }
-        if ( isEndOfTheGame ) return NEGATIVE_INFINITY;
+        if ( isEndOfTheGame ) return endOfTheGameScore( examineBoard );
 
         return alpha;
     }
@@ -137,7 +139,7 @@ int Search::alphaBeta( const Board& examineBoard, int depth, int alpha, int beta
                 break;
             }
         }
-        if ( isEndOfTheGame ) return POSITIVE_INFINITY;
+        if ( isEndOfTheGame ) return endOfTheGameScore( examineBoard );
 
         return beta;
     }
@@ -169,7 +171,7 @@ int Search::endOfTheGameScore( const Board& board ) const {
 /**
  * Generates a list of pseudo evaluated possible moves for the given board.
  * Pseudo evaluation tries to guess which moves are the most promising, so they can be searched first.
- * Moves score for black is negative and for white is positive (black' best move is -inf).
+ * Moves score for black is negative and for white is positive (black's best move is -inf).
  * It assumes that the board has valid moves calculated.
  * Considerations: captures only (TODO: promotion, enpassant, castling and piece's first move).
  *
@@ -186,9 +188,14 @@ std::vector<MoveContent> Search::getPossibleMoves( const Board& board ) const {
 
         MoveContent move;
         move.src = srcSquare;
+        move.pieceMoving = pieceMoving->type;
+
         for ( auto destSquare : pieceMoving->validMoves ) {
             move.dest = destSquare;
-            move.pieceMoving = pieceMoving->type;
+            if ( pieceMoving->type == PAWN && ( destSquare < 8 || destSquare > 55 ) ) {
+                move.promotion = QUEEN;
+            }
+
             const auto& pieceTaken = board.squares[destSquare];
             pieceTaken ? move.pieceTaken = pieceTaken->type : move.pieceTaken = EMPTY;
 

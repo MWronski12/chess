@@ -14,7 +14,7 @@ WindowGui::WindowGui( Board& b ) : window( VideoMode( 504, 504 ), "The Chess!" )
     sBoard = Sprite( t2 );
 
     loadPosition();
-};
+}
 
 void WindowGui::loadPosition() {
     int k = 0;

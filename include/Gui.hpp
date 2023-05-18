@@ -68,10 +68,10 @@ private:
 /* ------------------------------------------------------------------------------------------------------------------ */
 class ConsoleGui : public Gui {
 public:
-    ConsoleGui() : engine( Engine() ) {}
+    ConsoleGui() : engine_( Engine() ) {}
 
     void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY ) override {
-        auto& piece = engine.board->squares[src];
+        auto& piece = engine_.board.squares[src];
 
         // Assert move is a pseudo valid move
         if ( std::find( piece->validMoves.cbegin(), piece->validMoves.cend(), dest ) == piece->validMoves.cend() ) {
@@ -79,7 +79,7 @@ public:
         }
 
         // Assert move is a fully valid move
-        if ( engine.makeMove( src, dest, promotion ) == false ) {
+        if ( engine_.makeMove( src, dest, promotion ) == false ) {
             throw std::logic_error( "Move leaves the king in check!" );
         };
 
@@ -146,7 +146,7 @@ public:
     }
 
 private:
-    Engine engine;
+    Engine engine_;
 
     char pieceToChar( PieceColor color, PieceType type ) const {
         char result;
@@ -189,14 +189,12 @@ private:
     }
 
     void draw() const {
-        std::cout << "\n\n";
-
         for ( int i = 0; i < 64; i++ ) {
             if ( i % 8 == 0 ) {
                 std::cout << ( 64 - i ) / 8 << " ";
             }
-            if ( engine.board->squares[i] ) {
-                std::cout << pieceToChar( engine.board->squares[i]->color, engine.board->squares[i]->type );
+            if ( engine_.board.squares[i] ) {
+                std::cout << pieceToChar( engine_.board.squares[i]->color, engine_.board.squares[i]->type );
             } else {
                 std::cout << '-';
             }
@@ -208,5 +206,9 @@ private:
         }
 
         std::cout << "  A  B  C  D  E  F  G  H\r\n";
+        std::cout << "Player to move: " << ( engine_.board.sideToMove == WHITE ? "White" : "Black" ) << "\r\n";
+        std::cout << "Best move: " << ( engine_.getBestMove() ) << "\r\n";
+        std::cout << "Evaluation: " << ( engine_.getEvaluation() ) << "\r\n";
+        std::cout << "\n\n";
     }
 };

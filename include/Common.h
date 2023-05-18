@@ -21,6 +21,8 @@ enum PieceType {
     KING,
 };
 
+enum GameResult { WHITE_WON, BLACK_WON, DRAW, IN_PROGRESS };
+
 /* -------------------------------- CONSTANTS ------------------------------- */
 
 auto const PAWN_VALUE = 100;

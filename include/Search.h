@@ -1,3 +1,6 @@
+#ifndef SEARCH_H
+#define SEARCH_H
+
 #include <algorithm>
 #include <limits>
 #include <vector>
@@ -17,8 +20,8 @@ public:
     Search( Search& ) = delete;
     Search( Search&& ) = delete;
 
-    MoveContent getBestMove( const Board& examineBoard, int maxDepth, bool maximizingPlayer, int nodesExamined = 0,
-                             int nodesEvaluated = 0, int nodesPruned = 0 ) const;
+    MoveContent getBestMove( const Board& examineBoard, int maxDepth, bool maximizingPlayer, int timeout = 5,
+                             int nodesExamined = 0, int nodesEvaluated = 0, int nodesPruned = 0 ) const;
     std::vector<MoveContent> getPossibleMoves( const Board& board ) const;
 
 private:
@@ -30,3 +33,5 @@ private:
 
     int endOfTheGameScore( const Board& board ) const;
 };
+
+#endif  // SEARCH_H

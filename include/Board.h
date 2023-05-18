@@ -20,10 +20,8 @@ public:
     bool blackIsChecked;
     bool whiteHasCastled;
     bool blackHasCastled;
-    bool whiteIsCheckMated;
-    bool blackIsCheckMated;
-    bool staleMate;
     int score;
+    GameResult gameResult;
     PieceColor sideToMove;
     MoveContent lastMove;
     SquareIndex enPassantSquare;

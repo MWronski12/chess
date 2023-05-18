@@ -8,11 +8,10 @@
  * Date: 24.03.2023
  */
 
-#include "Board.h"
-
 #include <iostream>
 #include <stdexcept>
 
+#include "Board.h"
 
 /* ------------------------------ Constructors ------------------------------ */
 
@@ -22,10 +21,8 @@ Board::Board()
       blackIsChecked( false ),
       whiteHasCastled( false ),
       blackHasCastled( false ),
-      whiteIsCheckMated( false ),
-      blackIsCheckMated( false ),
-      staleMate( false ),
       score( 0 ),
+      gameResult( IN_PROGRESS ),
       sideToMove( WHITE ),
       lastMove( MoveContent() ),
       enPassantSquare( NULL_SQUARE ),
@@ -51,10 +48,8 @@ Board::Board()
 Board::Board( std::string fen )
     : whiteIsChecked( false ),
       blackIsChecked( false ),
-      whiteIsCheckMated( false ),
-      blackIsCheckMated( false ),
-      staleMate( false ),
       score( 0 ),
+      gameResult( IN_PROGRESS ),
       threefoldRepetitionCounter_( 0 ) {
     /* ------------------------ Board squares description ----------------------- */
     int numOfSlashes = 0;         // Should be exactly 7 slashes
@@ -244,7 +239,7 @@ void Board::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) {
     if ( pieceMoving != PAWN && pieceTaken == EMPTY ) {
         fiftyMoveCounter_++;
         if ( fiftyMoveCounter_ == 50 ) {
-            staleMate = true;
+            gameResult = DRAW;
             return;
         }
     } else {
@@ -319,7 +314,7 @@ bool Board::enPassantIsAvailable() const {
 // - promotion is not EMPTY only if this is a promoting move
 void Board::validateMove( SquareIndex src, SquareIndex dest, PieceType promotion ) const {
     // Check if game is over
-    if ( staleMate || blackIsCheckMated || whiteIsCheckMated ) {
+    if ( gameResult != IN_PROGRESS ) {
         throw std::logic_error( "The game is already over!" );
     }
     // Validate square indices

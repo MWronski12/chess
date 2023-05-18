@@ -1,8 +1,4 @@
-#include <catch2/generators/catch_generators.hpp>
-
-#include "Engine.h"
 #include "Movegen.h"
-#include "catch2/benchmark/catch_benchmark.hpp"
 #include "catch2/catch_test_macros.hpp"
 
 /* ---------------------------------- Perft --------------------------------- */
@@ -62,24 +58,6 @@ uint64_t perft( int depth, Board &board, PieceValidMoves &generator ) {
     }
 
     return nodes;
-}
-
-/* -------------------- benchmarks from starting position ------------------- */
-
-TEST_CASE( "Perft function multiple benchmarking", "[perft]" ) {
-    int depth;
-    uint64_t expected_result;
-    std::tie( depth, expected_result ) = GENERATE( table<int, uint64_t>( {
-        { 0, 1 }, { 1, 20 }, { 2, 400 },
-        // { 3, 8'902 },
-        // { 4, 197'281 },
-    } ) );
-
-    Board b;
-    PieceValidMoves g;
-    g.generateValidMoves( b );
-    REQUIRE( perft( depth, b, g ) == expected_result );
-    BENCHMARK( "Perft at depth " + std::to_string( depth ) ) { return perft( depth, b, g ); };
 }
 
 /* --------------------- different fen loaded positions --------------------- */

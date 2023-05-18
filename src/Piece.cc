@@ -47,6 +47,37 @@ Piece::Piece( char piece ) : hasMoved( false ), attackedValue( 0 ), defendedValu
     actionValue = calculatePieceActionValue( type );
 }
 
+std::string Piece::toString() const {
+    std::string pieceString;
+    switch ( type ) {
+        case PAWN:
+            pieceString = "p";
+            break;
+        case KNIGHT:
+            pieceString = "n";
+            break;
+        case BISHOP:
+            pieceString = "b";
+            break;
+        case ROOK:
+            pieceString = "r";
+            break;
+        case QUEEN:
+            pieceString = "q";
+            break;
+        case KING:
+            pieceString = "k";
+            break;
+        default:
+            throw std::logic_error( "Invalid piece type!" );
+    }
+    if ( color == WHITE ) {
+        pieceString = toupper( pieceString[0] );
+    }
+
+    return pieceString;
+}
+
 /* ----------------------------- Helper methods ----------------------------- */
 
 int Piece::calculatePieceValue( PieceType piece ) {

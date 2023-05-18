@@ -12,6 +12,8 @@ add_executable(tests Search_test.cc Piece_test.cc Board_test.cc PieceMoves_test.
 target_link_libraries(tests engine)
 target_link_libraries(tests Catch2::Catch2WithMain)
 
+add_subdirectory(benchmarks)
+
 include(CTest)
 include(Catch)
 catch_discover_tests(tests)

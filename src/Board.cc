@@ -8,8 +8,9 @@
  * Date: 24.03.2023
  */
 
-#include <iostream>
+#include <sstream>
 #include <stdexcept>
+#include <string>
 
 #include "Board.h"
 
@@ -26,6 +27,7 @@ Board::Board()
       sideToMove( WHITE ),
       lastMove( MoveContent() ),
       enPassantSquare( NULL_SQUARE ),
+      fullMoveCounter_( 1 ),
       fiftyMoveCounter_( 0 ),
       threefoldRepetitionCounter_( 0 ) {
     for ( SquareIndex i = 0; i < 64; i++ ) {
@@ -164,11 +166,12 @@ Board::Board( std::string fen )
     fiftyMoveCounter_ = std::stoi( fiftyMoveCount );
     if ( it == fen.cend() ) throw std::invalid_argument( "Invalid FEN notation - turn count required" );
 
-    /* ------------------------------- turn count ------------------------------- */
-    std::string turnCount;
+    /* ---------------------------- full move counter --------------------------- */
+    std::string fullMoveCount;
     while ( ++it != fen.cend() ) {
-        turnCount += *it;
+        fullMoveCount += *it;
     }
+    fullMoveCounter_ = std::stoi( fullMoveCount );
 }
 
 Board Board::fastCopy() const {
@@ -186,6 +189,74 @@ Board Board::fastCopy() const {
         }
     }
     return copy;
+}
+
+std::string Board::toFEN() const {
+    std::stringstream fen;
+
+    // Piece positions
+    for ( int rank = 0; rank < 8; rank++ ) {
+        int emptySquares = 0;
+        for ( int file = 0; file < 8; file++ ) {
+            if ( squares[rank * 8 + file] == std::nullopt ) {
+                emptySquares++;
+            } else {
+                if ( emptySquares > 0 ) {
+                    fen << emptySquares;
+                    emptySquares = 0;
+                }
+                fen << squares[rank * 8 + file]->toString();
+            }
+        }
+        if ( emptySquares > 0 ) {
+            fen << emptySquares;
+        }
+        if ( rank < 7 ) {
+            fen << '/';
+        }
+    }
+
+    fen << ' ';
+
+    // Active color
+    fen << ( sideToMove == WHITE ? 'w' : 'b' );
+    fen << ' ';
+
+    // Castling availability
+    if ( !whiteCanCastle() && !blackCanCastle() ) {
+        fen << '-';
+    } else {
+        if ( whiteCanCastleKingSide() ) {
+            fen << 'K';
+        }
+        if ( whiteCanCastleQueenSide() ) {
+            fen << 'Q';
+        }
+        if ( blackCanCastleKingSide() ) {
+            fen << 'k';
+        }
+        if ( blackCanCastleQueenSide() ) {
+            fen << 'q';
+        }
+    }
+    fen << ' ';
+
+    // En passant target square
+    if ( enPassantSquare != NULL_SQUARE ) {
+        fen << static_cast<char>( 'a' + ( enPassantSquare % 8 ) );
+        fen << static_cast<char>( '1' + ( enPassantSquare / 8 ) );
+    } else {
+        fen << '-';
+    }
+    fen << ' ';
+
+    // Halfmove clock
+    fen << fiftyMoveCounter_ << ' ';
+
+    // Fullmove number
+    fen << fullMoveCounter_;
+
+    return fen.str();
 }
 
 /* --------------------------------- Methods -------------------------------- */
@@ -404,4 +475,60 @@ void Board::handlePromotion( SquareIndex src, PieceType promotion ) {
     squares[src]->type = promotion;
     squares[src]->value = Piece::calculatePieceValue( promotion );
     squares[src]->actionValue = Piece::calculatePieceActionValue( promotion );
+}
+
+bool Board::whiteCanCastle() const { return whiteCanCastleKingSide() || whiteCanCastleQueenSide(); }
+
+bool Board::whiteCanCastleKingSide() const {
+    auto &king = squares[60];
+    // King is gone
+    if ( king == std::nullopt || king->type != KING || king->color != WHITE ) return false;
+    // King already moved
+    if ( king->hasMoved ) return false;
+    // Rook is gone or already moved
+    if ( !squares[63] || squares[63]->type != ROOK || squares[63]->hasMoved ) return false;
+    // Squares between king and rook are occupied
+    if ( squares[61] || squares[62] ) return false;
+    return true;
+}
+
+bool Board::whiteCanCastleQueenSide() const {
+    auto &king = squares[60];
+    // King is gone
+    if ( king == std::nullopt || king->type != KING || king->color != WHITE ) return false;
+    // King already moved
+    if ( king->hasMoved ) return false;
+    // Rook is gone or already moved
+    if ( !squares[56] || squares[56]->type != ROOK || squares[56]->hasMoved ) return false;
+    // Squares between king and rook are occupied
+    if ( squares[57] || squares[58] || squares[59] ) return false;
+    return true;
+}
+
+bool Board::blackCanCastle() const { return blackCanCastleKingSide() || blackCanCastleQueenSide(); }
+
+bool Board::blackCanCastleKingSide() const {
+    auto &king = squares[4];
+    // King is gone
+    if ( king == std::nullopt || king->type != KING || king->color != BLACK ) return false;
+    // King already moved
+    if ( king->hasMoved ) return false;
+    // Rook is gone or already moved
+    if ( !squares[7] || squares[7]->type != ROOK || squares[7]->hasMoved ) return false;
+    // Squares between king and rook are occupied
+    if ( squares[5] || squares[6] ) return false;
+    return true;
+}
+
+bool Board::blackCanCastleQueenSide() const {
+    auto &king = squares[4];
+    // King is gone
+    if ( king == std::nullopt || king->type != KING || king->color != BLACK ) return false;
+    // King already moved
+    if ( king->hasMoved ) return false;
+    // Rook is gone or already moved
+    if ( !squares[0] || squares[0]->type != ROOK || squares[0]->hasMoved ) return false;
+    // Squares between king and rook are occupied
+    if ( squares[1] || squares[2] || squares[3] ) return false;
+    return true;
 }

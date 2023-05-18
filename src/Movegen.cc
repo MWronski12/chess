@@ -253,56 +253,29 @@ bool PieceValidMoves::analyzePawnMove( Board& board, SquareIndex srcSquare, Squa
 }
 
 bool PieceValidMoves::analyzeCastlingMove( Board& board, SquareIndex srcSquare, SquareIndex destSquare ) {
-    auto& king = board.squares[srcSquare];
-
-    /* ------------------------- Black king side castle ------------------------- */
-    if ( srcSquare == 4 && destSquare == 6 ) {
-        // King already moved
-        if ( king->hasMoved ) return false;
-        // Rook is gone or already moved
-        if ( !board.squares[7] || board.squares[7]->type != ROOK || board.squares[7]->hasMoved ) return false;
-        // Squares between king and rook are occupied
-        if ( board.squares[5] || board.squares[6] ) return false;
-        // King passes through attacked squares
-        if ( whiteAttackBoard_[4] || whiteAttackBoard_[5] || whiteAttackBoard_[6] ) return false;
-        return true;
-    }
-    /* ------------------------- Black queen side castle ------------------------ */
-    if ( srcSquare == 4 && destSquare == 2 ) {
-        // King already moved
-        if ( king->hasMoved ) return false;
-        // Rook is gone or already moved
-        if ( !board.squares[0] || board.squares[0]->type != ROOK || board.squares[0]->hasMoved ) return false;
-        // Squares between king and rook are occupied
-        if ( board.squares[1] || board.squares[2] || board.squares[3] ) return false;
-        // King passes through attacked squares
-        if ( whiteAttackBoard_[2] || whiteAttackBoard_[3] || whiteAttackBoard_[4] ) return false;
-        return true;
-    }
-    /* ------------------------- White king side castle ------------------------- */
+    // White king side castle
     if ( srcSquare == 60 && destSquare == 62 ) {
-        // King already moved
-        if ( king->hasMoved ) return false;
-        // Rook is gone or already moved
-        if ( !board.squares[63] || board.squares[63]->type != ROOK || board.squares[63]->hasMoved ) return false;
-        // Squares between king and rook are occupied
-        if ( board.squares[61] || board.squares[62] ) return false;
-        // King passes through attacked squares
+        if ( !board.whiteCanCastleKingSide() ) return false;
         if ( blackAttackBoard_[60] || blackAttackBoard_[61] || blackAttackBoard_[62] ) return false;
         return true;
     }
-    /* ------------------------- White queen side castle ------------------------ */
+    // White queen side castle
     if ( srcSquare == 60 && destSquare == 58 ) {
-        // King already moved
-        if ( king->hasMoved ) return false;
-        // Rook is gone or already moved
-        if ( !board.squares[56] || board.squares[56]->type != ROOK || board.squares[56]->hasMoved ) return false;
-        // Squares between king and rook are occupied
-        if ( board.squares[57] || board.squares[58] || board.squares[59] ) return false;
-        // King passes through attacked squares
+        if ( !board.whiteCanCastleQueenSide() ) return false;
         if ( blackAttackBoard_[58] || blackAttackBoard_[59] || blackAttackBoard_[60] ) return false;
         return true;
     }
-
+    // Black king side castle
+    if ( srcSquare == 4 && destSquare == 6 ) {
+        if ( !board.blackCanCastleKingSide() ) return false;
+        if ( whiteAttackBoard_[4] || whiteAttackBoard_[5] || whiteAttackBoard_[6] ) return false;
+        return true;
+    }
+    //  Black queen side castle
+    if ( srcSquare == 4 && destSquare == 2 ) {
+        if ( !board.blackCanCastleQueenSide() ) return false;
+        if ( whiteAttackBoard_[2] || whiteAttackBoard_[3] || whiteAttackBoard_[4] ) return false;
+        return true;
+    }
     throw std::logic_error( "Analyze castling move was called with a move that doesn't represent castling!" );
 }

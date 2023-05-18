@@ -3,8 +3,7 @@
 #include "Board.h"
 #include "catch2/catch_test_macros.hpp"
 
-/* ------------------------------ Constructors ------------------------------ */
-
+/* ------------------------------- Constructor ------------------------------ */
 TEST_CASE( "Board constructs correct starting position by default", "[Board::Board()]" ) {
     Board board;
     for ( int i = 0; i < 64; i++ ) {
@@ -175,4 +174,37 @@ TEST_CASE( "Pieces are moved correctly", "[Board::makeMove()]" ) {
     board.makeMove( 6, 21, EMPTY );
     REQUIRE( board.squares[6] == std::nullopt );
     REQUIRE( board.squares[21]->type == KNIGHT );
+}
+
+/* ---------------------------- FEN serialization --------------------------- */
+TEST_CASE( "Board serializes and deserializes properly to fen", "Board::Board(std::string fen) Board::toFEN()" ) {
+    Board board;
+    std::string fen = board.toFEN();
+    Board board2( fen );
+    REQUIRE( board2.toFEN() == fen );
+
+    // Piece placement
+    for ( SquareIndex i = 0; i < 64; i++ ) {
+        auto piece = board.squares[i];
+        auto piece2 = board2.squares[i];
+        if ( piece ) {
+            REQUIRE( piece2 );
+            REQUIRE( piece->type == piece2->type );
+            REQUIRE( piece->color == piece2->color );
+        } else {
+            REQUIRE( !piece2 );
+        }
+    }
+
+    // Side to move
+    REQUIRE( board2.sideToMove == board.sideToMove );
+
+    // Enpassant
+    REQUIRE( board2.enPassantSquare == board.enPassantSquare );
+
+    // Castling rights
+    REQUIRE( board2.whiteCanCastleKingSide() == board.whiteCanCastleKingSide() );
+    REQUIRE( board2.whiteCanCastleQueenSide() == board.whiteCanCastleQueenSide() );
+    REQUIRE( board2.blackCanCastleKingSide() == board.blackCanCastleKingSide() );
+    REQUIRE( board2.blackCanCastleQueenSide() == board.blackCanCastleQueenSide() );
 }

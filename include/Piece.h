@@ -1,6 +1,7 @@
 #ifndef PIECE_H
 #define PIECE_H
 
+#include <string>
 #include <vector>
 
 #include "Common.h"
@@ -10,6 +11,8 @@ public:
     // constructors
     Piece( PieceColor color, PieceType type, bool hasMoved = false );
     Piece( char piece );
+
+    std::string toString() const;
 
     // members
     PieceColor color;

@@ -30,10 +30,19 @@ public:
     // methods
     void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY );
     void makeMove( std::string move );  // d2d4 notation (d7d8Q for promotion)
-    // TODO: serializes Board object to FEN string notation
+
+    // Castling rights methods
+    bool whiteCanCastle() const;
+    bool whiteCanCastleKingSide() const;
+    bool whiteCanCastleQueenSide() const;
+    bool blackCanCastle() const;
+    bool blackCanCastleKingSide() const;
+    bool blackCanCastleQueenSide() const;
+
     std::string toFEN() const;
 
 private:
+    int fullMoveCounter_;
     int fiftyMoveCounter_;
     int threefoldRepetitionCounter_;
 

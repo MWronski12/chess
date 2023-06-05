@@ -12,13 +12,13 @@ using SquareIndex = uint8_t;
 enum PieceColor { WHITE, BLACK };
 
 enum PieceType {
-    EMPTY,
-    PAWN,
+    ROOK,
     KNIGHT,
     BISHOP,
-    ROOK,
     QUEEN,
     KING,
+    PAWN,
+    EMPTY,
 };
 
 enum GameResult { WHITE_WON, BLACK_WON, DRAW, IN_PROGRESS };

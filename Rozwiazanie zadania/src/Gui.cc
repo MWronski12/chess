@@ -9,17 +9,18 @@
  *
  */
 
+#include "Gui.hpp"
+
 #include <string>
 
-#include "Gui.hpp"
 
 /**
  * @brief Constructor of WindowGui object
  *
  */
 WindowGui::WindowGui() : engine_( Engine() ), window_( VideoMode( 504, 504 ), "The Chess!" ), offset_( 28, 28 ) {
-    figuresImages_.loadFromFile( "../images/figures.png" );
-    boardImage_.loadFromFile( "../images/board1.png" );
+    figuresImages_.loadFromFile( "../Rozwiazanie zadania/images/figures.png" );
+    boardImage_.loadFromFile( "../Rozwiazanie zadania/images/board1.png" );
 
     for ( int i = 0; i < 32; i++ )
         f[i].setTexture( figuresImages_ );
@@ -294,7 +295,7 @@ void WindowGui::dragAndDrop( Event e, Vector2i pos ) {
         if ( e.mouseButton.button == Mouse::Left ) {
             isMove_ = false;
             Vector2f p = f[currentFigureIndex_].getPosition() + Vector2f( FIGURE_SIZE / 2, FIGURE_SIZE / 2 );
-            newPos_ = Vector2f( FIGURE_SIZE * int( p.x / FIGURE_SIZE ), FIGURE_SIZE* int( p.y / FIGURE_SIZE ) );
+            newPos_ = Vector2f( FIGURE_SIZE * int( p.x / FIGURE_SIZE ), FIGURE_SIZE * int( p.y / FIGURE_SIZE ) );
             std::string str = vector2ToChessNotation( oldPos_ ) + vector2ToChessNotation( newPos_ );
 
             try {

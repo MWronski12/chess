@@ -15,6 +15,11 @@ Window gui and MiniMax algorithm for choosing the best move are currently under 
 - `make chess`
 - `./chess`
 
+Game tutorial:
+1. Make move
+2. press space and wait for computer to make move
+3. repeat 1. and 2.
+
 UML class diagram:
 
 ![Chess application UML class diagram](https://user-images.githubusercontent.com/66621445/229904436-fbe6475a-2f64-4f3a-afb5-91c9fce12d30.png)

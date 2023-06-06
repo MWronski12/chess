@@ -16,15 +16,15 @@ add_compile_options(
 
 add_executable(chess main.cpp src/Gui.cc)
 
-# Define a custom target to install packages
-add_custom_target(install_packages
-    COMMAND chmod +x ${CMAKE_CURRENT_SOURCE_DIR}/install-packages.sh
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/install-packages.sh
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-)
+# # Define a custom target to install packages
+# add_custom_target(install_packages
+#     COMMAND chmod +x ${CMAKE_CURRENT_SOURCE_DIR}/install-packages.sh
+#     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/install-packages.sh
+#     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+# )
 
-# Add a dependency on the custom target to your main target
-add_dependencies(chess install_packages)
+# # Add a dependency on the custom target to your main target
+# add_dependencies(chess install_packages)
 
 include_directories(include)
 add_subdirectory(src)

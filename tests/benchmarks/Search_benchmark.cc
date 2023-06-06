@@ -8,10 +8,10 @@ TEST_CASE( "getBestMove finds one move check mate instantly", "[Search.getBestMo
     int depth;
     MoveContent expected_result;
     std::tie( depth, expected_result ) = GENERATE( table<int, MoveContent>( {
-        { 1, MoveContent( 45, 13 ) },
-        { 2, MoveContent( 45, 13 ) },
-        { 3, MoveContent( 45, 13 ) },
-        { 4, MoveContent( 45, 13 ) },
+        { 1, MoveContent( F3, F7 ) },
+        { 2, MoveContent( F3, F7 ) },
+        { 3, MoveContent( F3, F7 ) },
+        { 4, MoveContent( F3, F7 ) },
     } ) );
 
     Search s;

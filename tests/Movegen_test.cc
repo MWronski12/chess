@@ -1,4 +1,5 @@
 #include "Movegen.h"
+
 #include "catch2/catch_test_macros.hpp"
 
 /* ---------------------------------- Perft --------------------------------- */
@@ -71,7 +72,7 @@ TEST_CASE( "Fen starting position 1", "[perft]" ) {
     REQUIRE( perft( 1, b, g ) == 20 );
     REQUIRE( perft( 2, b, g ) == 400 );
     REQUIRE( perft( 3, b, g ) == 8902 );
-    // REQUIRE( perft( 4, b, g ) == 197281 );
+    REQUIRE( perft( 4, b, g ) == 197281 );
 }
 
 TEST_CASE( "Fen position 2", "[perft]" ) {
@@ -81,7 +82,7 @@ TEST_CASE( "Fen position 2", "[perft]" ) {
     REQUIRE( perft( 1, b, g ) == 48 );
     REQUIRE( perft( 2, b, g ) == 2039 );
     REQUIRE( perft( 3, b, g ) == 97862 );
-    // REQUIRE( perft( 4, b, g ) == 4085603 );
+    REQUIRE( perft( 4, b, g ) == 4085603 );
     // REQUIRE( perft( 5, b, g ) == 193690690 );
 }
 
@@ -115,7 +116,7 @@ TEST_CASE( "Fen position 5", "[perft]" ) {
     REQUIRE( perft( 1, b, g ) == 44 );
     REQUIRE( perft( 2, b, g ) == 1486 );
     REQUIRE( perft( 3, b, g ) == 62379 );
-    // REQUIRE( perft( 4, b, g ) == 2103487 );
+    REQUIRE( perft( 4, b, g ) == 2103487 );
     // REQUIRE( perft( 5, b, g ) == 89941194 );
 }
 
@@ -126,6 +127,6 @@ TEST_CASE( "Fen position 6", "[perft]" ) {
     REQUIRE( perft( 1, b, g ) == 46 );
     REQUIRE( perft( 2, b, g ) == 2079 );
     REQUIRE( perft( 3, b, g ) == 89890 );
-    // REQUIRE( perft( 4, b, g ) == 3894594 );
+    REQUIRE( perft( 4, b, g ) == 3894594 );
     // REQUIRE( perft( 5, b, g ) == 164075551 );
 }

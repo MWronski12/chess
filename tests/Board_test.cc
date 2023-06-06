@@ -1,6 +1,7 @@
+#include "Board.h"
+
 #include <iostream>
 
-#include "Board.h"
 #include "catch2/catch_test_macros.hpp"
 
 /* ------------------------------- Constructor ------------------------------ */
@@ -9,9 +10,9 @@ TEST_CASE( "Board constructs correct starting position by default", "[Board::Boa
     for ( int i = 0; i < 64; i++ ) {
         if ( board.squares[i] ) {
             REQUIRE( board.squares[i]->type == STARTING_POSITION[i] );
-            if ( i < 16 ) {
+            if ( i < A6 ) {
                 REQUIRE( board.squares[i]->color == BLACK );
-            } else if ( i > 47 ) {
+            } else if ( i > H3 ) {
                 REQUIRE( board.squares[i]->color == WHITE );
             }
         }
@@ -31,15 +32,15 @@ TEST_CASE( "Board constructs correct starting position by default", "[Board::Boa
 TEST_CASE( "Cannot make move when the game is over!", "[Board::Validate()]" ) {
     Board board;
     board.gameResult = DRAW;
-    REQUIRE_THROWS_AS( board.makeMove( 55, 47, EMPTY ), std::logic_error );
+    REQUIRE_THROWS_AS( board.makeMove( H2, H3, EMPTY ), std::logic_error );
 
     board = Board();
     board.gameResult = WHITE_WON;
-    REQUIRE_THROWS_AS( board.makeMove( 55, 47, EMPTY ), std::logic_error );
+    REQUIRE_THROWS_AS( board.makeMove( H2, H3, EMPTY ), std::logic_error );
 
     board = Board();
     board.gameResult = BLACK_WON;
-    REQUIRE_THROWS_AS( board.makeMove( 55, 47, EMPTY ), std::logic_error );
+    REQUIRE_THROWS_AS( board.makeMove( H2, H3, EMPTY ), std::logic_error );
 }
 
 TEST_CASE( "Invalid SquareIndices are not allowed!", "[Board::validateMove()]" ) {
@@ -49,72 +50,72 @@ TEST_CASE( "Invalid SquareIndices are not allowed!", "[Board::validateMove()]" )
 
 TEST_CASE( "Source square must be occupied by a piece", "[Board::validateMove()]" ) {
     Board board;
-    REQUIRE_THROWS_AS( board.makeMove( 20, 28, EMPTY ), std::logic_error );
+    REQUIRE_THROWS_AS( board.makeMove( E6, E5, EMPTY ), std::logic_error );
 }
 
 TEST_CASE( "Source square must be occupied by an allied piece", "[Board::validateMove()]" ) {
     Board board;
-    REQUIRE_THROWS_AS( board.makeMove( 0, 18, EMPTY ), std::logic_error );
+    REQUIRE_THROWS_AS( board.makeMove( A7, A6, EMPTY ), std::logic_error );
 }
 
 TEST_CASE( "Dest square cannot be occupied by an allied piece", "[Board::validateMove()]" ) {
     Board board;
-    REQUIRE_THROWS_AS( board.makeMove( 0, 1, EMPTY ), std::logic_error );
+    REQUIRE_THROWS_AS( board.makeMove( G2, H2, EMPTY ), std::logic_error );
 }
 
 TEST_CASE( "Promotion cannot be set to EMPTY for promoting moves", "[Board::validateMove()]" ) {
     Board board;
-    REQUIRE_THROWS_AS( board.makeMove( 55, 7, EMPTY ), std::logic_error );
+    REQUIRE_THROWS_AS( board.makeMove( H2, H8, EMPTY ), std::logic_error );
 }
 
 TEST_CASE( "Promotion must be set to EMPTY for non-promoting moves", "[Board::validateMove()]" ) {
     Board board;
-    REQUIRE_THROWS_AS( board.makeMove( 55, 47, QUEEN ), std::logic_error );
+    REQUIRE_THROWS_AS( board.makeMove( H2, H3, QUEEN ), std::logic_error );
 }
 
 /* ----------------------------- Board::makeMove ---------------------------- */
 
 TEST_CASE( "Move details are correctly recorded after making the move", "[Board::makeMove()]" ) {
     Board board;
-    board.makeMove( 55, 47, EMPTY );
-    REQUIRE( board.lastMove.src == 55 );
-    REQUIRE( board.lastMove.dest == 47 );
+    board.makeMove( H2, H3, EMPTY );
+    REQUIRE( board.lastMove.src == H2 );
+    REQUIRE( board.lastMove.dest == H3 );
     REQUIRE( board.lastMove.isEnPassantCapture == false );
     REQUIRE( board.lastMove.pieceMoving == PAWN );
     REQUIRE( board.sideToMove == BLACK );
 
-    board.makeMove( 15, 47, EMPTY );
+    board.makeMove( H7, H3, EMPTY );
     REQUIRE( board.lastMove.pieceTaken == PAWN );
     REQUIRE( board.sideToMove == WHITE );
 
-    board.makeMove( 54, 6, QUEEN );
+    board.makeMove( G2, G8, QUEEN );
     REQUIRE( board.lastMove.promotion == QUEEN );
 }
 
 TEST_CASE( "Board keeps track of en passant square", "[Board::makeMove()]" ) {
     Board board;
-    board.makeMove( 52, 36, EMPTY );
-    REQUIRE( board.enPassantSquare == 44 );
+    board.makeMove( E2, E4, EMPTY );
+    REQUIRE( board.enPassantSquare == E3 );
 
-    board.makeMove( 12, 28, EMPTY );
-    REQUIRE( board.enPassantSquare == 20 );
+    board.makeMove( E7, E5, EMPTY );
+    REQUIRE( board.enPassantSquare == E6 );
 
-    board.makeMove( 48, 40, EMPTY );
+    board.makeMove( A2, A3, EMPTY );
     REQUIRE( board.enPassantSquare == NULL_SQUARE );
 }
 
 TEST_CASE( "En passant capture is handled properly", "[Board::makeMove()]" ) {
     Board board;
-    board.makeMove( 52, 36, EMPTY );
-    REQUIRE( board.enPassantSquare == 44 );
-    board.makeMove( 13, 44, EMPTY );
-    REQUIRE( board.squares[36] == std::nullopt );
+    board.makeMove( E2, E4, EMPTY );
+    REQUIRE( board.enPassantSquare == E3 );
+    board.makeMove( F7, E3, EMPTY );
+    REQUIRE( board.squares[E4] == std::nullopt );
     REQUIRE( board.lastMove.isEnPassantCapture == true );
     REQUIRE( board.lastMove.pieceTaken == PAWN );
-    board.makeMove( 55, 47, EMPTY );
-    board.makeMove( 11, 27, EMPTY );
-    board.makeMove( 50, 19, EMPTY );
-    REQUIRE( board.squares[27] == std::nullopt );
+    board.makeMove( H2, H3, EMPTY );
+    board.makeMove( D7, D5, EMPTY );
+    board.makeMove( C2, D6, EMPTY );
+    REQUIRE( board.squares[D5] == std::nullopt );
     REQUIRE( board.lastMove.isEnPassantCapture == true );
     REQUIRE( board.lastMove.pieceTaken == PAWN );
 }
@@ -122,58 +123,58 @@ TEST_CASE( "En passant capture is handled properly", "[Board::makeMove()]" ) {
 TEST_CASE( "Castle king side is handled properly", "Board::makeMove()" ) {
     Board board;
     // move away the horses - dest square cannot be occupied by an allied piece
-    board.makeMove( 62, 45, EMPTY );
-    board.makeMove( 6, 21, EMPTY );
+    board.makeMove( G1, F3, EMPTY );
+    board.makeMove( G8, F6, EMPTY );
     // white castle king side
-    board.makeMove( 60, 62, EMPTY );
-    REQUIRE( board.squares[63] == std::nullopt );
-    REQUIRE( board.squares[61]->type == ROOK );
-    REQUIRE( board.squares[61]->hasMoved == true );
+    board.makeMove( E1, G1, EMPTY );
+    REQUIRE( board.squares[H1] == std::nullopt );
+    REQUIRE( board.squares[F1]->type == ROOK );
+    REQUIRE( board.squares[F1]->hasMoved == true );
     REQUIRE( board.whiteHasCastled == true );
     // black castle king side
-    board.makeMove( 4, 6, EMPTY );
-    REQUIRE( board.squares[7] == std::nullopt );
-    REQUIRE( board.squares[5]->type == ROOK );
-    REQUIRE( board.squares[5]->hasMoved == true );
+    board.makeMove( E8, G8, EMPTY );
+    REQUIRE( board.squares[H8] == std::nullopt );
+    REQUIRE( board.squares[F8]->type == ROOK );
+    REQUIRE( board.squares[F8]->hasMoved == true );
     REQUIRE( board.blackHasCastled == true );
 }
 
 TEST_CASE( "Castle queen side is handled properly", "Board::makeMove()" ) {
     Board board;
     // move away the bishops - dest square cannot be occupied by an allied piece
-    board.makeMove( 58, 44, EMPTY );
-    board.makeMove( 2, 20, EMPTY );
+    board.makeMove( C1, E3, EMPTY );
+    board.makeMove( C8, E6, EMPTY );
     // white castle queen side
-    board.makeMove( 60, 58, EMPTY );
-    REQUIRE( board.squares[56] == std::nullopt );
-    REQUIRE( board.squares[59]->type == ROOK );
-    REQUIRE( board.squares[59]->hasMoved == true );
+    board.makeMove( E1, C1, EMPTY );
+    REQUIRE( board.squares[A1] == std::nullopt );
+    REQUIRE( board.squares[D1]->type == ROOK );
+    REQUIRE( board.squares[D1]->hasMoved == true );
     REQUIRE( board.whiteHasCastled == true );
     // black castle king side
-    board.makeMove( 4, 2, EMPTY );
-    REQUIRE( board.squares[0] == std::nullopt );
-    REQUIRE( board.squares[3]->type == ROOK );
-    REQUIRE( board.squares[3]->hasMoved == true );
+    board.makeMove( E8, C8, EMPTY );
+    REQUIRE( board.squares[A8] == std::nullopt );
+    REQUIRE( board.squares[D8]->type == ROOK );
+    REQUIRE( board.squares[D8]->hasMoved == true );
     REQUIRE( board.blackHasCastled == true );
 }
 
 TEST_CASE( "Promotion is handled correctly", "Board::makeMove()" ) {
     Board board;
-    board.makeMove( 55, 7, KNIGHT );
-    REQUIRE( board.squares[7]->type == KNIGHT );
-    REQUIRE( board.squares[7]->value == KNIGHT_VALUE );
-    REQUIRE( board.squares[7]->actionValue == KNIGHT_ACTION_VALUE );
+    board.makeMove( H2, H8, KNIGHT );
+    REQUIRE( board.squares[H8]->type == KNIGHT );
+    REQUIRE( board.squares[H8]->value == KNIGHT_VALUE );
+    REQUIRE( board.squares[H8]->actionValue == KNIGHT_ACTION_VALUE );
 }
 
 TEST_CASE( "Pieces are moved correctly", "[Board::makeMove()]" ) {
     Board board;
-    board.makeMove( 53, 37, EMPTY );
-    REQUIRE( board.squares[53] == std::nullopt );
-    REQUIRE( board.squares[37]->type == PAWN );
+    board.makeMove( F2, F4, EMPTY );
+    REQUIRE( board.squares[F2] == std::nullopt );
+    REQUIRE( board.squares[F4]->type == PAWN );
 
-    board.makeMove( 6, 21, EMPTY );
-    REQUIRE( board.squares[6] == std::nullopt );
-    REQUIRE( board.squares[21]->type == KNIGHT );
+    board.makeMove( G8, F6, EMPTY );
+    REQUIRE( board.squares[G8] == std::nullopt );
+    REQUIRE( board.squares[F6]->type == KNIGHT );
 }
 
 /* ---------------------------- FEN serialization --------------------------- */

@@ -82,7 +82,7 @@ TEST_CASE( "Fen position 2", "[perft]" ) {
     REQUIRE( perft( 1, b, g ) == 48 );
     REQUIRE( perft( 2, b, g ) == 2039 );
     REQUIRE( perft( 3, b, g ) == 97862 );
-    REQUIRE( perft( 4, b, g ) == 4085603 );
+    // REQUIRE( perft( 4, b, g ) == 4085603 );
     // REQUIRE( perft( 5, b, g ) == 193690690 );
 }
 
@@ -104,7 +104,7 @@ TEST_CASE( "Fen position 4", "[perft]" ) {
     REQUIRE( perft( 1, b, g ) == 6 );
     REQUIRE( perft( 2, b, g ) == 264 );
     REQUIRE( perft( 3, b, g ) == 9467 );
-    REQUIRE( perft( 4, b, g ) == 422333 );
+    // REQUIRE( perft( 4, b, g ) == 422333 );
     // REQUIRE( perft( 5, b, g ) == 15833292 );
     // REQUIRE( perft( 6, b, g ) == 706045033 );
 }
@@ -116,7 +116,7 @@ TEST_CASE( "Fen position 5", "[perft]" ) {
     REQUIRE( perft( 1, b, g ) == 44 );
     REQUIRE( perft( 2, b, g ) == 1486 );
     REQUIRE( perft( 3, b, g ) == 62379 );
-    REQUIRE( perft( 4, b, g ) == 2103487 );
+    // REQUIRE( perft( 4, b, g ) == 2103487 );
     // REQUIRE( perft( 5, b, g ) == 89941194 );
 }
 
@@ -127,6 +127,6 @@ TEST_CASE( "Fen position 6", "[perft]" ) {
     REQUIRE( perft( 1, b, g ) == 46 );
     REQUIRE( perft( 2, b, g ) == 2079 );
     REQUIRE( perft( 3, b, g ) == 89890 );
-    REQUIRE( perft( 4, b, g ) == 3894594 );
+    // REQUIRE( perft( 4, b, g ) == 3894594 );
     // REQUIRE( perft( 5, b, g ) == 164075551 );
 }

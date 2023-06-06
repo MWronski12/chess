@@ -16,18 +16,6 @@ TEST_CASE( "Evaluate moves returns array of 20 moves scored to 0 at initial posi
     }
 }
 
-/* ------------------------------- getBestMove ------------------------------ */
-TEST_CASE( "Search finds the corect move for 1 ply fool's mate position for white", "[Search.getBestMove]" ) {
-    Search s;
-    Board b( "r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq - 0 2" );
-    PieceValidMoves g;
-    g.generateValidMoves( b );
-    auto bestMove = s.getBestMove( b, 5, b.sideToMove == WHITE );
-    REQUIRE( bestMove.pieceMoving == QUEEN );
-    REQUIRE( bestMove.src == 45 );
-    REQUIRE( bestMove.dest == 13 );
-}
-
 /* ----------------------------- quiescentSearch ---------------------------- */
 
 TEST_CASE( "getPossibleCaptureMoves returns correctly sorted capture moves ", "[Search.getPossibleCaptureMoves]" ) {
@@ -61,17 +49,6 @@ TEST_CASE( "quiescentSearch returns evaluation of a quiet position ", "[Search.q
 /* --------------------------------------------- testcases from internet -------------------------------------------- */
 
 TEST_CASE( "Don't stalemate if you can win", "[search]" ) {
-    // MagicMoves::initmagicmoves();
-    // Tables::init();
-    // ZK::initZobristKeys();
-    // globalTT.init_TT_size( TT::TEST_MB_SIZE );  // For tests TT size is TT_SIZE_DEFAULT
-
-    // std::shared_ptr<Board> sp = std::shared_ptr<Board>( new Board( "7k/8/7K/8/8/8/8/5R2 w - - 51 142" ) );
-    // Search search( sp );
-    // search.negaMaxRoot( 5 );
-    // Move move = search.myBestMove;
-    // REQUIRE( move.toShortString() == "f1f8" );
-
     Search s;
     Board b( "7k/8/7K/8/8/8/8/5R2 w - - 51 142" );
     PieceValidMoves g;
@@ -82,47 +59,46 @@ TEST_CASE( "Don't stalemate if you can win", "[search]" ) {
     REQUIRE( bestMove.dest == 5 );
 }
 
-// TEST_CASE( "Search", "[search]" ) {
-//     MagicMoves::initmagicmoves();
-//     Tables::init();
-//     ZK::initZobristKeys();
-//     globalTT.init_TT_size( TT::TEST_MB_SIZE );
+TEST_CASE( "Fool's mate position for white", "[Search.getBestMove]" ) {
+    Search s;
+    Board b( "r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq - 0 2" );
+    PieceValidMoves g;
+    g.generateValidMoves( b );
+    auto bestMove = s.getBestMove( b, 5, b.sideToMove == WHITE );
+    REQUIRE( bestMove.pieceMoving == QUEEN );
+    REQUIRE( bestMove.src == 45 );
+    REQUIRE( bestMove.dest == 13 );
+}
 
-//     SECTION( "Test search depth 1 white" ) {
-//         std::shared_ptr<Board> sp = std::shared_ptr<Board>( new Board( "kn6/nn3r2/8/8/2p2Q2/8/NN6/KN6 w - -" ) );
-//         Search search( sp );
-//         search.negaMaxRoot( 1 );
-//         Move move = search.myBestMove;
+TEST_CASE( "Mate in two - Paul Morphy's problem", "[Search.getBestMove]" ) {
+    Search s;
+    Board b( "kbK5/pp6/1P6/8/8/8/8/R7 w - - 1 1" );
+    PieceValidMoves g;
+    g.generateValidMoves( b );
+    auto bestMove = s.getBestMove( b, 10, b.sideToMove == WHITE );
 
-//         REQUIRE( move.toShortString() == "f4f7" );
-//     }
+    REQUIRE( bestMove.src == A1 );
+    REQUIRE( bestMove.dest == A6 );
+}
 
-//     SECTION( "Test search depth 1 black" ) {
-//         std::shared_ptr<Board> sp = std::shared_ptr<Board>( new Board( "k4K2/8/8/3q4/8/1R3N1P/8/8 b - -" ) );
-//         Search search( sp );
-//         search.negaMaxRoot( 1 );
-//         Move move = search.myBestMove;
+TEST_CASE( "Mate in two with 2 queens", "[Search.getBestMove]" ) {
+    Search s;
+    Board b( "Q7/7k/Q7/8/8/8/7K/1q6 w - - 0 1" );
+    PieceValidMoves g;
+    g.generateValidMoves( b );
+    auto bestMove = s.getBestMove( b, 10, b.sideToMove == WHITE );
 
-//         REQUIRE( move.toShortString() == "d5b3" );
-//     }
+    REQUIRE( bestMove.src == A8 );
+    REQUIRE( bestMove.dest == A7 );
+}
 
-//     SECTION( "Test search depth 2" ) {
-//         std::shared_ptr<Board> sp = std::shared_ptr<Board>( new Board( "kn6/nn2rr2/8/4Q3/8/2p1p2b/1Q6/KN6 w - -" ) );
-//         Search search( sp );
-//         search.negaMaxRoot( 2 );
-//         Move move = search.myBestMove;
+TEST_CASE( "Mate in two - Milan Vidmar vs. Max Euwe", "[Search.getBestMove]" ) {
+    Search s;
+    Board b( "6k1/5p2/1p5p/p4Np1/5q2/Q6P/PPr5/3R3K w - - 1 0" );
+    PieceValidMoves g;
+    g.generateValidMoves( b );
+    auto bestMove = s.getBestMove( b, 10, b.sideToMove == WHITE );
 
-//         REQUIRE( move.toShortString() == "e5c3" );
-//     }
-
-//     SECTION( "Always find the quickest mate" ) {
-//         std::shared_ptr<Board> sp = std::shared_ptr<Board>( new Board( "8/3R4/3p4/3P4/1K4Q1/8/7k/8 w - - 97 104" ) );
-//         Search search( sp );
-
-//         for ( int i = 2; i < 7; i++ ) {
-//             search.negaMaxRoot( i );
-//             Move move = search.myBestMove;
-//             REQUIRE( move.toShortString() == "d7h7" );
-//         }
-//     }
-// }
+    REQUIRE( bestMove.src == A3 );
+    REQUIRE( bestMove.dest == F8 );
+}

@@ -32,35 +32,35 @@ public:
 
 using namespace sf;
 
-// Vector2f offset(28, 28);
-
 class WindowGui : public Gui {
 public:
     WindowGui();
+    void start() override;
+
+private:
+    static const int NUM_FIGURES = 32;
+    static const int FIGURE_SIZE = 56;
     virtual void makeMove( std::string move ) override;
     virtual void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY ) override;
     virtual void draw() override;
-    void start() override;
     void dragAndDrop( Event e, Vector2i pos );
-    std::string toChessNote( Vector2f p );
-    RenderWindow window;      // ok
-    Vector2f offset;          // ok
-    Sprite f[32];             // ok
-    bool isMove = false;      // ok
-    float dx = 0, dy = 0;     // ok
-    int n = 0;                // ok
-    Vector2f oldPos, newPos;  // ok
-    Vector2f toCoord( char a, char b );
-    Sprite sBoard;
-    std::string position = "";  // ok
-
-private:
-    Engine engine_;
-    Texture t1, t2;   // ok
-    std::string str;  // ok
-    int size = 56;    // ok
     void loadPosition();
-    void _move( std::string str );
+    void makeMoveOnGui( std::string str );
+    std::string vector2ToChessNotation( Vector2f p );
+    std::string squareToChessNotation( int square );
+    std::string moveContentToChessNotation( int src, int dest );
+    Vector2f toSquareCoord( char a, char b );
+    Engine engine_;
+    RenderWindow window_;
+    Vector2f offset_;
+    Sprite f[NUM_FIGURES];
+    bool isMove_ = false;
+    float dx_ = 0, dy_ = 0;
+    int currentFigureIndex_ = 0;
+    Vector2f oldPos_, newPos_;
+    Sprite board_;
+    std::string strPosition_ = "";
+    Texture figuresImages_, boardImage_;
 };
 
 /* ------------------------------------------------------------------------------------------------------------------ */

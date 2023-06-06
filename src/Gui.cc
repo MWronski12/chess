@@ -2,32 +2,15 @@
 
 #include <string>
 
-WindowGui::WindowGui() : engine_( Engine() ), window( VideoMode( 504, 504 ), "The Chess!" ), offset( 28, 28 ) {
-    // Texture t1, t2;
-    t1.loadFromFile( "../images/figures.png" );
-    t2.loadFromFile( "../images/board1.png" );
+WindowGui::WindowGui() : engine_( Engine() ), window_( VideoMode( 504, 504 ), "The Chess!" ), offset_( 28, 28 ) {
+    figuresImages_.loadFromFile( "../images/figures.png" );
+    boardImage_.loadFromFile( "../images/board1.png" );
 
-    for ( int i = 0; i < 32; i++ ) f[i].setTexture( t1 );
-    // Sprite sBoard(t2);
-    sBoard = Sprite( t2 );
+    for ( int i = 0; i < 32; i++ ) f[i].setTexture( figuresImages_ );
+    board_ = Sprite( boardImage_ );
 
     loadPosition();
 };
-
-std::string toChessNotation( int square ) {
-    int rank = 8 - square / 8;
-    int file = square % 8;
-    std::string notation = "";
-    notation += char( file + 'a' );
-    notation += char( rank + '0' );
-    return notation;
-}
-
-std::string toChessNotation( int src, int dest ) {
-    std::string srcNotation = toChessNotation( src );
-    std::string destNotation = toChessNotation( dest );
-    return srcNotation + destNotation;
-}
 
 void WindowGui::loadPosition() {
     int k = 0;
@@ -37,30 +20,87 @@ void WindowGui::loadPosition() {
             if ( piece.has_value() ) {
                 int x = abs( piece->type );
                 int y = piece->color == WHITE ? 1 : 0;
-                f[k].setTextureRect( IntRect( size * x, size * y, size, size ) );
-                f[k].setPosition( size * j, size * i );
+                f[k].setTextureRect( IntRect( FIGURE_SIZE * x, FIGURE_SIZE * y, FIGURE_SIZE, FIGURE_SIZE ) );
+                f[k].setPosition( FIGURE_SIZE * j, FIGURE_SIZE * i );
                 k++;
             } else
                 continue;
         }
 
-    for ( int i = 0; i < (int)position.length(); i += 5 ) _move( position.substr( i, 4 ) );
+    for ( int i = 0; i < (int)strPosition_.length(); i += 5 ) makeMoveOnGui( strPosition_.substr( i, 4 ) );
 }
 
-void WindowGui::_move( std::string str ) {
-    Vector2f oldPos = toCoord( str[0], str[1] );
-    Vector2f newPos = toCoord( str[2], str[3] );
-    // w gui dodać promotion
+void WindowGui::start() {
+    draw();
 
-    for ( int i = 0; i < 32; i++ )
-        if ( f[i].getPosition() == newPos )
-            //
-            f[i].setPosition( -100, -100 );
+    while ( window_.isOpen() ) {
+        Vector2i pos = Mouse::getPosition( window_ ) - Vector2i( offset_ );
 
-    for ( int i = 0; i < 32; i++ )
-        if ( f[i].getPosition() == oldPos )
-            //
-            f[i].setPosition( newPos );
+        Event e;
+        while ( window_.pollEvent( e ) ) {
+            if ( e.type == Event::Closed ) {
+                window_.close();
+                break;
+            }
+
+            dragAndDrop( e, pos );
+
+            if ( Keyboard::isKeyPressed( Keyboard::Space ) ) {
+                MoveContent mov = engine_.getBestMove();
+                std::string str = moveContentToChessNotation( mov.src, mov.dest );
+
+                oldPos_ = toSquareCoord( str[0], str[1] );
+                newPos_ = toSquareCoord( str[2], str[3] );
+
+                for ( int i = 0; i < 32; i++ )
+                    if ( f[i].getPosition() == oldPos_ ) currentFigureIndex_ = i;
+
+                /////animation///////
+                for ( int k = 0; k < 50; k++ ) {
+                    Vector2f p = newPos_ - oldPos_;
+                    f[currentFigureIndex_].move( p.x / 50, p.y / 50 );
+                    window_.draw( board_ );
+                    for ( int i = 0; i < 32; i++ ) f[i].move( offset_ );
+                    for ( int i = 0; i < 32; i++ ) window_.draw( f[i] );
+                    window_.draw( f[currentFigureIndex_] );
+                    for ( int i = 0; i < 32; i++ ) f[i].move( -offset_ );
+                    window_.display();
+                }
+
+                makeMove( str );
+                strPosition_ += str + " ";
+                f[currentFigureIndex_].setPosition( newPos_ );
+                std::cout << "Evaluation: " << ( engine_.board.score ) << "\r\n";
+            }
+        }
+
+        // if we are moving piece, we need to update its position in GUI
+        if ( isMove_ ) f[currentFigureIndex_].setPosition( pos.x - dx_, pos.y - dy_ );
+
+        draw();
+    }
+}
+
+std::string WindowGui::squareToChessNotation( int square ) {
+    int rank = 8 - square / 8;
+    int file = square % 8;
+    std::string notation = "";
+    notation += char( file + 'a' );
+    notation += char( rank + '0' );
+    return notation;
+}
+
+std::string WindowGui::moveContentToChessNotation( int src, int dest ) {
+    std::string srcNotation = squareToChessNotation( src );
+    std::string destNotation = squareToChessNotation( dest );
+    return srcNotation + destNotation;
+}
+
+std::string WindowGui::vector2ToChessNotation( Vector2f p ) {
+    std::string str = "";
+    str += char( p.x / FIGURE_SIZE + 97 );
+    str += char( 7 - p.y / FIGURE_SIZE + 49 );
+    return str;
 }
 
 void WindowGui::makeMove( std::string move ) {
@@ -107,9 +147,6 @@ void WindowGui::makeMove( std::string move ) {
     else {
         throw std::invalid_argument( "Invalid move notation!" );
     }
-    // engine_.board.makeMove( move );
-    // _move( move );  // here we need also to call makeMove from board?  bcs right now it is  only GUI
-    // draw();
 }
 void WindowGui::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) {
     auto& piece = engine_.board.squares[src];
@@ -123,31 +160,35 @@ void WindowGui::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion
     if ( engine_.makeMove( src, dest, promotion ) == false ) {
         throw std::logic_error( "Move leaves the king in check!" );
     };
-    std::string str = toChessNotation( src, dest );
-    _move( str );
-    // draw();
+    std::string str = moveContentToChessNotation( src, dest );
+    makeMoveOnGui( str );
 }
 
-Vector2f WindowGui::toCoord( char a, char b ) {
+void WindowGui::makeMoveOnGui( std::string str ) {
+    Vector2f oldPos_ = toSquareCoord( str[0], str[1] );
+    Vector2f newPos_ = toSquareCoord( str[2], str[3] );
+
+    for ( int i = 0; i < 32; i++ )
+        if ( f[i].getPosition() == newPos_ ) f[i].setPosition( -100, -100 );
+
+    for ( int i = 0; i < 32; i++ )
+        if ( f[i].getPosition() == oldPos_ ) f[i].setPosition( newPos_ );
+}
+
+Vector2f WindowGui::toSquareCoord( char a, char b ) {
     int x = int( a ) - 97;
     int y = 7 - int( b ) + 49;
-    return Vector2f( x * size, y * size );
+    return Vector2f( x * FIGURE_SIZE, y * FIGURE_SIZE );
 }
 
 void WindowGui::draw() {
-    window.clear();
-    window.draw( sBoard );
-    for ( int i = 0; i < 32; i++ ) f[i].move( offset );
-    for ( int i = 0; i < 32; i++ ) window.draw( f[i] );
-    window.draw( f[n] );
-    for ( int i = 0; i < 32; i++ ) f[i].move( -offset );
-    window.display();
-
-    //     std::cout << "  A  B  C  D  E  F  G  H\r\n";
-    // std::cout << "Player to move: " << ( engine_.board.sideToMove == WHITE ? "White" : "Black" ) << "\r\n";
-    // std::cout << "Best move: " << ( engine_.getBestMove().toString() ) << "\r\n";
-    // std::cout << "Evaluation: " << ( engine_.board.score ) << "\r\n";
-    // std::cout << "\n\n";
+    window_.clear();
+    window_.draw( board_ );
+    for ( int i = 0; i < 32; i++ ) f[i].move( offset_ );
+    for ( int i = 0; i < 32; i++ ) window_.draw( f[i] );
+    window_.draw( f[currentFigureIndex_] );
+    for ( int i = 0; i < 32; i++ ) f[i].move( -offset_ );
+    window_.display();
 }
 
 void WindowGui::dragAndDrop( Event e, Vector2i pos ) {
@@ -155,115 +196,28 @@ void WindowGui::dragAndDrop( Event e, Vector2i pos ) {
         if ( e.mouseButton.button == Mouse::Left )
             for ( int i = 0; i < 32; i++ )
                 if ( f[i].getGlobalBounds().contains( pos.x, pos.y ) ) {
-                    isMove = true;
-                    n = i;
-                    dx = pos.x - f[i].getPosition().x;
-                    dy = pos.y - f[i].getPosition().y;
-                    oldPos = f[i].getPosition();
+                    isMove_ = true;
+                    currentFigureIndex_ = i;
+                    dx_ = pos.x - f[i].getPosition().x;
+                    dy_ = pos.y - f[i].getPosition().y;
+                    oldPos_ = f[i].getPosition();
                 }
 
     if ( e.type == Event::MouseButtonReleased )
         if ( e.mouseButton.button == Mouse::Left ) {
-            isMove = false;
-            Vector2f p = f[n].getPosition() + Vector2f( size / 2, size / 2 );
-            newPos = Vector2f( size * int( p.x / size ), size * int( p.y / size ) );
-            str = toChessNote( oldPos ) + toChessNote( newPos );
+            isMove_ = false;
+            Vector2f p = f[currentFigureIndex_].getPosition() + Vector2f( FIGURE_SIZE / 2, FIGURE_SIZE / 2 );
+            newPos_ = Vector2f( FIGURE_SIZE * int( p.x / FIGURE_SIZE ), FIGURE_SIZE * int( p.y / FIGURE_SIZE ) );
+            std::string str = vector2ToChessNotation( oldPos_ ) + vector2ToChessNotation( newPos_ );
 
             try {
-                makeMove( str );  // wrapper to our make move
+                makeMove( str );
             } catch ( std::exception& e ) {
                 std::cout << e.what() << "\r\n";
-                f[n].setPosition( oldPos );
+                f[currentFigureIndex_].setPosition( oldPos_ );
                 return;
             }
-            // makeMove( str );  // wrapper to our make move
-            if ( oldPos != newPos ) position += str + " ";
-            f[n].setPosition( newPos );
+            if ( oldPos_ != newPos_ ) strPosition_ += str + " ";
+            f[currentFigureIndex_].setPosition( newPos_ );
         }
-}
-std::string WindowGui::toChessNote( Vector2f p ) {
-    std::string s = "";
-    s += char( p.x / size + 97 );
-    s += char( 7 - p.y / size + 49 );
-    return s;
-}
-
-void WindowGui::start() {
-    draw();
-
-    // bool compFlag = false;
-
-    while ( window.isOpen() ) {
-        Vector2i pos = Mouse::getPosition( window ) - Vector2i( offset );
-
-        Event e;
-        while ( window.pollEvent( e ) ) {
-            if ( e.type == Event::Closed ) {
-                window.close();
-                break;
-            }
-
-            // ////move back//////
-            // if (e.type == Event::KeyPressed)
-            //   if (e.key.code == Keyboard::BackSpace) {
-            //     if (position.length() > 6)
-            //       position.erase(position.length() - 6, 5);
-            //     loadPosition();
-            //   }
-
-            // draw();
-            // while ( true ) {
-            //     std::string move;
-            //     std::cout << "Enter move: ";
-            //     std::cin >> move;
-            //     try {
-            //         makeMove( move );
-            //     } catch ( std::exception& e ) {
-            //         std::cout << e.what() << "\r\n";
-            //     }
-            // }
-
-            /////drag and drop///////
-            dragAndDrop( e, pos );
-            // Search search_;
-            // PieceValidMoves generator_;
-            // comp
-            if ( Keyboard::isKeyPressed( Keyboard::Space ) ) {
-                MoveContent mov = engine_.getBestMove();
-                std::string str = toChessNotation( mov.src, mov.dest );
-                std::cout << str << "\r\n";
-                // std::string str = engine_.getBestMove().toString();
-
-                oldPos = toCoord( str[0], str[1] );
-                newPos = toCoord( str[2], str[3] );
-
-                for ( int i = 0; i < 32; i++ )
-                    if ( f[i].getPosition() == oldPos ) n = i;
-
-                /////animation///////
-                for ( int k = 0; k < 50; k++ ) {
-                    Vector2f p = newPos - oldPos;
-                    f[n].move( p.x / 50, p.y / 50 );
-                    window.draw( sBoard );
-                    for ( int i = 0; i < 32; i++ ) f[i].move( offset );
-                    for ( int i = 0; i < 32; i++ ) window.draw( f[i] );
-                    window.draw( f[n] );
-                    for ( int i = 0; i < 32; i++ ) f[i].move( -offset );
-                    window.display();
-                }
-
-                makeMove( str );
-                position += str + " ";
-                f[n].setPosition( newPos );
-                // std::cout << "Player to move: " << ( engine_.board.sideToMove == WHITE ? "White" : "Black" ) <<
-                // "\r\n"; std::cout << "Best move: " << ( engine_.getBestMove().toString() ) << "\r\n"; std::cout <<
-                // "Evaluation: " << ( engine_.board.score ) << "\r\n"; std::cout << "\n\n";
-            }
-        }
-
-        if ( isMove )
-            f[n].setPosition( pos.x - dx, pos.y - dy );  // if we are moving piece, we need to update its position
-
-        draw();
-    }
 }

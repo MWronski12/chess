@@ -49,7 +49,7 @@ private:
     std::string vector2ToChessNotation( Vector2f p );
     std::string squareToChessNotation( int square );
     std::string moveContentToChessNotation( int src, int dest );
-    Vector2f toSquareCoord( char a, char b );
+    Vector2f toVector2Coord( char a, char b );
     Engine engine_;
     RenderWindow window_;
     Vector2f offset_;

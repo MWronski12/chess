@@ -1,7 +1,19 @@
+/**
+ * @brief This file contains the implementation of the WindowGui class
+ *
+ * It is responsible for starting the game, handling user input, drawing the board and figures.
+ *
+ * Author: Jakub Dydyński
+ * Date: 06.06.2023
+ */
+
 #include "Gui.hpp"
 
 #include <string>
-
+/**
+ * @brief Construct a new Window Gui:: Window Gui object
+ *
+ */
 WindowGui::WindowGui() : engine_( Engine() ), window_( VideoMode( 504, 504 ), "The Chess!" ), offset_( 28, 28 ) {
     figuresImages_.loadFromFile( "../images/figures.png" );
     boardImage_.loadFromFile( "../images/board1.png" );
@@ -12,6 +24,10 @@ WindowGui::WindowGui() : engine_( Engine() ), window_( VideoMode( 504, 504 ), "T
     loadPosition();
 };
 
+/**
+ * @brief Loads figures initial position on gui
+ *
+ */
 void WindowGui::loadPosition() {
     int k = 0;
     for ( int i = 0; i < 8; i++ )
@@ -29,6 +45,11 @@ void WindowGui::loadPosition() {
 
     for ( int i = 0; i < (int)strPosition_.length(); i += 5 ) makeMoveOnGui( strPosition_.substr( i, 4 ) );
 }
+
+/**
+ * @brief Starts the infinite loop of the game, draws the board and figures, handles moving figures and computer moves
+ * @note Press space to make computer move
+ */
 
 void WindowGui::start() {
     draw();
@@ -49,8 +70,8 @@ void WindowGui::start() {
                 MoveContent mov = engine_.getBestMove();
                 std::string str = moveContentToChessNotation( mov.src, mov.dest );
 
-                oldPos_ = toSquareCoord( str[0], str[1] );
-                newPos_ = toSquareCoord( str[2], str[3] );
+                oldPos_ = toVector2Coord( str[0], str[1] );
+                newPos_ = toVector2Coord( str[2], str[3] );
 
                 for ( int i = 0; i < 32; i++ )
                     if ( f[i].getPosition() == oldPos_ ) currentFigureIndex_ = i;
@@ -81,6 +102,12 @@ void WindowGui::start() {
     }
 }
 
+/**
+ * @brief Converts square index to chess notation
+ *
+ * @param square
+ * @return std::string
+ */
 std::string WindowGui::squareToChessNotation( int square ) {
     int rank = 8 - square / 8;
     int file = square % 8;
@@ -90,12 +117,25 @@ std::string WindowGui::squareToChessNotation( int square ) {
     return notation;
 }
 
+/**
+ * @brief Converts MoveContent to chess notation
+ *
+ * @param src
+ * @param dest
+ * @return std::string
+ */
 std::string WindowGui::moveContentToChessNotation( int src, int dest ) {
     std::string srcNotation = squareToChessNotation( src );
     std::string destNotation = squareToChessNotation( dest );
     return srcNotation + destNotation;
 }
 
+/**
+ * @brief Converts vector2 type to chess notation
+ *
+ * @param p
+ * @return std::string
+ */
 std::string WindowGui::vector2ToChessNotation( Vector2f p ) {
     std::string str = "";
     str += char( p.x / FIGURE_SIZE + 97 );
@@ -103,6 +143,11 @@ std::string WindowGui::vector2ToChessNotation( Vector2f p ) {
     return str;
 }
 
+/**
+ * @brief Makes move on gui
+ *
+ * @param move string in chess notation
+ */
 void WindowGui::makeMove( std::string move ) {
     // Calculate and validate SquareIndex
     int src = 8 * ( 8 - ( int( move[1] ) - 48 ) ) + ( int( toupper( move[0] ) ) - 65 );
@@ -148,6 +193,14 @@ void WindowGui::makeMove( std::string move ) {
         throw std::invalid_argument( "Invalid move notation!" );
     }
 }
+
+/**
+ * @brief Updates board state and GUI after making a move
+ *
+ * @param src   source square index
+ * @param dest  destination square index
+ * @param promotion promotion type
+ */
 void WindowGui::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) {
     auto& piece = engine_.board.squares[src];
 
@@ -164,9 +217,14 @@ void WindowGui::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion
     makeMoveOnGui( str );
 }
 
+/**
+ * @brief Updates GUI after making a move
+ *
+ * @param str string in chess notation
+ */
 void WindowGui::makeMoveOnGui( std::string str ) {
-    Vector2f oldPos_ = toSquareCoord( str[0], str[1] );
-    Vector2f newPos_ = toSquareCoord( str[2], str[3] );
+    Vector2f oldPos_ = toVector2Coord( str[0], str[1] );
+    Vector2f newPos_ = toVector2Coord( str[2], str[3] );
 
     for ( int i = 0; i < 32; i++ )
         if ( f[i].getPosition() == newPos_ ) f[i].setPosition( -100, -100 );
@@ -175,12 +233,23 @@ void WindowGui::makeMoveOnGui( std::string str ) {
         if ( f[i].getPosition() == oldPos_ ) f[i].setPosition( newPos_ );
 }
 
-Vector2f WindowGui::toSquareCoord( char a, char b ) {
+/**
+ * @brief Converts chess notation to vector2 type
+ *
+ * @param a
+ * @param b
+ * @return Vector2f
+ */
+Vector2f WindowGui::toVector2Coord( char a, char b ) {
     int x = int( a ) - 97;
     int y = 7 - int( b ) + 49;
     return Vector2f( x * FIGURE_SIZE, y * FIGURE_SIZE );
 }
 
+/**
+ * @brief draws the board and figures
+ *
+ */
 void WindowGui::draw() {
     window_.clear();
     window_.draw( board_ );
@@ -191,6 +260,12 @@ void WindowGui::draw() {
     window_.display();
 }
 
+/**
+ * @brief handles user dragging and dropping figures
+ *
+ * @param e
+ * @param pos
+ */
 void WindowGui::dragAndDrop( Event e, Vector2i pos ) {
     if ( e.type == Event::MouseButtonPressed )
         if ( e.mouseButton.button == Mouse::Left )

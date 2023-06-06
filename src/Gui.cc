@@ -13,7 +13,7 @@
 
 #include <string>
 /**
- * @brief Construct a new Window Gui:: Window Gui object
+ * @brief Constructor of WindowGui object
  *
  */
 WindowGui::WindowGui() : engine_( Engine() ), window_( VideoMode( 504, 504 ), "The Chess!" ), offset_( 28, 28 ) {

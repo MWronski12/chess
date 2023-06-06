@@ -5,7 +5,6 @@
 #include <iostream>
 #include <limits>
 
-
 /**
  * Returns the best possible move for the current player.
  * It assumes that the board has valid moves calculated and the game is not over yet!
@@ -103,9 +102,9 @@ MoveContent Search::getBestMove( const Board& examinedBoard, int maxDepth, bool 
 int Search::alphaBeta( const Board& examinedBoard, int depth, int alpha, int beta, bool maximizingPlayer,
                        int& nodesExamined, int& nodesEvaluated, int& nodesPruned, int& nodesExaminedQ,
                        int& nodesEvaluatedQ, int& nodesPrunedQ ) const {
-    nodesExamined++;
+    ++nodesExamined;
     if ( depth == 0 ) {
-        nodesEvaluated++;
+        ++nodesEvaluated;
         return quiescentSearch( examinedBoard, depth / 2 + 1, alpha, beta, maximizingPlayer, nodesExaminedQ,
                                 nodesEvaluatedQ, nodesPrunedQ );
     }
@@ -134,7 +133,7 @@ int Search::alphaBeta( const Board& examinedBoard, int depth, int alpha, int bet
                                   nodesExaminedQ, nodesEvaluatedQ, nodesPrunedQ );
             alpha = std::max( alpha, eval );
             if ( beta <= alpha ) {
-                nodesPruned++;
+                ++nodesPruned;
                 break;
             }
         }
@@ -159,7 +158,7 @@ int Search::alphaBeta( const Board& examinedBoard, int depth, int alpha, int bet
                                   nodesExaminedQ, nodesEvaluatedQ, nodesPrunedQ );
             beta = std::min( beta, eval );
             if ( beta <= alpha ) {
-                nodesPruned++;
+                ++nodesPruned;
                 break;
             }
         }
@@ -288,11 +287,11 @@ std::vector<MoveContent> Search::getPossibleCaptureMoves( const Board& board ) c
  */
 int Search::quiescentSearch( const Board& examinedBoard, int depth, int alpha, int beta, bool maximizingPlayer,
                              int& nodesExamined, int& nodesEvaluated, int& nodesPruned ) const {
-    nodesExamined++;
+    ++nodesExamined;
     std::vector<MoveContent> possibleCaptureMoves = getPossibleCaptureMoves( examinedBoard );
 
     if ( depth == 0 || possibleCaptureMoves.empty() ) {
-        nodesEvaluated++;
+        ++nodesEvaluated;
         return Evaluation::evaluateBoard( examinedBoard );
     }
 
@@ -310,7 +309,7 @@ int Search::quiescentSearch( const Board& examinedBoard, int depth, int alpha, i
                 quiescentSearch( board, depth - 1, alpha, beta, false, nodesExamined, nodesEvaluated, nodesPruned );
             alpha = std::max( alpha, eval );
             if ( beta <= alpha ) {
-                nodesPruned++;
+                ++nodesPruned;
                 break;
             }
         }
@@ -331,7 +330,7 @@ int Search::quiescentSearch( const Board& examinedBoard, int depth, int alpha, i
                 quiescentSearch( board, depth - 1, alpha, beta, true, nodesExamined, nodesEvaluated, nodesPruned );
             beta = std::min( beta, eval );
             if ( beta <= alpha ) {
-                nodesPruned++;
+                ++nodesPruned;
                 break;
             }
         }

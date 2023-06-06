@@ -18,7 +18,7 @@ static int countTotalMoves( PieceColor color, PieceType type ) {
         for ( auto &ray : pieceMoves.getMoveList( color, type, square ) ) {
             for ( auto &_ : ray ) {
                 (void)_;
-                count++;
+                ++count;
             }
         }
 

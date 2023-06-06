@@ -1,7 +1,7 @@
 /**
  * @file PieceMoves.cc
  * @author Mikołaj Wroński
- * @brief   Implementation of PieceMoves class. Generates move vectors for all pieces on every square.
+ * @brief Implementation of PieceMoves class. Generates move vectors for all pieces on every square.
  * @date 2023-06-06
  *
  * @copyright Copyright (c) 2023
@@ -210,8 +210,8 @@ void PieceMoves::generateBishopMoves() {
 
             // Bottom right diagonal ray
             while ( row < 7 && col < 7 ) {
-                row++;
-                col++;
+                ++row;
+                ++col;
                 move = position( col, row );
                 ray.push_back( move );
             }
@@ -222,8 +222,8 @@ void PieceMoves::generateBishopMoves() {
 
             // Bottom left diagonal ray
             while ( row < 7 && col > 0 ) {
-                row++;
-                col--;
+                ++row;
+                --col;
                 move = position( col, row );
                 ray.push_back( move );
             }
@@ -234,8 +234,8 @@ void PieceMoves::generateBishopMoves() {
 
             // Top right diagonal ray
             while ( row > 0 && col < 7 ) {
-                row--;
-                col++;
+                --row;
+                ++col;
                 move = position( col, row );
                 ray.push_back( move );
             }
@@ -246,8 +246,8 @@ void PieceMoves::generateBishopMoves() {
 
             // Top left diagonal ray
             while ( row > 0 && col > 0 ) {
-                row--;
-                col--;
+                --row;
+                --col;
                 move = position( col, row );
                 ray.push_back( move );
             }
@@ -279,7 +279,7 @@ void PieceMoves::generateRookMoves() {
 
             // Top side ray
             while ( row > 0 ) {
-                row--;
+                --row;
                 move = position( col, row );
                 ray.push_back( move );
             }
@@ -290,7 +290,7 @@ void PieceMoves::generateRookMoves() {
 
             // Left side ray
             while ( col > 0 ) {
-                col--;
+                --col;
                 move = position( col, row );
                 ray.push_back( move );
             }
@@ -322,7 +322,7 @@ void PieceMoves::generateQueenMoves() {
 
             // Bottom sie ray
             while ( row < 7 ) {
-                row++;
+                ++row;
                 move = position( col, row );
                 ray.push_back( move );
             }
@@ -333,7 +333,7 @@ void PieceMoves::generateQueenMoves() {
 
             // Top side ray
             while ( row > 0 ) {
-                row--;
+                --row;
                 move = position( col, row );
                 ray.push_back( move );
             }
@@ -344,7 +344,7 @@ void PieceMoves::generateQueenMoves() {
 
             // Left side ray
             while ( col > 0 ) {
-                col--;
+                --col;
                 move = position( col, row );
                 ray.push_back( move );
             }
@@ -355,7 +355,7 @@ void PieceMoves::generateQueenMoves() {
 
             // Right side ray
             while ( col < 7 ) {
-                col++;
+                ++col;
                 move = position( col, row );
                 ray.push_back( move );
             }
@@ -366,8 +366,8 @@ void PieceMoves::generateQueenMoves() {
 
             // Botton right diagonal ray
             while ( row < 7 && col < 7 ) {
-                row++;
-                col++;
+                ++row;
+                ++col;
                 move = position( col, row );
                 ray.push_back( move );
             }
@@ -378,8 +378,8 @@ void PieceMoves::generateQueenMoves() {
 
             // Bottom left diagonal ray
             while ( row < 7 && col > 0 ) {
-                row++;
-                col--;
+                ++row;
+                --col;
                 move = position( col, row );
                 ray.push_back( move );
             }
@@ -390,8 +390,8 @@ void PieceMoves::generateQueenMoves() {
 
             // Top right diagonal ray
             while ( row > 0 && col < 7 ) {
-                row--;
-                col++;
+                --row;
+                ++col;
                 move = position( col, row );
                 ray.push_back( move );
             }
@@ -402,8 +402,8 @@ void PieceMoves::generateQueenMoves() {
 
             // Top left diagonal ray
             while ( row > 0 && col > 0 ) {
-                row--;
-                col--;
+                --row;
+                --col;
                 move = position( col, row );
                 ray.push_back( move );
             }
@@ -424,7 +424,7 @@ void PieceMoves::generateKingMoves() {
 
             // Bottom side ray
             if ( row < 7 ) {
-                row++;
+                ++row;
                 move = position( col, row );
                 ray.push_back( move );
                 kingMoves_[index].push_back( ray );
@@ -435,7 +435,7 @@ void PieceMoves::generateKingMoves() {
 
             // Top side ray
             if ( row > 0 ) {
-                row--;
+                --row;
                 move = position( col, row );
                 ray.push_back( move );
                 kingMoves_[index].push_back( ray );
@@ -446,7 +446,7 @@ void PieceMoves::generateKingMoves() {
 
             // Left side ray
             if ( col > 0 ) {
-                col--;
+                --col;
                 move = position( col, row );
                 ray.push_back( move );
                 // Queen side castle
@@ -463,7 +463,7 @@ void PieceMoves::generateKingMoves() {
 
             // Right side ray
             if ( col < 7 ) {
-                col++;
+                ++col;
                 move = position( col, row );
                 ray.push_back( move );
                 // King side castle
@@ -480,8 +480,8 @@ void PieceMoves::generateKingMoves() {
 
             // Bottom right diagonal ray
             if ( row < 7 && col < 7 ) {
-                row++;
-                col++;
+                ++row;
+                ++col;
                 move = position( col, row );
                 ray.push_back( move );
                 kingMoves_[index].push_back( ray );
@@ -492,8 +492,8 @@ void PieceMoves::generateKingMoves() {
 
             // Bottom left diagonal ray
             if ( row < 7 && col > 0 ) {
-                row++;
-                col--;
+                ++row;
+                --col;
                 move = position( col, row );
                 ray.push_back( move );
                 kingMoves_[index].push_back( ray );
@@ -504,8 +504,8 @@ void PieceMoves::generateKingMoves() {
 
             // Top right diagonal ray
             if ( row > 0 && col < 7 ) {
-                row--;
-                col++;
+                --row;
+                ++col;
                 move = position( col, row );
                 ray.push_back( move );
                 kingMoves_[index].push_back( ray );
@@ -516,8 +516,8 @@ void PieceMoves::generateKingMoves() {
 
             // Top left diagonal ray
             if ( row > 0 && col > 0 ) {
-                row--;
-                col--;
+                --row;
+                --col;
                 move = position( col, row );
                 ray.push_back( move );
                 kingMoves_[index].push_back( ray );

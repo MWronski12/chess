@@ -1,0 +1,8 @@
+Temat
+Szachy z wykorzystaniem algorytmu MiniMax
+
+
+Rozwinięcie tematu i opis
+Tematem projektu jest implementacja szachów a dokładniej aplikacji komputerowej umożliwiającej grę w szachy w kilku trybach: użytkownik kontra użytkowniki, użytkownik kontra komputer. 
+Aplikacja powinna posiadać interfejs graficzny prezentujący plansze oraz figury, a także podstawową komunikację z użytkownikiem prezentującą wynik rozgrywki, czy też niepoprawnie wykonany ruch.
+Silnik szachowy, który będzie sterował komputerem w trybie użytkownik kontra komputer będzie oparty na algorytmie MiniMax, funkcji ewaluacyjnej oraz tabeli transpozycji.

@@ -7,7 +7,9 @@
 using namespace std;
 
 int main() {
-    Gui *gui = new ConsoleGui();
-    gui->start();
+    // Gui *gui = new ConsoleGui();
+    // gui->start();
+    WindowGui gui = WindowGui();
+    gui.start();
     return 0;
 }

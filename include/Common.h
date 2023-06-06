@@ -10,13 +10,13 @@ using SquareIndex = uint8_t;
 enum PieceColor { WHITE, BLACK };
 
 enum PieceType {
-    EMPTY,
-    PAWN,
+    ROOK,
     KNIGHT,
     BISHOP,
-    ROOK,
     QUEEN,
     KING,
+    PAWN,
+    EMPTY,
 };
 
 enum SquareIndexEnum {

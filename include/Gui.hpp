@@ -36,31 +36,31 @@ using namespace sf;
 
 class WindowGui : public Gui {
 public:
-    WindowGui( Board& board );
+    WindowGui();
     virtual void makeMove( std::string move ) override;
-    virtual void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion ) override;
+    virtual void makeMove( SquareIndex src, SquareIndex dest, PieceType promotion = EMPTY ) override;
     virtual void draw() override;
     void start() override;
     void dragAndDrop( Event e, Vector2i pos );
     std::string toChessNote( Vector2f p );
-    RenderWindow window;   // ok
-    Vector2f offset;       // ok
-    Sprite f[32];          // ok
-    bool isMove = false;   // ok
-    float dx = 0, dy = 0;  // ok
-    int n = 0;             // ok
+    RenderWindow window;      // ok
+    Vector2f offset;          // ok
+    Sprite f[32];             // ok
+    bool isMove = false;      // ok
+    float dx = 0, dy = 0;     // ok
+    int n = 0;                // ok
+    Vector2f oldPos, newPos;  // ok
+    Vector2f toCoord( char a, char b );
+    Sprite sBoard;
+    std::string position = "";  // ok
 
 private:
-    Board& board;    // ok
-    Texture t1, t2;  // ok
-    Sprite sBoard;
-    Vector2f oldPos, newPos;    // ok
-    std::string str;            // ok
-    std::string position = "";  // ok
-    int size = 56;              // ok
+    Engine engine_;
+    Texture t1, t2;   // ok
+    std::string str;  // ok
+    int size = 56;    // ok
     void loadPosition();
     void _move( std::string str );
-    Vector2f toCoord( char a, char b );
 };
 
 /* ------------------------------------------------------------------------------------------------------------------ */

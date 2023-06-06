@@ -1,5 +1,4 @@
 #include "Search.h"
-
 #include "catch2/catch_test_macros.hpp"
 
 /* ------------------------------ evaluateMoves ----------------------------- */
@@ -38,8 +37,7 @@ TEST_CASE( "quiescentSearch returns evaluation of a quiet position ", "[Search.q
     PieceValidMoves g;
     g.generateValidMoves( b );
     int nodesExamined = 0, nodesEvaluated = 0, nodesPruned = 0;
-    int quietEval = s.quiescentSearch( b, 5, NEGATIVE_INFINITY, POSITIVE_INFINITY, true, nodesExamined, nodesEvaluated,
-                                       nodesPruned );
+    int quietEval = s.quiescentSearch( b, 5, NEGATIVE_INFINITY, POSITIVE_INFINITY, true );
     REQUIRE( quietEval == 10 );
     REQUIRE( nodesExamined == 2 );
     REQUIRE( nodesEvaluated == 1 );

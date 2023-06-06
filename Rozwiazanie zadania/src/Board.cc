@@ -3,17 +3,17 @@
  * @author Mikołaj Wroński
  * @brief  Board class representing position in the game of chess.
  * Contains all the information necessary to continue a valid game of chess.
- * Provides makeMove method.
+ * Provides makeMove method for manipulating its internal state.
  * @date 2023-03-024
  *
  * @copyright Copyright (c) 2023
  *
  */
-#include "Board.h"
-
 #include <sstream>
 #include <stdexcept>
 #include <string>
+
+#include "Board.h"
 
 /* ------------------------------ Constructors ------------------------------ */
 

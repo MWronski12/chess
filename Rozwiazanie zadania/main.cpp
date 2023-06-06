@@ -7,9 +7,8 @@
 using namespace std;
 
 int main() {
-    // Gui *gui = new ConsoleGui();
-    // gui->start();
-    WindowGui gui = WindowGui();
+    WindowGui gui = WindowGui();  // Window gui does not integrate the engine at this point.
+    // ConsoleGui gui = ConsoleGui(); // Console gui integrates the engine and provides info on the best move.
     gui.start();
     return 0;
 }

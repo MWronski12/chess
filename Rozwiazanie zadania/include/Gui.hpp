@@ -1,3 +1,16 @@
+/**
+ * @file Gui.hpp
+ * @author Jakub Dydyński
+ * @brief  GUI interface and console GUI implementation made mostly for testing during development.
+ * @date 2023-03-024
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
+
+#ifndef GUI_HPP
+#define GUI_HPP
+
 #include <inttypes.h>
 #include <time.h>
 
@@ -206,10 +219,13 @@ private:
             }
         }
 
-        std::cout << "  A  B  C  D  E  F  G  H\r\n";
+        std::cout << "  A  B  C  D  E  F  G  H\r\n\r\n";
         std::cout << "Player to move: " << ( engine_.board.sideToMove == WHITE ? "White" : "Black" ) << "\r\n";
+        std::cout << "Thinking on the move...\r\n";
         std::cout << "Best move: " << ( engine_.getBestMove().toString() ) << "\r\n";
         std::cout << "Evaluation: " << ( engine_.board.score ) << "\r\n";
         std::cout << "\n\n";
     }
 };
+
+#endif  // GUI_HPP

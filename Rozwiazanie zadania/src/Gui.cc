@@ -9,9 +9,10 @@
  *
  */
 
+#include <string>
+
 #include "Gui.hpp"
 
-#include <string>
 /**
  * @brief Constructor of WindowGui object
  *
@@ -26,7 +27,7 @@ WindowGui::WindowGui() : engine_( Engine() ), window_( VideoMode( 504, 504 ), "T
     board_ = Sprite( boardImage_ );
 
     loadPosition();
-};
+}
 
 /**
  * @brief Loads figures initial position on gui
@@ -293,7 +294,7 @@ void WindowGui::dragAndDrop( Event e, Vector2i pos ) {
         if ( e.mouseButton.button == Mouse::Left ) {
             isMove_ = false;
             Vector2f p = f[currentFigureIndex_].getPosition() + Vector2f( FIGURE_SIZE / 2, FIGURE_SIZE / 2 );
-            newPos_ = Vector2f( FIGURE_SIZE * int( p.x / FIGURE_SIZE ), FIGURE_SIZE * int( p.y / FIGURE_SIZE ) );
+            newPos_ = Vector2f( FIGURE_SIZE * int( p.x / FIGURE_SIZE ), FIGURE_SIZE* int( p.y / FIGURE_SIZE ) );
             std::string str = vector2ToChessNotation( oldPos_ ) + vector2ToChessNotation( newPos_ );
 
             try {

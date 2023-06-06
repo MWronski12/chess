@@ -25,15 +25,12 @@ public:
 
     std::vector<MoveContent> getPossibleCaptureMoves( const Board& board ) const;
 
-    int quiescentSearch( const Board& board, int depth, int alpha, int beta, bool maximizingPlayer, int& nodesExamined,
-                         int& nodesEvaluated, int& nodesPruned ) const;
+    int quiescentSearch( const Board& board, int depth, int alpha, int beta, bool maximizingPlayer ) const;
 
 private:
     mutable PieceValidMoves generator;
 
-    int alphaBeta( const Board& examineBoard, int depth, int alpha, int beta, bool maximizingPlayer, int& nodesExamined,
-                   int& nodesEvaluated, int& nodesPruned, int& nodesExaminedQ, int& nodesEvaluatedQ,
-                   int& nodesPrunedQ ) const;
+    int alphaBeta( const Board& examineBoard, int depth, int alpha, int beta, bool maximizingPlayer ) const;
 
     int endOfTheGameScore( const Board& board ) const;
 };

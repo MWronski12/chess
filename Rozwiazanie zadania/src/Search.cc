@@ -1,9 +1,20 @@
-#include "Search.h"
+/**
+ * @file Search.cc
+ * @author Mikołaj Wroński
+ * @brief Search class that implements alpha-beta pruning algorithm with iterative deepening and quiescent search.
+ * @date 2023-05-30
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 
 #include <algorithm>
 #include <chrono>
 #include <iostream>
 #include <limits>
+#include <optional>
+
+#include "Search.h"
 
 /**
  * Returns the best possible move for the current player.
@@ -12,18 +23,12 @@
  * @param board position to examine.
  * @param maxDepth maximum depth of search.
  * @param maximizingPlayer true if the current player is WHITE, false if BLACK.
+ * @param timeout in seconds.
  *
  * @return MoveContent representing the best move for the current player.
  */
 MoveContent Search::getBestMove( const Board& examinedBoard, int maxDepth, bool maximizingPlayer, int timeout ) const {
     auto start = std::chrono::steady_clock::now();
-
-    int nodesExamined = 0;
-    int nodesEvaluated = 0;
-    int nodesPruned = 0;
-    int nodesExaminedQ = 0;
-    int nodesEvaluatedQ = 0;
-    int nodesPrunedQ = 0;
 
     MoveContent bestMove;
     bestMove.score = maximizingPlayer ? NEGATIVE_INFINITY : POSITIVE_INFINITY;
@@ -51,9 +56,7 @@ MoveContent Search::getBestMove( const Board& examinedBoard, int maxDepth, bool 
                 break;
             }
 
-            move.score =
-                alphaBeta( board, depth, NEGATIVE_INFINITY, POSITIVE_INFINITY, !maximizingPlayer, nodesExamined,
-                           nodesEvaluated, nodesPruned, nodesExaminedQ, nodesEvaluatedQ, nodesPrunedQ );
+            move.score = alphaBeta( board, depth, NEGATIVE_INFINITY, POSITIVE_INFINITY, !maximizingPlayer );
 
             // Found a better move
             if ( ( maximizingPlayer && move.score > bestMove.score ) ||
@@ -76,15 +79,6 @@ MoveContent Search::getBestMove( const Board& examinedBoard, int maxDepth, bool 
         }
     }
 
-    std::cout << "Nodes examined: " << nodesExamined << std::endl;
-    std::cout << "Nodes evaluated: " << nodesEvaluated << std::endl;
-    std::cout << "Nodes pruned: " << nodesPruned << std::endl;
-    std::cout << "Depth searched: " << depth << std::endl;
-    std::cout << std::endl;
-    std::cout << "Nodes examined Q: " << nodesExaminedQ << std::endl;
-    std::cout << "Nodes evaluated Q: " << nodesEvaluatedQ << std::endl;
-    std::cout << "Nodes pruned Q:" << nodesPrunedQ << std::endl;
-
     return bestMove;
 }
 
@@ -99,14 +93,9 @@ MoveContent Search::getBestMove( const Board& examinedBoard, int maxDepth, bool 
  *
  * @return int score for the current board and player.
  */
-int Search::alphaBeta( const Board& examinedBoard, int depth, int alpha, int beta, bool maximizingPlayer,
-                       int& nodesExamined, int& nodesEvaluated, int& nodesPruned, int& nodesExaminedQ,
-                       int& nodesEvaluatedQ, int& nodesPrunedQ ) const {
-    ++nodesExamined;
+int Search::alphaBeta( const Board& examinedBoard, int depth, int alpha, int beta, bool maximizingPlayer ) const {
     if ( depth == 0 ) {
-        ++nodesEvaluated;
-        return quiescentSearch( examinedBoard, depth / 2 + 1, alpha, beta, maximizingPlayer, nodesExaminedQ,
-                                nodesEvaluatedQ, nodesPrunedQ );
+        return quiescentSearch( examinedBoard, depth / 2 + 1, alpha, beta, maximizingPlayer );
     }
 
     // If no legal moves found we decide that the game is over.
@@ -129,11 +118,9 @@ int Search::alphaBeta( const Board& examinedBoard, int depth, int alpha, int bet
 
             // We found a legal move, the game is not over.
             isEndOfTheGame = false;
-            int eval = alphaBeta( board, depth - 1, alpha, beta, false, nodesExamined, nodesEvaluated, nodesPruned,
-                                  nodesExaminedQ, nodesEvaluatedQ, nodesPrunedQ );
+            int eval = alphaBeta( board, depth - 1, alpha, beta, false );
             alpha = std::max( alpha, eval );
             if ( beta <= alpha ) {
-                ++nodesPruned;
                 break;
             }
         }
@@ -154,11 +141,9 @@ int Search::alphaBeta( const Board& examinedBoard, int depth, int alpha, int bet
             }
 
             isEndOfTheGame = false;
-            int eval = alphaBeta( board, depth - 1, alpha, beta, true, nodesExamined, nodesEvaluated, nodesPruned,
-                                  nodesExaminedQ, nodesEvaluatedQ, nodesPrunedQ );
+            int eval = alphaBeta( board, depth - 1, alpha, beta, true );
             beta = std::min( beta, eval );
             if ( beta <= alpha ) {
-                ++nodesPruned;
                 break;
             }
         }
@@ -285,13 +270,10 @@ std::vector<MoveContent> Search::getPossibleCaptureMoves( const Board& board ) c
  *
  * @return int score for the current board and player.
  */
-int Search::quiescentSearch( const Board& examinedBoard, int depth, int alpha, int beta, bool maximizingPlayer,
-                             int& nodesExamined, int& nodesEvaluated, int& nodesPruned ) const {
-    ++nodesExamined;
+int Search::quiescentSearch( const Board& examinedBoard, int depth, int alpha, int beta, bool maximizingPlayer ) const {
     std::vector<MoveContent> possibleCaptureMoves = getPossibleCaptureMoves( examinedBoard );
 
     if ( depth == 0 || possibleCaptureMoves.empty() ) {
-        ++nodesEvaluated;
         return Evaluation::evaluateBoard( examinedBoard );
     }
 
@@ -305,11 +287,9 @@ int Search::quiescentSearch( const Board& examinedBoard, int depth, int alpha, i
                 continue;
             }
 
-            int eval =
-                quiescentSearch( board, depth - 1, alpha, beta, false, nodesExamined, nodesEvaluated, nodesPruned );
+            int eval = quiescentSearch( board, depth - 1, alpha, beta, false );
             alpha = std::max( alpha, eval );
             if ( beta <= alpha ) {
-                ++nodesPruned;
                 break;
             }
         }
@@ -326,11 +306,9 @@ int Search::quiescentSearch( const Board& examinedBoard, int depth, int alpha, i
                 continue;
             }
 
-            int eval =
-                quiescentSearch( board, depth - 1, alpha, beta, true, nodesExamined, nodesEvaluated, nodesPruned );
+            int eval = quiescentSearch( board, depth - 1, alpha, beta, true );
             beta = std::min( beta, eval );
             if ( beta <= alpha ) {
-                ++nodesPruned;
                 break;
             }
         }

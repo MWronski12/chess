@@ -14,6 +14,21 @@ WindowGui::WindowGui() : engine_( Engine() ), window( VideoMode( 504, 504 ), "Th
     loadPosition();
 };
 
+std::string toChessNotation( int square ) {
+    int rank = 8 - square / 8;
+    int file = square % 8;
+    std::string notation = "";
+    notation += char( file + 'a' );
+    notation += char( rank + '0' );
+    return notation;
+}
+
+std::string toChessNotation( int src, int dest ) {
+    std::string srcNotation = toChessNotation( src );
+    std::string destNotation = toChessNotation( dest );
+    return srcNotation + destNotation;
+}
+
 void WindowGui::loadPosition() {
     int k = 0;
     for ( int i = 0; i < 8; i++ )
@@ -38,10 +53,14 @@ void WindowGui::_move( std::string str ) {
     // w gui dodać promotion
 
     for ( int i = 0; i < 32; i++ )
-        if ( f[i].getPosition() == newPos ) f[i].setPosition( -100, -100 );
+        if ( f[i].getPosition() == newPos )
+            //
+            f[i].setPosition( -100, -100 );
 
     for ( int i = 0; i < 32; i++ )
-        if ( f[i].getPosition() == oldPos ) f[i].setPosition( newPos );
+        if ( f[i].getPosition() == oldPos )
+            //
+            f[i].setPosition( newPos );
 }
 
 void WindowGui::makeMove( std::string move ) {
@@ -82,7 +101,7 @@ void WindowGui::makeMove( std::string move ) {
                 break;
         }
         makeMove( src, dest, promotion );
-        _move( move );
+
     }
     // Invalid move
     else {
@@ -104,8 +123,9 @@ void WindowGui::makeMove( SquareIndex src, SquareIndex dest, PieceType promotion
     if ( engine_.makeMove( src, dest, promotion ) == false ) {
         throw std::logic_error( "Move leaves the king in check!" );
     };
-
-    draw();
+    std::string str = toChessNotation( src, dest );
+    _move( str );
+    // draw();
 }
 
 Vector2f WindowGui::toCoord( char a, char b ) {
@@ -168,20 +188,6 @@ std::string WindowGui::toChessNote( Vector2f p ) {
     return s;
 }
 
-std::string toChessNotation( int square ) {
-    int rank = 8 - square / 8;
-    int file = square % 8;
-    std::string notation = "";
-    notation += char( file + 'a' );
-    notation += char( rank + '0' );
-    return notation;
-}
-
-std::string toChessNotation( int src, int dest ) {
-    std::string srcNotation = toChessNotation( src );
-    std::string destNotation = toChessNotation( dest );
-    return srcNotation + destNotation;
-}
 void WindowGui::start() {
     draw();
 

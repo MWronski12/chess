@@ -1,9 +1,10 @@
+#include "Search.h"
+
 #include <algorithm>
 #include <chrono>
 #include <iostream>
 #include <limits>
 
-#include "Search.h"
 
 /**
  * Returns the best possible move for the current player.
@@ -122,7 +123,8 @@ int Search::alphaBeta( const Board& examinedBoard, int depth, int alpha, int bet
             auto board = examinedBoard;
             board.makeMove( move.src, move.dest, move.promotion );
             generator.generateValidMoves( board );
-            if ( !generator.validateBoard( board ) ) {
+            if ( !generator.validateBoard(
+                     board ) ) {  // continues to search for legal move in none was found then isEndOfTheGame is true
                 continue;
             }
 

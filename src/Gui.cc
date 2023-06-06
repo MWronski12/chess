@@ -20,7 +20,9 @@ WindowGui::WindowGui() : engine_( Engine() ), window_( VideoMode( 504, 504 ), "T
     figuresImages_.loadFromFile( "../images/figures.png" );
     boardImage_.loadFromFile( "../images/board1.png" );
 
-    for ( int i = 0; i < 32; i++ ) f[i].setTexture( figuresImages_ );
+    for ( int i = 0; i < 32; i++ )
+        f[i].setTexture( figuresImages_ );
+
     board_ = Sprite( boardImage_ );
 
     loadPosition();
@@ -45,7 +47,8 @@ void WindowGui::loadPosition() {
                 continue;
         }
 
-    for ( int i = 0; i < (int)strPosition_.length(); i += 5 ) makeMoveOnGui( strPosition_.substr( i, 4 ) );
+    for ( int i = 0; i < (int)strPosition_.length(); i += 5 )
+        makeMoveOnGui( strPosition_.substr( i, 4 ) );
 }
 
 /**
@@ -83,10 +86,13 @@ void WindowGui::start() {
                     Vector2f p = newPos_ - oldPos_;
                     f[currentFigureIndex_].move( p.x / 50, p.y / 50 );
                     window_.draw( board_ );
-                    for ( int i = 0; i < 32; i++ ) f[i].move( offset_ );
-                    for ( int i = 0; i < 32; i++ ) window_.draw( f[i] );
+                    for ( int i = 0; i < 32; i++ )
+                        f[i].move( offset_ );
+                    for ( int i = 0; i < 32; i++ )
+                        window_.draw( f[i] );
                     window_.draw( f[currentFigureIndex_] );
-                    for ( int i = 0; i < 32; i++ ) f[i].move( -offset_ );
+                    for ( int i = 0; i < 32; i++ )
+                        f[i].move( -offset_ );
                     window_.display();
                 }
 
@@ -255,10 +261,13 @@ Vector2f WindowGui::toVector2Coord( char a, char b ) {
 void WindowGui::draw() {
     window_.clear();
     window_.draw( board_ );
-    for ( int i = 0; i < 32; i++ ) f[i].move( offset_ );
-    for ( int i = 0; i < 32; i++ ) window_.draw( f[i] );
+    for ( int i = 0; i < 32; i++ )
+        f[i].move( offset_ );
+    for ( int i = 0; i < 32; i++ )
+        window_.draw( f[i] );
     window_.draw( f[currentFigureIndex_] );
-    for ( int i = 0; i < 32; i++ ) f[i].move( -offset_ );
+    for ( int i = 0; i < 32; i++ )
+        f[i].move( -offset_ );
     window_.display();
 }
 

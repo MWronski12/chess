@@ -440,15 +440,15 @@ void Board::handleCastling( SquareIndex src, SquareIndex dest ) {
     if ( src == 60 ) {
         // king side
         if ( dest == 62 ) {
-            squares[61] = std::move( squares[63] );
-            squares[61]->hasMoved = true;
-            squares[63] = std::nullopt;
+            squares[dest - 1] = std::move( squares[dest + 1] );
+            squares[dest - 1]->hasMoved = true;
+            squares[dest + 1] = std::nullopt;
         }
         // queen side
         if ( dest == 58 ) {
-            squares[59] = std::move( squares[56] );
-            squares[59]->hasMoved = true;
-            squares[56] = std::nullopt;
+            squares[dest + 1] = std::move( squares[dest - 2] );
+            squares[dest + 1]->hasMoved = true;
+            squares[dest - 2] = std::nullopt;
         }
         whiteHasCastled = true;
     }
@@ -456,15 +456,15 @@ void Board::handleCastling( SquareIndex src, SquareIndex dest ) {
     else if ( src == 4 ) {
         // king side
         if ( dest == 6 ) {
-            squares[5] = std::move( squares[7] );
-            squares[5]->hasMoved = true;
-            squares[7] = std::nullopt;
+            squares[dest - 1] = std::move( squares[dest + 1] );
+            squares[dest - 1]->hasMoved = true;
+            squares[dest + 1] = std::nullopt;
         }
         // queen side
         else if ( dest == 2 ) {
-            squares[3] = std::move( squares[0] );
-            squares[3]->hasMoved = true;
-            squares[0] = std::nullopt;
+            squares[dest + 1] = std::move( squares[dest - 2] );
+            squares[dest + 1]->hasMoved = true;
+            squares[dest - 2] = std::nullopt;
         }
         blackHasCastled = true;
     }

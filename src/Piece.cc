@@ -1,6 +1,16 @@
-#include <stdexcept>
+/**
+ * @file Piece.cc
+ * @author Jakub Dydyński
+ * @brief Implementation of Piece class. Represents a single piece on the board.
+ * @date 2023-06-06
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 
 #include "Piece.h"
+
+#include <stdexcept>
 
 /* ------------------------------ Constructors ------------------------------ */
 

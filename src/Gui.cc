@@ -1,10 +1,12 @@
 /**
- * @brief This file contains the implementation of the WindowGui class
+ * @file Piece.cc
+ * @author Jakub Dydyński
+ * @brief This file contains the implementation of the WindowGui class. It is responsible for starting the game,
+ * handling user input, drawing the board and figures.
+ * @date 2023-06-06
  *
- * It is responsible for starting the game, handling user input, drawing the board and figures.
+ * @copyright Copyright (c) 2023
  *
- * Author: Jakub Dydyński
- * Date: 06.06.2023
  */
 
 #include "Gui.hpp"

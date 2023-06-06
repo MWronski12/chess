@@ -1,3 +1,13 @@
+/**
+ * @file MoveContent.cc
+ * @author Mikołaj Wroński
+ * @brief Implementation of MoveContent class. Represents a single move.
+ * @date 2023-06-06
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
+
 #include "MoveContent.h"
 
 MoveContent::MoveContent( SquareIndex src, SquareIndex dest, PieceType promotion, PieceType pieceMoving,

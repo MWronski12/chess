@@ -1,18 +1,19 @@
-/*
- * Brief:
- * Board class representing position in the game of chess.
+/**
+ * @file Board.cc
+ * @author Mikołaj Wroński
+ * @brief  Board class representing position in the game of chess.
  * Contains all the information necessary to continue a valid game of chess.
  * Provides makeMove method.
+ * @date 2023-03-024
  *
- * Author: Mikołaj Wroński
- * Date: 24.03.2023
+ * @copyright Copyright (c) 2023
+ *
  */
+#include "Board.h"
 
 #include <sstream>
 #include <stdexcept>
 #include <string>
-
-#include "Board.h"
 
 /* ------------------------------ Constructors ------------------------------ */
 

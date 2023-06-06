@@ -1,6 +1,15 @@
-#include <numeric>
-
+/**
+ * @file Evaluation.cc
+ * @author Mikołaj Wroński
+ * @brief Implementation of Evaluation class. Provides method for evaluating board state.
+ * @date 2023-06-06
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 #include "Evaluation.h"
+
+#include <numeric>
 
 int Evaluation::evaluateBoard( const Board &board ) {
     int score = 0;

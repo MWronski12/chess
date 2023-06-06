@@ -1,3 +1,13 @@
+/**
+ * @file PieceMoves.cc
+ * @author Mikołaj Wroński
+ * @brief   Implementation of PieceMoves class. Generates move vectors for all pieces on every square.
+ * @date 2023-06-06
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
+
 #include "PieceMoves.h"
 
 #include <stdexcept>

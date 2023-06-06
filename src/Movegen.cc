@@ -1,3 +1,14 @@
+/**
+ * @file Movegen.cc
+ * @author Mikołaj Wroński
+ * @brief Implementation of PieceValidMoves class. Generates valid moves for every piece on the board. Provides method
+ * for validating the board.
+ * @date 2023-06-06
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
+
 #include "Movegen.h"
 
 /* -------------------------------------------------------------------------- */
